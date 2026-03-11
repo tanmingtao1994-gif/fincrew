@@ -1,0 +1,8 @@
+node_modules/
+data/
+output/
+.env
+*.js
+*.d.ts
+*.js.map
+.DS_Store

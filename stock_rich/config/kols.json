@@ -1,0 +1,184 @@
+{
+  "kols": [
+        {
+      "id": "混沌与概率1997",
+      "name": "混沌与概率1997",
+      "platforms": {
+        "weibo": { "uid": "1648195723" }
+      },
+      "expertise": ["宏观", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+    {
+      "id": "LoneSchicksal",
+      "name": "LoneSchicksal",
+      "platforms": {
+        "weibo": { "uid": "1645776681" }
+      },
+      "expertise": ["宏观", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+        {
+      "id": "tombkeeper",
+      "name": "tombkeeper",
+      "platforms": {
+        "weibo": { "uid": "1401527553" }
+      },
+      "expertise": ["宏观", "经济","人性"],
+      "reliability": 4,
+      "language": "zh"
+    },
+        {
+      "id": "梁斌penny",
+      "name": "梁斌penny",
+      "platforms": {
+        "weibo": { "uid": "1497035431" }
+      },
+      "expertise": ["AI", "创业","经济"],
+      "reliability": 4,
+      "language": "zh"
+    },
+     {
+      "id": "波浪理论学习",
+      "name": "波浪理论学习",
+      "platforms": {
+        "weibo": { "uid": "1644724561" }
+      },
+      "expertise": ["数字货币", "美股","波浪理论"],
+      "reliability": 4,
+      "language": "zh"
+    },
+        {
+      "id": "信号与噪声",
+      "name": "信号与噪声",
+      "platforms": {
+        "weibo": { "uid": "7833030132" }
+      },
+      "expertise": ["宏观", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+        {
+      "id": "美股C姐",
+      "name": "美股C姐",
+      "platforms": {
+        "weibo": { "uid": "2826115500" }
+      },
+      "expertise": ["美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+     {
+      "id": "Master WU",
+      "name": "Master WU",
+      "platforms": {
+        "twitter": { "username": "MasterPandaWu" }
+      },
+      "expertise": ["美股","波浪理论"],
+      "reliability": 4,
+      "language": "EN"
+    },
+        {
+      "id": "qinbafrank",
+      "name": "qinbafrank",
+      "platforms": {
+        "twitter": { "username": "qinbafrank" }
+      },
+      "expertise": ["宏观", "美股","加密货币"],
+      "reliability": 4,
+      "language": "zh"
+    },
+        {
+      "id": "杰克船长宏观策略",
+      "name": "示例杰克船长宏观策略KOL",
+      "platforms": {
+        "twitter": { "username": "macrotradecn" }
+      },
+      "expertise": ["宏观", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+     {
+      "id": "价值&投资",
+      "name": "价值&投资",
+      "platforms": {
+        "twitter": { "username": "joely7758521" }
+      },
+      "expertise": ["美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+        {
+      "id": "James Lt",
+      "name": "James Lt",
+      "platforms": {
+        "twitter": { "username": "JamesLt196801" }
+      },
+      "expertise": ["宏观", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+        {
+      "id": "川沐｜Trumoo",
+      "name": "川沐｜Trumoo",
+      "platforms": {
+        "twitter": { "username": "xiaomucrypto" }
+      },
+      "expertise": ["加密货币", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+       {
+      "id": "shu fen",
+      "name": "shu fen",
+      "platforms": {
+        "twitter": { "username": "shufen46250836" }
+      },
+      "expertise": ["加密货币", "美股","A股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+           {
+      "id": "IamRamenPanda",
+      "name": "IamRamenPanda",
+      "platforms": {
+        "twitter": { "username": "IamRamenPanda" }
+      },
+      "expertise": ["宏观", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+               {
+      "id": "shirleyusy",
+      "name": "shirleyusy",
+      "platforms": {
+        "twitter": { "username": "shirleyusy" }
+      },
+      "expertise": ["AI", "美股","加密货币"],
+      "reliability": 4,
+      "language": "zh"
+    },
+                   {
+      "id": "Balder13946731",
+      "name": "Balder13946731",
+      "platforms": {
+        "twitter": { "username": "Balder13946731" }
+      },
+      "expertise": ["AI", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+       {
+      "id": "A Nomad Life自由旅居",
+      "name": "A Nomad Life自由旅居",
+      "platforms": {
+        "YouTube": { "channelid": "@A-Nomad-Life" }
+      },
+      "expertise": [ "美股"],
+      "reliability": 4,
+      "language": "zh"
+    }
+  ]
+}
