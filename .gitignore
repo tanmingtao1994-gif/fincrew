@@ -6,3 +6,16 @@ output/
 *.d.ts
 *.js.map
 .DS_Store
+# Added by automation for Node/TypeScript project
+# Build artifacts
+/dist/
+/build/
+/coverage/
+# Logs and environment
+*.log
+.env*
+# IDE/editor
+.vscode/
+.idea/
+# OS
+Thumbs.db
