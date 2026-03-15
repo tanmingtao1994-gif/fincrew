@@ -60,408 +60,139 @@ pnpm test
 ## 项目结构
 
 ```
-stock_rich/                 # 现有数据收集模块
-src/
-├── decision/              # 决策逻辑
-├── execution/             # 交易执行
-├── review/                # 交易审查
-├── memory/                # 长期记忆
-├── tools/                 # OpenClaw 工具
-└── skills/                # OpenClaw 技能
+src/agents/                 # 多智能集集合
+├── skills/               # 通用技能（所有 agent 共享）
+│   ├── _TEMPLATE.skill.md
+│   ├── analyzeMarket.skill.md
+│   ├── analyzeStock.skill.md
+│   ├── analyzeTradeResult.skill.md
+│   ├── checkRiskLimits.skill.md
+│   ├── collect.skill.md
+│   ├── createTradingPlan.skill.md
+│   ├── executeTrade.skill.md
+│   ├── extractLessons.skill.md
+│   ├── generateReviewReport.skill.md
+│   ├── requestUserConfirmation.skill.md
+│   ├── rollbackTrade.skill.md
+│   ├── validateAgainstMemory.skill.md
+│   ├── validateRiskControls.skill.md
+│   └── validateTradeRequest.skill.md
+├── workspace-financial-manager     # 软链接到 ~/.openclaw/workspace-financial-manager
+├── workspace-info-processor        # 软链接到 ~/.openclaw/workspace-info-processor
+├── workspace-macro-analyst        # 软链接到 ~/.openclaw/workspace-macro-analyst
+├── workspace-reviewer             # 软链接到 ~/.openclaw/workspace-reviewer
+└── workspace-technical-analyst    # 软链接到 ~/.openclaw/workspace-technical-analyst
+
+src/stock_rich/             # 现有数据收集模块
 ```
+
+---
+
+## OpenClaw Agent 架构
+
+系统采用 OpenClaw 多 Agent 架构，每个 Agent 都有独立的 workspace：
+
+### Agent 结构
+
+- **financial-manager** - 主控 Agent，负责任务调度、分工和结果汇总
+- **info-processor** - 信息处理 Agent，负责数据处理、记忆管理和用户偏好管理
+- **macro-analyst** - 宏观分析 Agent，负责市场整体分析和热点识别
+- **technical-analyst** - 技术分析 Agent，负责个股技术分析和投资建议
+- **reviewer** - 复盘 Agent，负责交易结果复盘和经验总结
+
+### Workspace 管理
+
+每个 Agent 都有对应的 OpenClaw workspace，通过软链接方式管理：
+- workspace-financial-manager -> ~/.openclaw/workspace-financial-manager
+- workspace-info-processor -> ~/.openclaw/workspace-info-processor
+- workspace-macro-analyst -> ~/.openclaw/workspace-macro-analyst
+- workspace-reviewer -> ~/.openclaw/workspace-reviewer
+- workspace-technical-analyst -> ~/.openclaw/workspace-technical-analyst
+
+### Agent 规范
+
+每个 Agent 的 OpenClaw workspace 中必须包含：
+- IDENTITY.md - Agent 的身份标识
+- SOUL.md - Agent 的"灵魂/定义"文档
+- USER.md - Agent 对"用户"的理解
+- BOOTSTRAP.md - Agent 的启动配置
+- HEARTBEAT.md - Agent 的心跳检测
+- TOOLS.md - Agent 可用的工具列表
 
 ---
 
 ## 基本用法
 
-### 1. 获取股票数据
+### 1. 使用 OpenClaw Agent
+
+```bash
+# 列出所有可用的 agents
+openclaw agents list
+
+# 切换到特定 agent
+openclaw agents switch financial-manager
+
+# 查看 agent 的状态
+openclaw agents status
+```
+
+### 2. 调用 Skills
+
+Skills 是所有 Agent 共享的功能模块，定义在 `src/agents/skills/` 目录中：
 
 ```typescript
-import { getStockPrice } from './src/tools/market-data-tools';
-
-const stockData = await getStockPrice({
+// 示例：调用 collect skill
+const result = await callSkill('collect', {
   ticker: 'AAPL',
-  includePreMarket: true
+  sources: ['news', 'twitter', 'youtube']
 });
 
-console.log(`AAPL Price: $${stockData.price}`);
-console.log(`Change: ${stockData.changePercent}%`);
+console.log(`Collected data for ${result.ticker}`);
 ```
 
-### 2. 分析股票
+### 3. Agent 协同工作流
 
 ```typescript
-import { analyzeStock } from './src/tools/decision-tools';
-
-const analysis = await analyzeStock({
-  ticker: 'AAPL',
-  timeframe: '1d',
-  includeMemory: true
-});
-
-console.log(`Recommendation: ${analysis.recommendation.action}`);
-console.log(`Confidence: ${analysis.confidence}`);
-console.log(`Rationale: ${analysis.rationale}`);
-```
-
-### 3. 创建交易计划
-
-```typescript
-import { createTradingPlan } from './src/tools/decision-tools';
-
-const tradingPlan = await createTradingPlan({
-  stockAnalysis: analysis,
-  userPortfolio: currentPortfolio,
-.
-  userPreference: userPrefs
-});
-
-console.log(`Action: ${tradingPlan.action}`);
-console.log(`Quantity: ${tradingPlan.execution.quantity}`);
-console.log(`Stop Loss: $${tradingPlan.riskControls.stopLoss}`);
-```
-
-### 4. 执行交易
-
-```typescript
-import {
-  validateTradeRequest,
-  checkRiskLimits,
-  validateAgainstMemory,
-  requestUserConfirmation,
-  executeTrade
-} from './src/tools/execution-tools';
-
-// 多层安全检查
-const validation = await validateTradeRequest({
-  tradingPlan,
-  userPortfolio: currentPortfolio,
-  userPreference: userPrefs
-});
-
-if (!validation.valid) {
-  console.error('Trade validation failed:', validation.errors);
-  return;
-}
-
-const riskCheck = await checkRiskLimits({
-  tradingPlan,
-  userPortfolio: currentPortfolio,
-  userPreference: userPrefs
-});
-
-if (!riskCheck.passed) {
-  console.error('Risk check failed:', riskCheck.errors);
-  return;
-}
-
-const memoryCheck = await validateAgainstMemory({
-  tradingPlan
-});
-
-if (!memoryCheck.compliant) {
-  console.error('Memory check failed:', memoryCheck.violations);
-  return;
-}
-
-// 请求用户确认
-const confirmation = await requestUserConfirmation({
-  tradingPlan,
-  userPortfolio: currentPortfolio,
-  riskCheckResult: riskCheck,
-  memoryCheckResult: memoryCheck
-});
-
-if (!confirmation.confirmed) {
-  console.log('Trade cancelled by user');
-  return;
-}
-
-// 执行交易
-const execution = await executeTrade({
-  tradingPlan,
-  confirmationId: confirmation.confirmationId,
-  dryRun: false  // 设置为 true 用于测试
-});
-
-if (execution.success) {
-  console.log('Trade executed successfully!');
-  console.log('Order ID:', execution.tradeRecord.execution.orderId);
-} else {
-  console.error('Trade execution failed:', execution.errors);
-}
-```
-
-### 5. 存储和检索记忆
-
-```typescript
-import {
-  storeMemory,
-  retrieveMemory,
-  updateMemoryEffectiveness
-} from './src/tools/memory-tools';
-
-// 存储新记忆
-const memory = await storeMemory({
-  parentId: 'root',
-  type: 'principle',
-  title: 'Strong earnings momentum',
-  content: 'When a stock beats earnings estimates with strong guidance...',
-  metadata: {
-    weight: 0.85,
-    confidence: 0.9,
-    tags: ['earnings', 'momentum']
-  },
-  relatedTickers: ['AAPL', 'MSFT']
-});
-
-console.log('Memory stored with ID:', memory.id);
-
-// 检索记忆
-const results = await retrieveMemory({
-  query: {
-    keywords: ['earnings', 'momentum'],
-    tickers: ['AAPL'],
-    limit: 5
-  }
-});
-
-console.log(`Found ${results.total} memories`);
-results.memories.forEach(m => {
-  console.log(`- ${m.node.title} (relevance: ${m.relevanceScore})`);
-});
-
-// 更新记忆敏感度
-await updateMemoryEffectiveness({
-  id: memory.id,
-  feedback: {
-    helpful: true,
-    correct: true,
-    confidence: 0.9
-  },
-  reason: 'Memory correctly predicted earnings momentum'
-});
-```
-
-### 6. 审查交易
-
-```typescript
-import {
-  analyzeTradeResult,
-  extractLessons,
-  generateReviewReport
-} from './src/tools/review-tools';
-
-// 分析交易结果
-const review = await analyzeTradeResult({
-  tradeId: 'trade-001',
-  currentPrice: 185.50
-});
-
-console.log(`Trade Grade: ${review.evaluation.grade}`);
-console.log(`Success: ${review.evaluation.success ? 'Yes' : 'No'}`);
-
-// 提取教训
-const lessons = await extractLessons({
-  reviewResult: review,
-  tradeRecord: tradeRecord
-});
-
-console.log(`Extracted ${lessons.summary.totalLessons} lessons`);
-lessons.lessons.forEach(lesson => {
-  console.log(`- ${lesson.title}: ${lesson.content}`);
-});
-
-// 生成审查报告
-const report = await generateReviewReport({
-  tradeId: 'trade-001',
-  reviewResult: review,
-  format: 'markdown'
-});
-
-console.log(report.content);
-```
-
----
-
-## 常见工作流程
-
-### 工作流程 1：每日市场分析
-
-```typescript
-import { analyzeMarket } from './src/tools/decision-tools';
-
-// 1. 分析整体市场
-const marketAnalysis = await analyzeMarket({
-  timeframe: '1d'
-});
-
-console.log('Market Sentiment:', marketAnalysis.sentiment.overall);
-console.log('Risk Level:', marketAnalysis.riskLevel);
-
-// 2. 检查热门股票
-marketAnalysis.hotStocks.forEach(ticker => {
-  console.log('Hot Stock:', ticker);
-});
-
-// 3. 审查板块
-Object.entries(marketAnalysis.sectors).forEach(([sector, data]) => {
-  console.log(`${sector}: ${data.trend} (strength: ${data.strength})`);
-});
-```
-
-### 工作流程 2：股票分析和交易决策
-
-```typescript
-import {
-  getStockPrice,
-  analyzeStock,
-  createTradingPlan,
-  validateTradeRequest,
-  executeTrade
-} from './src/tools';
-
+// 示例：financial-manager 协调其他 agents
 async function analyzeAndTrade(ticker: string) {
-  // 1. 获取当前价格
-  const priceData = await getStockPrice({ ticker });
-
-  // 2. 分析股票
-  const analysis = await analyzeStock({
+  // 1. 调用 info-processor 收集数据
+  const data = await callAgent('info-processor', 'collect', { ticker });
+  
+  // 2. 调用 macro-analyst 分析市场
+  const marketAnalysis = await callAgent('macro-analyst', 'analyzeMarket', { 
+    tickers: [ticker] 
+  });
+  
+  // 3. 调用 technical-analyst 分析股票
+  const stockAnalysis = await callAgent('technical-analyst', 'analyzeStock', {
     ticker,
-    timeframe: '1d',
-    includeMemory: true
+    timeframe: '1d'
   });
-
-  // 3. 如果建议是买入/卖出，则创建交易计划
-  if (['buy', 'sell'].includes(analysis.recommendation.action)) {
-    const plan = await createTradingPlan({
-      stockAnalysis: analysis,
-      userPortfolio: currentPortfolio,
-      userPreference: userPrefs
+  
+  // 4. 生成交易计划
+  const tradingPlan = await callSkill('createTradingPlan', {
+    stockAnalysis,
+    marketAnalysis
+  });
+  
+  // 5. 请求用户确认
+  const confirmation = await callSkill('requestUserConfirmation', {
+    tradingPlan
+  });
+  
+  // 6. 执行交易
+  if (confirmation.confirmed) {
+    const execution = await callSkill('executeTrade', {
+      tradingPlan,
+      dryRun: false
     });
-
-    // 4. 验证和执行
-    const validation = await validateTradeRequest({
-      tradingPlan: plan,
-      userPortfolio: currentPortfolio,
-      userPreference: userPrefs
-    });
-
-    if (validation.valid) {
-      const execution = await execute
-Trade({
-        tradingPlan: plan,
-        confirmationId: 'auto-generated', // 用于自动交易
-        dryRun: true  // 始终先使用试运行
-      });
-
-      if (execution.success) {
-        console.log(`Trade executed: ${execution.tradeRecord.id}`);
-      }
-    }
-  }
-}
-
-// 使用
-analyzeAndTrade('AAPL');
-```
-
-### 工作流程 3：从交易中学习
-
-```typescript
-import {
-  analyzeTradeResult,
-  extractLessons,
-  storeMemory
-} from './src/tools';
-
-async function learnFromTrade(tradeId: string) {
-  // 1. 分析交易结果
-  const review = await analyzeTradeResult({ tradeId });
-
-  // 2. 提取教训
-  const lessons = await extractLessons({
-    reviewResult: review,
-    tradeRecord: tradeRecord
-  });
-
-  // 3. 将教训存储为记忆
-  for (const lesson of lessons.lessons) {
-    const memory = await storeMemory({
-      parentId: 'root',
-      type: lesson.type,
-      title: lesson.title,
-      content: lesson.content,
-      metadata: {
-        weight: lesson.weight,
-        confidence: lesson.confidence,
-        tags: lesson.tags
-      },
-      relatedTickers: lesson.relatedTickers
-    });
-
-    console.log(`Stored memory: ${memory.id}`);
-  }
-}
-
-// 使用
-learnFromTrade('trade-001');
-```
-
-### 工作流程 4：记忆增强的决策
-
-```typescript
-import {
-  retrieveMemory,
-  analyzeStock,
-  createTradingPlan
-} from './src/tools';
-
-async function makeMemoryEnhancedDecision(ticker: string) {
-  // 1. 检索相关记忆
-  const memories = await retrieveMemory({
-    query: {
-      tickers: [ticker],
-      types: ['principle', 'lesson'],
-      limit: 10
-    }
-  });
-
-  console.log(`Found ${memories.total} relevant memories`);
-
-  // 2. 使用记忆上下文分析股票
-  const analysis = await analyzeStock({
-    ticker,
-    timeframe: '1d',
-    includeMemory: true
-  });
-
-  // 3. 检查分析是否符合记忆
-  const memoryViolations = memories.memories.filter(m => {
-    // 检查分析是否违反任何记忆原则
-    return !checkMemoryCompliance(m.node, analysis);
-  });
-
-  if (memoryViolations.length > 0) {
-    console.warn('Analysis may violate memory principles:');
-    memoryViolations.forEach(v => {
-      console.warn(`- ${v.node.title}`);
+    
+    // 7. 调用 reviewer 复盘
+    await callAgent('reviewer', 'analyzeTradeResult', {
+      tradeId: execution.tradeRecord.id
     });
   }
-
-  // 4. 创建交易计划
-  const plan = await createTradingPlan({
-    stockAnalysis: analysis,
-    userPortfolio: currentPortfolio,
-    userPreference: userPrefs,
-    memoryIds: memories.memories.map(m => m.node.id)
-  });
-
-  return plan;
 }
-
-// 使用
-const plan = await makeMemoryEnhancedDecision('AAPL');
 ```
 
 ---
@@ -473,6 +204,10 @@ const plan = await makeMemoryEnhancedDecision('AAPL');
 在项目根目录创建 `.env` 文件：
 
 ```bash
+# OpenClaw 配置
+OPENCLAW_DEFAULT_AGENT=financial-manager
+OPENCLAW_WORKSPACE_ROOT=~/.openclaw
+
 # 交易设置
 TRADING_DRY_RUN=true
 TRADING_MAX_POSITION_SIZE=10
@@ -614,4 +349,4 @@ if (!result.success) {
 ---
 
 **Version**: 1.0.0
-**Last Updated**: 2026-03-12
+**Last Updated**: 2026-03-15
