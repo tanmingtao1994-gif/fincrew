@@ -1,0 +1,41 @@
+{
+  "name": "ai-financial-assistant",
+  "version": "1.0.0",
+  "description": "AI Personal Financial Assistant powered by OpenClaw",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "test": "ts-node scripts/run-all-tests.ts",
+    "collect": "ts-node src/index.ts collect",
+    "analyze": "ts-node src/index.ts analyze",
+    "market": "ts-node src/index.ts market",
+    "trade": "ts-node src/index.ts trade",
+    "update-docs": "ts-node scripts/update-agents-doc.ts"
+  },
+  "keywords": [
+    "ai",
+    "finance",
+    "agent",
+    "trading"
+  ],
+  "author": "OpenClaw User",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.0.0",
+    "dotenv": "^16.3.1",
+    "fast-xml-parser": "^4.2.7",
+    "inquirer": "^8.2.6",
+    "rettiwt-api": "^1.2.3",
+    "technicalindicators": "^3.1.0",
+    "uuid": "^9.0.0",
+    "yahoo-finance2": "^2.4.3"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.3",
+    "@types/node": "^20.5.0",
+    "@types/uuid": "^9.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
