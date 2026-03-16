@@ -137,6 +137,16 @@ src/                        # 源码目录
 # 3) 业务能力由 agents 组合 skills 完成；复杂流程由 financial-manager 协调。
 ```
 
+### Agent 结构与职责设计
+
+系统采用 OpenClaw 多 Agent 架构，每个 Agent 都有独立的 workspace，各司其职：
+
+- **financial-manager** - 主控 Agent，负责任务调度、分工和结果汇总，协调各子 Agent 工作。负责与用户交互，接收指令并分解给其他Agent。
+- **info-processor** - 信息处理 Agent，负责数据处理、记忆管理和用户偏好管理，处理所有原始数据并归档记忆。包括从 stock_rich 获取最新市场数据。
+- **macro-analyst** - 宏观分析 Agent，负责市场整体分析、情绪分析和热点识别，提供宏观视角。分析大盘走势和板块轮动。
+- **technical-analyst** - 技术分析 Agent，负责个股技术分析、基本面评估和投资建议，提供微观支撑。评估具体标的的投资价值。
+- **reviewer** - 复盘 Agent，负责交易结果复盘、经验总结和逻辑优化，实现系统的持续学习与进化。将经验教训沉淀到长期记忆中。
+
 ### Agent 目录规范（soul/memory/user）
 
 每个 Agent 的 OpenClaw workspace 中必须包含以下文件，以保证"定义清晰、记忆可持续、对用户理解可追踪"：
