@@ -150,31 +150,34 @@ src/                        # 源码目录
 ### Agent 详细设计
 
 #### 1. Financial Manager (主控)
-- **Identity**: 资深私人财富管家，沉稳、专业、全局观强。
+- **Identity**: 资深私人财富管家，沉稳、专业、全局观强，拥有卓越的学习能力和记忆力。
 - **Soul**:
-  - **核心目标**: 理解用户意图，协调专家团队（各子 Agent），交付最终决策结果。
-  - **行为准则**: 总是优先确认用户需求；在行动前进行风险提示；整合各方观点给出综合建议。
+  - **核心目标**: 理解用户意图，协调专家团队（各子 Agent），交付最终决策结果；维护长期记忆，确保持续进化。
+  - **行为准则**: 总是优先确认用户需求；在行动前进行风险提示；整合各方观点给出综合建议；主动学习并沉淀经验。
 - **Skills 依赖**:
   - `requestUserConfirmation`: 关键操作前获取用户授权。
   - `validateTradeRequest`: 初步校验用户交易请求的合理性。
+  - `processLearningMaterial`: 学习书籍、博文、讨论内容。
+  - `updateMemory`: 将新知识/经验存入长期记忆。
+  - `validateAgainstMemory`: 验证当前决策是否违背历史经验/原则。
   - (调用 Agent): `info-processor`, `macro-analyst`, `technical-analyst`, `reviewer`。
 
-#### 2. Info Processor (信息/记忆)
-- **Identity**: 敏锐的数据情报官，严谨、高效、记忆力超群。
+#### 2. Info Processor (信息)
+- **Identity**: 敏锐的数据情报官，严谨、高效。
 - **Soul**:
-  - **核心目标**: 收集全网数据，维护长期记忆，确保信息准确无误。
-  - **行为准则**: 数据来源必须多源验证；记忆更新必须及时；用户偏好必须严格遵守。
+  - **核心目标**: 收集全网数据，提炼核心信息，为其他 Agent 提供决策依据。
+  - **行为准则**: 数据来源必须多源验证；信息总结必须客观准确；只提供事实，不提供决策。
 - **Skills 依赖**:
   - `collect`: 调用 stock_rich 采集市场/新闻/KOL数据。
-  - `validateAgainstMemory`: 验证当前决策是否违背历史经验/原则。
 
 #### 3. Macro Analyst (宏观)
 - **Identity**: 宏观策略分析师，视野宏大、洞察力强。
 - **Soul**:
-  - **核心目标**: 研判市场大势，识别系统性风险与机会。
-  - **行为准则**: 关注情绪面与资金面；不做个股推荐，只判大势。
+  - **核心目标**: 研判市场大势，识别系统性风险与机会，捕捉全网热点。
+  - **行为准则**: 关注情绪面与资金面；不做个股推荐，只判大势；对市场热度保持敏锐。
 - **Skills 依赖**:
   - `analyzeMarket`: 分析大盘指数、板块轮动、市场情绪。
+  - `searchHotKeywords`: 搜索全网热点关键词，感知市场风向。
 
 #### 4. Technical Analyst (技术/个股)
 - **Identity**: 资深证券分析师，精通技术指标与基本面，实战派。
@@ -190,7 +193,7 @@ src/                        # 源码目录
 #### 5. Reviewer (复盘)
 - **Identity**: 铁面无私的风控审计官，客观、冷静、批判性思维。
 - **Soul**:
-  - **核心目标**: 审计每一笔交易，提取成功经验与失败教训，反哺记忆。
+  - **核心目标**: 审计每一笔交易，提取成功经验与失败教训，反馈给 Financial Manager 进行记忆沉淀。
   - **行为准则**: 即使赚钱的交易也要找漏洞；失败的交易要找根因；确保"不二过"。
 - **Skills 依赖**:
   - `analyzeTradeResult`: 分析实际交易结果 vs 预期。
@@ -209,10 +212,16 @@ graph TD
     FM -->|复盘请求| REV[Reviewer]
     
     %% Skills 依赖
+    FM -->|Uses| S_Confirm[requestUserConfirmation]
+    FM -->|Uses| S_Exec[executeTrade]
+    FM -->|Uses| S_Learn[processLearningMaterial]
+    FM -->|Uses| S_MemUpd[updateMemory]
+    FM -->|Uses| S_MemVal[validateAgainstMemory]
+
     IP -->|Uses| S_Collect[collect]
-    IP -->|Uses| S_MemVal[validateAgainstMemory]
     
     MA -->|Uses| S_MktAna[analyzeMarket]
+    MA -->|Uses| S_HotKey[searchHotKeywords]
     
     TA -->|Uses| S_StkAna[analyzeStock]
     TA -->|Uses| S_Plan[createTradingPlan]
@@ -222,16 +231,18 @@ graph TD
     REV -->|Uses| S_Less[extractLessons]
     REV -->|Uses| S_Rep[generateReviewReport]
     
-    FM -->|Uses| S_Confirm[requestUserConfirmation]
-    FM -->|Uses| S_Exec[executeTrade]
-    
     %% 数据流
+    IP -.->|提供数据| FM
     IP -.->|提供数据| MA
     IP -.->|提供数据| TA
     IP -.->|提供数据| REV
     
     TA -.->|交易计划| FM
     MA -.->|市场环境| TA
+    REV -.->|复盘/教训| FM
+    
+    %% 记忆流
+    FM -.->|读取/更新| Memory[(长期记忆)]
 ```
 
 ### Skills 功能简述
@@ -242,6 +253,7 @@ graph TD
 | :--- | :--- | :--- | :--- |
 | **collect** | 调用 stock_rich 采集市场/新闻/KOL数据 | `ticker`: 股票代码<br>`sources`: 数据源列表 | `StockData`, `News[]`, `KOLView[]` |
 | **analyzeMarket** | 分析大盘指数、板块轮动、市场情绪 | `indices`: 指数列表<br>`timeframe`: 时间周期 | `MarketSentiment`, `SectorTrend[]` |
+| **searchHotKeywords** | 搜索全网热点关键词，感知市场风向 | `sources`: 平台列表(Twitter/Weibo等) | `HotKeyword[]` (词、热度、来源) |
 | **analyzeStock** | 个股技术/基本面/期权分析 | `ticker`: 股票代码<br>`indicators`: 指标列表 | `TechnicalAnalysis`, `FundamentalData`, `OptionAnalysis` |
 | **createTradingPlan** | 生成包含价位、仓位的交易计划 | `ticker`: 股票代码<br>`analysis`: 分析结果<br>`capital`: 可用资金 | `TradingPlan` (含买卖点、仓位、理由) |
 | **checkRiskLimits** | 检查交易是否超限（仓位、亏损额） | `plan`: 交易计划<br>`portfolio`: 当前持仓 | `passed`: boolean<br>`reason`: string |
@@ -251,6 +263,8 @@ graph TD
 | **analyzeTradeResult** | 分析实际交易结果 vs 预期 | `tradeId`: 交易ID<br>`marketData`: 交易时及后续行情 | `TradeReview` (含盈亏、归因) |
 | **extractLessons** | 从复盘中提炼原则性经验 | `review`: 复盘结果<br>`memory`: 当前记忆库 | `Lesson[]` (原则/教训) |
 | **generateReviewReport** | 生成结构化的复盘报告 | `reviews`: 复盘结果列表<br>`lessons`: 提炼的教训 | `ReviewReport` (Markdown格式) |
+| **processLearningMaterial** | 学习书籍、博文、讨论内容 | `content`: 文本/链接<br>`type`: 来源类型 | `KnowledgePoint[]` (核心观点、适用场景) |
+| **updateMemory** | 将新知识/经验存入长期记忆 | `knowledge`: 知识点/经验<br>`category`: 记忆分类 | `success`: boolean<br>`memoryId`: string |
 | **validateAgainstMemory** | 验证当前决策是否违背历史经验/原则 | `decision`: 拟定决策<br>`memory`: 长期记忆 | `conflict`: boolean<br>`warning`: string |
 | **validateTradeRequest** | 初步校验用户交易请求的合理性 | `request`: 用户自然语言请求 | `parsedIntent`: 结构化意图<br>`isValid`: boolean |
 | **rollbackTrade** | 交易失败时的回滚操作 | `tradeId`: 交易ID<br>`reason`: 回滚原因 | `success`: boolean<br>`rollbackRecord`: string |
