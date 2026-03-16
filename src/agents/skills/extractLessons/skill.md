@@ -1,3 +1,8 @@
+---
+name: extractLessons
+description: Extract principles, patterns, and lessons from trade reviews to update long-term memory.
+---
+
 # extractLessons
 
 ## 描述

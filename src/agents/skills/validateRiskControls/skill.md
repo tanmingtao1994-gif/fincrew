@@ -1,3 +1,8 @@
+---
+name: validateRiskControls
+description: Validate risk control parameters for a proposed trade against user preferences and portfolio constraints.
+---
+
 # validateRiskControls
 
 ## 描述

@@ -1,3 +1,8 @@
+---
+name: analyzeTradeResult
+description: Analyze the results of executed trades to evaluate performance and extract lessons.
+---
+
 # analyzeTradeResult
 
 ## 描述

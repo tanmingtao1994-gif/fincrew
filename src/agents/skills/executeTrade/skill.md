@@ -1,3 +1,8 @@
+---
+name: executeTrade
+description: Execute a trading plan with safety checks, confirmation verification, and rollback capabilities.
+---
+
 # executeTrade
 
 ## 描述

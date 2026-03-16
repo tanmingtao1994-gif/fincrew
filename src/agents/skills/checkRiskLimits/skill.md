@@ -1,3 +1,8 @@
+---
+name: checkRiskLimits
+description: Verify if a trading plan complies with user-defined risk limits such as position size and stop-loss levels.
+---
+
 # checkRiskLimits
 
 ## 描述

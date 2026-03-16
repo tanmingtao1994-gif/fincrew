@@ -1,3 +1,8 @@
+---
+name: validateAgainstMemory
+description: Validate a trading plan against investment principles stored in long-term memory.
+---
+
 # validateAgainstMemory
 
 ## 描述

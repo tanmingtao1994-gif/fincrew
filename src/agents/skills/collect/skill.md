@@ -1,3 +1,8 @@
+---
+name: collect
+description: Collect market data, technical indicators, news, KOL views, and option data for financial analysis.
+---
+
 # collect
 
 ## 描述

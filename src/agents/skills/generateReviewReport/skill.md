@@ -1,3 +1,8 @@
+---
+name: generateReviewReport
+description: Generate a comprehensive review report for a trade, including performance analysis, lessons learned, and recommendations.
+---
+
 # generateReviewReport
 
 ## 描述

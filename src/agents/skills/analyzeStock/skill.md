@@ -1,3 +1,8 @@
+---
+name: analyzeStock
+description: Analyze individual stocks, providing technical, fundamental, and sentiment analysis along with trading recommendations.
+---
+
 # analyzeStock
 
 ## 描述
@@ -61,3 +66,20 @@ interface AnalyzeStockOutput {
 - `INVALID_TICKER`: 股票代码格式无效
 - `NO_DATA`: 无股票数据可用
 - `ANALYSIS_ERROR`: 股票分析失败
+
+## Implementation Details
+
+### Steps (Example)
+```bash
+# 1) Collect necessary data for the ticker
+node ./stock_rich/dist/index.js collect --ticker ${TICKER} --range 1d
+node ./stock_rich/dist/index.js options --ticker ${TICKER} --date 2026-03-20
+node ./stock_rich/dist/index.js news --ticker ${TICKER} --days 3
+
+# 2) Aggregation and Scoring (TODO: Integrate actual script)
+# node ./scripts/analyze/stock.js --ticker ${TICKER} --timeframe 1d --out ./output/${TICKER}-analysis.json
+```
+
+### Gates
+- Output must include `conclusion`, `confidence`, and `assessment` (fundamental/technical/sentiment).
+- Must provide `risk` (level/factors/stopLoss) and `recommendation` (action/entry/target/positionSize).

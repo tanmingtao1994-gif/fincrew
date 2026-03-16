@@ -1,3 +1,8 @@
+---
+name: rollbackTrade
+description: Rollback a trade execution in case of failure or user cancellation request.
+---
+
 # rollbackTrade
 
 ## 描述

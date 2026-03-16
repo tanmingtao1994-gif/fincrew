@@ -1,3 +1,8 @@
+---
+name: requestUserConfirmation
+description: Request user confirmation for a trade, providing detailed trade, risk, and impact summaries.
+---
+
 # requestUserConfirmation
 
 ## 描述

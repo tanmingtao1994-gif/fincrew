@@ -1,3 +1,8 @@
+---
+name: createTradingPlan
+description: Create a detailed trading plan based on stock analysis, portfolio status, and user preferences.
+---
+
 # createTradingPlan
 
 ## 描述

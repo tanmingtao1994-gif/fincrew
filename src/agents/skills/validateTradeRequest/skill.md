@@ -1,3 +1,8 @@
+---
+name: validateTradeRequest
+description: Validate a user's trade request against business rules, portfolio constraints, and risk parameters.
+---
+
 # validateTradeRequest
 
 ## 描述

@@ -1,3 +1,8 @@
+---
+name: analyzeMarket
+description: Analyze overall market sentiment, sector trends, and identify hot topics and stocks.
+---
+
 # analyzeMarket
 
 ## 描述
