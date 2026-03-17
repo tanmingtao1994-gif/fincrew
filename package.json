@@ -2,15 +2,20 @@
   "name": "ai-financial-assistant",
   "version": "1.0.0",
   "description": "AI Personal Financial Assistant powered by OpenClaw",
+  "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "test": "ts-node scripts/run-all-tests.ts",
-    "collect": "ts-node src/index.ts collect",
-    "analyze": "ts-node src/index.ts analyze",
-    "market": "ts-node src/index.ts market",
-    "trade": "ts-node src/index.ts trade",
-    "update-docs": "ts-node scripts/update-agents-doc.ts"
+    "start": "node --loader ts-node/esm src/index.ts",
+    "test": "node --loader ts-node/esm scripts/run-all-tests.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "collect": "node ./dist/index.js -- --collect",
+    "data": "node ./dist/index.js -- data",
+    "options": "node ./dist/index.js -- options",
+    "news": "node ./dist/index.js -- news",
+    "analyze": "node --loader ts-node/esm src/index.ts analyze",
+    "market": "node --loader ts-node/esm src/index.ts market",
+    "trade": "node --loader ts-node/esm src/index.ts trade",
+    "update-docs": "node --loader ts-node/esm scripts/update-agents-doc.ts"
   },
   "keywords": [
     "ai",
@@ -23,13 +28,14 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^11.0.0",
-    "dotenv": "^16.3.1",
-    "fast-xml-parser": "^4.2.7",
+    "dotenv": "^16.4.0",
+    "fast-xml-parser": "^4.3.0",
     "inquirer": "^8.2.6",
-    "rettiwt-api": "^1.2.3",
+    "rettiwt-api": "^6.1.7",
     "technicalindicators": "^3.1.0",
     "uuid": "^9.0.0",
-    "yahoo-finance2": "^2.4.3"
+    "yahoo-finance2": "^3.13.0",
+    "youtube-transcript": "^1.2.1"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.3",

@@ -1,5 +1,5 @@
-import { ReviewResult } from '../../types/domain';
-import { withErrorHandling } from '../../utils/error';
+import { ReviewResult } from '../../types/domain.ts';
+import { withErrorHandling } from '../../utils/error.ts';
 
 interface GenerateReviewReportInput {
   reviews: ReviewResult[];

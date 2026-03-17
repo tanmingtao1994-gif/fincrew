@@ -15,6 +15,7 @@
  *   --direction call|put         方向 (options 命令)
  */
 import 'dotenv/config';
+import { fileURLToPath } from 'url';
 import { today } from './utils/date.js';
 import { readDailyData, writeDailyData } from './utils/cache.js';
 import { batchFundamentals } from './analysis/fundamental.js';
@@ -31,7 +32,20 @@ function parseArgs(): {
   symbol?: string; expiry?: string; direction?: 'call' | 'put';
 } {
   const args = process.argv.slice(2);
-  const command = (args[0] ?? 'collect') as Command;
+  
+  // 去除可能的 '--' 前缀（当通过 npm run 传递参数时）
+  if (args[0] === '--') {
+    args.shift();
+  }
+
+  let commandRaw = args[0];
+
+  // 如果第一个参数以 '-' 开头（例如 --collect）或者未提供，默认为 collect
+  if (!commandRaw || commandRaw.startsWith('-')) {
+    commandRaw = 'collect';
+  }
+
+  const command = commandRaw as Command;
 
   if (!COMMANDS.includes(command)) {
     console.error(`未知命令: ${command}`);
@@ -66,7 +80,7 @@ function parseArgs(): {
 }
 
 // ─── Collect ─── 采集 KOL 数据 → posts.json
-async function runCollect(date: string, platform?: string) {
+export async function runCollect(date: string, platform?: string) {
   const platforms = platform ? [platform] : ['twitter', 'weibo', 'youtube'];
   for (const p of platforms) {
     console.log(`[collect] 采集 ${p} 数据 (${date})...`);
@@ -134,7 +148,7 @@ async function loadAllPosts(date: string) {
 }
 
 // ─── Data ─── 获取基本面+技术面真实数据 (供 Claude Code skills 调用)
-async function runData(date: string, symbols?: string[]) {
+export async function runData(date: string, symbols?: string[]) {
   if (!symbols || symbols.length === 0) {
     const matchData = await readDailyData<{ symbols: string[] }>(date, 'matches');
     symbols = matchData?.symbols;
@@ -191,7 +205,7 @@ async function runData(date: string, symbols?: string[]) {
 }
 
 // ─── Options ─── 期权量化分析 (供 /trade skill 调用)
-async function runOptions(date: string, symbol?: string, expiry?: string, direction?: 'call' | 'put') {
+export async function runOptions(date: string, symbol?: string, expiry?: string, direction?: 'call' | 'put') {
   if (!symbol || !expiry || !direction) {
     console.error('[options] 请指定 --symbol NVDA --expiry 2026-02-27 --direction call');
     return;
@@ -205,7 +219,7 @@ async function runOptions(date: string, symbol?: string, expiry?: string, direct
 }
 
 // ─── News ─── 消息面搜索 + 内幕交易 (供 /trade, /daily, /news skill 通用调用)
-async function runNews(date: string, symbols?: string[]) {
+export async function runNews(date: string, symbols?: string[]) {
   if (!symbols || symbols.length === 0) {
     console.error('[news] 请指定 --symbols NVDA,TSM');
     return;
@@ -218,6 +232,10 @@ async function runNews(date: string, symbols?: string[]) {
 
 // ─── Main ───
 async function main() {
+  // Check if run directly
+  const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
+  if (!isMainModule) return;
+
   const { command, date, platform, symbols, symbol, expiry, direction } = parseArgs();
   console.log(`\n📊 Stock Rich — ${command} (${date})\n`);
 

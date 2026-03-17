@@ -1,27 +1,45 @@
 import { stockRichAdapter } from '../../utils/stockRichAdapter';
-import { optionAdapter } from '../../utils/optionAdapter';
-import { StockAnalysis, StockData, TechnicalIndicator } from '../../types/domain';
-import { withErrorHandling } from '../../utils/error';
+import { StockAnalysis } from '../../types/domain';
+import { withErrorHandling, ErrorCode, ToolError } from '../../utils/error';
+import { readDailyData } from '../../stock_rich/utils/cache';
 import { randomUUID } from 'crypto';
 
-interface AnalyzeStockInput {
+export interface AnalyzeStockInput {
   ticker: string;
+  date?: string;
 }
 
-export async function analyzeStock(input: AnalyzeStockInput): Promise<{ 
-    analysis: StockAnalysis; 
+export interface AnalyzeStockOutput {
+    analysis: StockAnalysis;
     data: any; // Raw stock_rich data
-    options?: any 
-}> {
+}
+
+/**
+ * Skill to analyze a stock based on fundamental and technical data.
+ */
+export async function analyzeStock(input: AnalyzeStockInput): Promise<AnalyzeStockOutput> {
   return withErrorHandling(async () => {
-    const { ticker } = input;
+    const { ticker, date } = input;
+    const targetDate = date || new Date().toISOString().split('T')[0];
     
     // 1. Get Market Data (Fundamentals + Technicals)
-    const marketDataMap = await stockRichAdapter.getMarketData([ticker]);
-    const marketData = marketDataMap.get(ticker);
+    // First try to read existing data
+    let marketData = null;
+    const rawData = await readDailyData<Record<string, any>>(targetDate, 'stockdata');
+    
+    if (rawData && rawData[ticker]) {
+        marketData = rawData[ticker];
+    } else {
+        // Trigger fetch if missing
+        await stockRichAdapter.getData([ticker], targetDate);
+        const newData = await readDailyData<Record<string, any>>(targetDate, 'stockdata');
+        if (newData && newData[ticker]) {
+            marketData = newData[ticker];
+        }
+    }
     
     if (!marketData) {
-        throw new Error(`Failed to get market data for ${ticker}`);
+        throw new ToolError(`Failed to get market data for ${ticker}`, ErrorCode.NOT_FOUND);
     }
 
     // 2. Get Options Data (if needed/available, maybe try ATM or max pain)
@@ -81,7 +99,7 @@ export async function analyzeStock(input: AnalyzeStockInput): Promise<{
         }
     }
     
-    if (tech) {
+    if (tech && tech.timeframes && tech.timeframes.daily) {
         const daily = tech.timeframes.daily;
         if (daily.rsi && daily.rsi < 30) {
             analysis.assessment.technical.score += 0.2; // Oversold
@@ -96,7 +114,7 @@ export async function analyzeStock(input: AnalyzeStockInput): Promise<{
         }
         
         // Wyckoff
-        if (tech.wyckoff.phase === 'accumulation' || tech.wyckoff.phase === 'markup') {
+        if (tech.wyckoff && (tech.wyckoff.phase === 'accumulation' || tech.wyckoff.phase === 'markup')) {
              analysis.assessment.technical.score += 0.2;
              analysis.assessment.technical.keyPoints.push(`Wyckoff Phase: ${tech.wyckoff.phase}`);
         }
@@ -116,5 +134,5 @@ export async function analyzeStock(input: AnalyzeStockInput): Promise<{
         analysis,
         data: marketData
     };
-  }, 'analyzeStock');
+  }, 'analyzeStock', ErrorCode.EXTERNAL_API_ERROR);
 }

@@ -95,9 +95,10 @@ async function runTest() {
   }
 }
 
-// Check if running directly
-if (require.main === module) {
+export { runTest };
+
+// If executed directly
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
     runTest().catch(console.error);
 }
-
-export { runTest };

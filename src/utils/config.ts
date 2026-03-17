@@ -1,15 +1,20 @@
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
 // Attempt to load .env file
 try {
-  dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+  const envPath = path.resolve(process.cwd(), '.env');
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+  }
 } catch (e) {
   // Ignore error if dotenv is not available, assume env vars are set
 }
 
 // Configuration Interface
 export interface Config {
+  env: string;
   trading: {
     dryRun: boolean;
     maxPositionSize: number; // Percentage
@@ -30,7 +35,10 @@ export interface Config {
     level: string;
     dir: string;
   };
-  env: string;
+  stockRich: {
+    baseDir: string;
+    dailyDataDir: string;
+  };
 }
 
 const getEnv = (key: string, defaultValue?: string): string => {
@@ -39,8 +47,6 @@ const getEnv = (key: string, defaultValue?: string): string => {
     if (defaultValue !== undefined) {
       return defaultValue;
     }
-    // For optional keys, we might return empty string or handle undefined in the caller
-    // But here we enforce required keys if no default is provided
     throw new Error(`Missing required environment variable: ${key}`);
   }
   return val;
@@ -48,7 +54,7 @@ const getEnv = (key: string, defaultValue?: string): string => {
 
 const getEnvNumber = (key: string, defaultValue: number): number => {
   const val = process.env[key];
-  if (val === undefined) {
+  if (val === undefined || val === '') {
     return defaultValue;
   }
   const parsed = Number(val);
@@ -60,13 +66,16 @@ const getEnvNumber = (key: string, defaultValue: number): number => {
 
 const getEnvBoolean = (key: string, defaultValue: boolean): boolean => {
   const val = process.env[key];
-  if (val === undefined) {
+  if (val === undefined || val === '') {
     return defaultValue;
   }
-  return val.toLowerCase() === 'true';
+  return val.toLowerCase() === 'true' || val === '1';
 };
 
+const stockRichBaseDir = path.resolve(process.cwd(), getEnv('STOCK_RICH_PATH', 'src/stock_rich'));
+
 export const config: Config = {
+  env: getEnv('NODE_ENV', 'development'),
   trading: {
     dryRun: getEnvBoolean('TRADING_DRY_RUN', true),
     maxPositionSize: getEnvNumber('TRADING_MAX_POSITION_SIZE', 5),
@@ -79,15 +88,18 @@ export const config: Config = {
     twitterApiSecret: process.env.TWITTER_API_SECRET,
   },
   memory: {
-    storagePath: getEnv('MEMORY_STORAGE_PATH', './data/memory'),
+    storagePath: path.resolve(process.cwd(), getEnv('MEMORY_STORAGE_PATH', './data/memory')),
     maxCacheSize: getEnvNumber('MEMORY_MAX_CACHE_SIZE', 1000),
     indexRefreshInterval: getEnvNumber('MEMORY_INDEX_REFRESH_INTERVAL', 3600000),
   },
   logging: {
     level: getEnv('LOG_LEVEL', 'info'),
-    dir: getEnv('LOG_DIR', './logs'),
+    dir: path.resolve(process.cwd(), getEnv('LOG_DIR', './logs')),
   },
-  env: getEnv('NODE_ENV', 'development'),
+  stockRich: {
+    baseDir: stockRichBaseDir,
+    dailyDataDir: path.join(stockRichBaseDir, 'data', 'daily'),
+  },
 };
 
 /**
@@ -95,12 +107,22 @@ export const config: Config = {
  * Throws an error if critical configuration is missing or invalid.
  */
 export function validateConfig(): void {
-  // Example validation
   if (config.trading.maxPositionSize <= 0 || config.trading.maxPositionSize > 100) {
     throw new Error('TRADING_MAX_POSITION_SIZE must be between 0 and 100');
   }
   
   if (config.trading.stopLossPercent <= 0 || config.trading.stopLossPercent > 100) {
     throw new Error('TRADING_STOP_LOSS_PERCENT must be between 0 and 100');
+  }
+
+  // Ensure directories exist or are creatable
+  try {
+      if (!fs.existsSync(config.logging.dir)) {
+          fs.mkdirSync(config.logging.dir, { recursive: true });
+      }
+      // We don't necessarily create stockRich dirs here as they might be managed by stock_rich module
+      // But we can check if baseDir exists if it's expected to be pre-existing
+  } catch (e) {
+      console.warn(`Warning: Could not create logging directory: ${e}`);
   }
 }

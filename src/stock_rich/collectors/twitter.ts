@@ -4,10 +4,11 @@
  */
 import { Rettiwt } from 'rettiwt-api';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { writeDailyData } from '../utils/cache.js';
 
-const ROOT = new URL('../../', import.meta.url).pathname;
+// Refactored to use process.cwd()
+const PROJECT_ROOT = resolve(process.cwd());
 
 interface KolConfig {
   id: string;
@@ -28,7 +29,7 @@ interface TweetResult {
 }
 
 async function getTwitterKols(): Promise<{ kolId: string; kolName: string; username: string }[]> {
-  const raw = await readFile(join(ROOT, 'config', 'kols.json'), 'utf-8');
+  const raw = await readFile(join(PROJECT_ROOT, 'config', 'kols.json'), 'utf-8');
   const config = JSON.parse(raw) as { kols: KolConfig[] };
   return config.kols
     .filter(k => k.platforms.twitter?.username)

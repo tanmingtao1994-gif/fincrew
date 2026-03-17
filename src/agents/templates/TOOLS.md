@@ -1,11 +1,10 @@
-# Tools & Skills
+# Tools: {{AGENT_NAME}}
 
 ## Core Skills
-- skill_name: Description of what the skill does
+{{CORE_SKILLS}}
 
 ## Data Access
-- Data Source 1
-- Data Source 2
+{{DATA_ACCESS}}
 
-## Sub-Agents (If applicable)
-- agent_name: Role
+## Sub-Agents
+{{SUB_AGENTS}}

@@ -1,5 +1,5 @@
-import { retrieveMemory } from './memory/retrieveMemory';
-import { withErrorHandling } from '../../utils/error';
+import { retrieveMemory } from './memory/retrieveMemory.ts';
+import { withErrorHandling } from '../../utils/error.ts';
 
 interface ValidateAgainstMemoryInput {
   decision: string; // Description of decision

@@ -3,14 +3,20 @@
  */
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
-import { extname, basename, dirname, join } from 'path';
+import { extname, basename, dirname, join, resolve } from 'path';
 
-const ROOT = new URL('../../', import.meta.url).pathname;
+// Refactored to use process.cwd() instead of import.meta.url for flattened structure
+const PROJECT_ROOT = resolve(process.cwd());
 
 /** 缓存根目录 */
-export const CACHE_DIR = join(ROOT, 'data', 'cache');
-export const DAILY_DIR = join(ROOT, 'data', 'daily');
-export const OUTPUT_DIR = join(ROOT, 'output');
+export const CACHE_DIR = join(PROJECT_ROOT, 'data', 'cache');
+export const DAILY_DIR = join(PROJECT_ROOT, 'data', 'daily');
+export const OUTPUT_DIR = join(PROJECT_ROOT, 'src', 'stock_rich', 'output'); // Keep output in stock_rich for now or move to root? Plan said data/config moved. Let's assume output stays or goes to root output. Let's use root output for consistency.
+// Actually, looking at original structure, output was in src/stock_rich/output. Let's move it to root/output to be consistent with data/config.
+// However, the original code had: const ROOT = new URL('../../', import.meta.url).pathname; which pointed to src/stock_rich/
+// So data/cache was src/stock_rich/data/cache.
+// Now data/cache is root/data/cache.
+// Correct.
 
 /** 若文件已存在，返回带 _HHMMSS 后缀的新路径，否则返回原路径 */
 function safeFilename(fullPath: string): string {

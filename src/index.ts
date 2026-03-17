@@ -1,11 +1,11 @@
 import readline from 'readline';
-import { collect } from './agents/skills/collect';
-import { analyzeMarket } from './agents/skills/analyzeMarket';
-import { analyzeStock } from './agents/skills/analyzeStock';
-import { validateTradeRequest } from './agents/skills/validateTradeRequest';
-import { createTradingPlan } from './agents/skills/createTradingPlan';
-import { executeTrade } from './agents/skills/executeTrade';
-import { config } from './utils/config';
+import { collect } from './agents/skills/collect.ts';
+import { analyzeMarket } from './agents/skills/analyzeMarket.ts';
+import { analyzeStock } from './agents/skills/analyzeStock.ts';
+import { validateTradeRequest } from './agents/skills/validateTradeRequest.ts';
+import { createTradingPlan } from './agents/skills/createTradingPlan.ts';
+import { executeTrade } from './agents/skills/executeTrade.ts';
+import { config } from './utils/config.ts';
 
 async function main() {
   const args = process.argv.slice(2);

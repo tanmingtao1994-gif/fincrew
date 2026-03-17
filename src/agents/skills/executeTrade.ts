@@ -1,7 +1,7 @@
-import { TradingPlan, TradeRecord } from '../../types/domain';
-import { withErrorHandling } from '../../utils/error';
+import { TradingPlan, TradeRecord } from '../../types/domain.ts';
+import { withErrorHandling } from '../../utils/error.ts';
 import { randomUUID } from 'crypto';
-import { dailyStorage } from '../../utils/dailyStorage';
+import { dailyStorage } from '../../utils/dailyStorage.ts';
 
 interface ExecuteTradeInput {
   plan: TradingPlan;

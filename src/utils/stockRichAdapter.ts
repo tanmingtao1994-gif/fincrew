@@ -1,141 +1,143 @@
-import { batchFundamentals } from '../stock_rich/src/analysis/fundamental.js';
-import { analyzeTechnical, FullTechnicalAnalysis } from '../stock_rich/src/analysis/technical.js';
-import { collectNews, NewsResult } from '../stock_rich/src/collectors/news.js';
-import { getOptionsMaxPain, FundamentalData, getMacroSnapshot, MacroSnapshot } from '../stock_rich/src/utils/yahoo.js';
-import { withErrorHandling } from './error';
-import path from 'path';
-import fs from 'fs';
+import { ToolError, ErrorCode, withErrorHandling } from './error';
 
-const STOCK_RICH_DAILY_DIR = path.resolve(process.cwd(), 'src/stock_rich/data/daily');
-
-export interface MarketDataResult {
-  fundamentals: FundamentalData | null;
-  technical: FullTechnicalAnalysis | null;
-}
+// Import functions directly from stock_rich modules
+// Note: We're using dynamic imports in methods to ensure all env vars and configs are loaded
+// However, since we are in the same process, we can just import.
+// But some stock_rich modules might rely on top-level await or side effects.
+// Let's assume standard exports.
 
 export class StockRichAdapter {
+  
   /**
-   * Fetch market data (fundamentals + technicals) for given symbols.
+   * Collect KOL data (Twitter, Weibo, YouTube)
    */
-  async getMarketData(symbols: string[]): Promise<Map<string, MarketDataResult>> {
+  async collect(date?: string, platform?: string): Promise<void> {
     return withErrorHandling(async () => {
-      const results = new Map<string, MarketDataResult>();
+      // Dynamic import to load fresh config if needed
+      const { runCollect } = await import('../stock_rich/index.js');
+      // Note: runCollect is not exported in original index.ts, we need to modify src/stock_rich/index.ts to export runner functions
+      // Or we can invoke the specific collectors directly if runCollect isn't exported.
+      // Let's modify src/stock_rich/index.ts first to export these functions.
+      // Wait, I cannot modify index.ts in this step easily without reading it again.
+      // But looking at previous `Read` of index.ts, it had `runCollect`, `runData` etc defined but not exported.
+      // I should have updated index.ts to export them.
       
-      console.log(`[StockRichAdapter] Fetching market data for ${symbols.join(', ')}`);
+      // Let's assume I will update index.ts to export these functions or I can import the underlying functions directly.
+      // runCollect calls collectTwitter, collectWeibo, collectYouTube. I can call them directly.
       
-      // 1. Fundamentals
-      const fundMap = await batchFundamentals(symbols);
+      const platforms = platform ? [platform] : ['twitter', 'weibo', 'youtube'];
+      const targetDate = date || new Date().toISOString().split('T')[0];
 
-      // 2. Technicals
-      for (const symbol of symbols) {
-        const fund = fundMap.get(symbol) ?? null;
-        let tech: FullTechnicalAnalysis | null = null;
-        try {
-          tech = await analyzeTechnical(symbol, fund);
-          if (tech) {
-            try {
-              tech.optionsMaxPain = await getOptionsMaxPain(symbol);
-            } catch (e) {
-               console.warn(`Failed to get options max pain for ${symbol}: ${e}`);
-            }
+      for (const p of platforms) {
+        switch (p) {
+          case 'twitter': {
+            const { collectTwitter } = await import('../stock_rich/collectors/twitter.js');
+            await collectTwitter(targetDate);
+            break;
           }
-        } catch (error) {
-          console.error(`Technical analysis failed for ${symbol}:`, error);
+          case 'weibo': {
+            const { collectWeibo } = await import('../stock_rich/collectors/weibo.js');
+            await collectWeibo(targetDate);
+            break;
+          }
+          case 'youtube': {
+            const { collectYouTube } = await import('../stock_rich/collectors/youtube.js');
+            await collectYouTube(targetDate);
+            break;
+          }
+          default:
+            console.warn(`[StockRichAdapter] Unknown platform: ${p}`);
         }
+      }
+    }, 'StockRichAdapter.collect');
+  }
 
-        results.set(symbol, {
-          fundamentals: fund,
-          technical: tech
-        });
+  /**
+   * Get fundamental and technical data for symbols
+   */
+  async getData(symbols: string[], date?: string): Promise<void> {
+    return withErrorHandling(async () => {
+      if (!symbols || symbols.length === 0) {
+        throw new ToolError('Symbols are required for getData', ErrorCode.INVALID_INPUT);
+      }
+      
+      const targetDate = date || new Date().toISOString().split('T')[0];
+      
+      // Direct call to analysis logic
+      // We need to implement logic similar to runData in index.ts
+      // Import necessary functions
+      const { readDailyData, writeDailyData } = await import('../stock_rich/utils/cache.js');
+      const { batchFundamentals } = await import('../stock_rich/analysis/fundamental.js');
+      const { analyzeTechnical } = await import('../stock_rich/analysis/technical.js');
+      const { getOptionsMaxPain } = await import('../stock_rich/utils/yahoo.js');
+
+      // Check existing
+      const existing = await readDailyData<Record<string, any>>(targetDate, 'stockdata');
+      const needFetch: string[] = [];
+      const result: Record<string, any> = existing ?? {};
+
+      for (const s of symbols) {
+        if (existing && existing[s]) {
+          // Already exists
+        } else {
+          needFetch.push(s);
+        }
       }
 
-      return results;
-    }, 'getMarketData');
-  }
+      if (needFetch.length === 0) return;
 
-  /**
-   * Trigger news collection for a symbol.
-   */
-  async collectNews(symbol: string): Promise<void> {
-    return withErrorHandling(async () => {
-      const date = new Date().toISOString().split('T')[0];
-      console.log(`[StockRichAdapter] Collecting news for ${symbol} on ${date}`);
-      await collectNews(date, [symbol]);
-    }, 'collectNews');
-  }
+      const fundMap = await batchFundamentals(needFetch);
 
-  /**
-   * Read collected news from stock_rich storage.
-   */
-  async getNews(symbol: string, date?: string): Promise<NewsResult | null> {
-    return withErrorHandling(async () => {
-       const d = date || new Date().toISOString().split('T')[0];
-       const filename = `news-${symbol}.json`;
-       const filePath = path.join(STOCK_RICH_DAILY_DIR, d, filename);
-       
-       if (!fs.existsSync(filePath)) {
-           return null;
-       }
-       
-       const content = fs.readFileSync(filePath, 'utf-8');
-       return JSON.parse(content) as NewsResult;
-    }, 'getNews');
-  }
-
-  /**
-   * Trigger social media collection (Twitter, Weibo, YouTube).
-   */
-  async collectSocial(platforms: string[] = ['twitter', 'weibo', 'youtube']): Promise<void> {
-    return withErrorHandling(async () => {
-        const date = new Date().toISOString().split('T')[0];
-        
-        for (const p of platforms) {
-            console.log(`[StockRichAdapter] Collecting ${p} data for ${date}`);
-            switch (p) {
-                case 'twitter':
-                    await import('../stock_rich/src/collectors/twitter.js').then(m => m.collectTwitter(date));
-                    break;
-                case 'weibo':
-                    await import('../stock_rich/src/collectors/weibo.js').then(m => m.collectWeibo(date));
-                    break;
-                case 'youtube':
-                    await import('../stock_rich/src/collectors/youtube.js').then(m => m.collectYouTube(date));
-                    break;
-            }
+      for (const symbol of needFetch) {
+        const fund = fundMap.get(symbol) ?? null;
+        let tech = null;
+        try {
+          tech = await analyzeTechnical(symbol, fund);
+        } catch (err) {
+          console.error(`[StockRichAdapter] ${symbol} Technical analysis failed:`, err);
         }
-    }, 'collectSocial');
+
+        if (tech) {
+          try {
+            tech.optionsMaxPain = await getOptionsMaxPain(symbol);
+          } catch { /* ignore */ }
+        }
+
+        result[symbol] = { fundamentals: fund, technical: tech };
+      }
+
+      await writeDailyData(targetDate, 'stockdata', result, true);
+
+    }, 'StockRichAdapter.getData');
   }
 
   /**
-   * Read collected social posts.
+   * Get news for symbols
    */
-  async getSocialPosts(date?: string, platforms: string[] = ['twitter', 'weibo', 'youtube']): Promise<any[]> {
-      return withErrorHandling(async () => {
-        const d = date || new Date().toISOString().split('T')[0];
-        const posts: any[] = [];
-        
-        for (const p of platforms) {
-            const filename = `${p}.json`;
-            const filePath = path.join(STOCK_RICH_DAILY_DIR, d, filename);
-            if (fs.existsSync(filePath)) {
-                const content = fs.readFileSync(filePath, 'utf-8');
-                const data = JSON.parse(content);
-                if (Array.isArray(data)) {
-                    posts.push(...data.map(item => ({ ...item, platform: p })));
-                }
-            }
-        }
-        return posts;
-      }, 'getSocialPosts');
-  }
-  /**
-   * Get macro market snapshot.
-   */
-  async getMacroSnapshot(): Promise<MacroSnapshot | null> {
+  async getNews(symbols: string[], date?: string): Promise<void> {
     return withErrorHandling(async () => {
-      console.log('[StockRichAdapter] Fetching macro snapshot...');
-      return await getMacroSnapshot();
-    }, 'getMacroSnapshot');
+       if (!symbols || symbols.length === 0) {
+        throw new ToolError('Symbols are required for getNews', ErrorCode.INVALID_INPUT);
+      }
+      const targetDate = date || new Date().toISOString().split('T')[0];
+      const { collectNews } = await import('../stock_rich/collectors/news.js');
+      await collectNews(targetDate, symbols);
+    }, 'StockRichAdapter.getNews');
+  }
+
+  /**
+   * Analyze options
+   */
+  async getOptions(symbol: string, expiry: string, direction: 'call' | 'put', date?: string): Promise<void> {
+    return withErrorHandling(async () => {
+      const targetDate = date || new Date().toISOString().split('T')[0];
+      const { analyzeOptions } = await import('../stock_rich/analysis/options.js');
+      const { writeDailyData } = await import('../stock_rich/utils/cache.js');
+      
+      const result = await analyzeOptions(symbol, expiry, direction);
+      const filename = `options-${symbol}-${expiry}`;
+      await writeDailyData(targetDate, filename, result);
+    }, 'StockRichAdapter.getOptions');
   }
 }
 

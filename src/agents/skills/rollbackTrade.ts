@@ -1,4 +1,4 @@
-import { withErrorHandling } from '../../utils/error';
+import { withErrorHandling } from '../../utils/error.ts';
 
 interface RollbackTradeInput {
   tradeId: string;

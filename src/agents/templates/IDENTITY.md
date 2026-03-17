@@ -1,12 +1,10 @@
-# Agent Identity
+# Identity: {{AGENT_NAME}}
 
 ## Role
-Describe the primary role of the agent here.
+{{ROLE_DESCRIPTION}}
 
 ## Personality
-- Trait 1: Description
-- Trait 2: Description
+{{PERSONALITY_TRAITS}}
 
-## Language Style
-- Professional/Casual/Technical
-- Tone: Objective/Optimistic/Cautious
+## Language
+{{LANGUAGE_STYLE}}

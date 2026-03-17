@@ -1,27 +1,53 @@
 import { stockRichAdapter } from '../../utils/stockRichAdapter';
-import { withErrorHandling } from '../../utils/error';
+import { withErrorHandling, ErrorCode } from '../../utils/error';
 
-interface CollectInput {
+export interface CollectInput {
   tickers: string[];
-  sources?: string[]; // e.g., ['market', 'news']
+  sources?: ('market' | 'news' | 'social')[];
+  date?: string;
 }
 
-export async function collect(input: CollectInput): Promise<{ marketData: boolean; news: boolean }> {
+export interface CollectOutput {
+  success: boolean;
+  message: string;
+  details: {
+    marketData?: boolean;
+    news?: boolean;
+    social?: boolean;
+  };
+}
+
+/**
+ * Skill to collect market data, news, and social info.
+ */
+export async function collect(input: CollectInput): Promise<CollectOutput> {
   return withErrorHandling(async () => {
-    const { tickers, sources = ['market', 'news'] } = input;
-    const results = { marketData: false, news: false };
+    const { tickers, date } = input;
+    const sources = input.sources || ['market', 'news', 'social'];
+    const details: CollectOutput['details'] = {};
 
+    // 1. Market Data (Fundamentals + Technicals)
     if (sources.includes('market')) {
-      await stockRichAdapter.getMarketData(tickers);
-      results.marketData = true;
+      await stockRichAdapter.getData(tickers, date);
+      details.marketData = true;
     }
 
+    // 2. News
     if (sources.includes('news')) {
-      // Parallelize news collection
-      await Promise.all(tickers.map(ticker => stockRichAdapter.collectNews(ticker)));
-      results.news = true;
+      await stockRichAdapter.getNews(tickers, date);
+      details.news = true;
+    }
+    
+    // 3. Social
+    if (sources.includes('social')) {
+      await stockRichAdapter.collect(date); // collect command gathers all social platforms
+      details.social = true;
     }
 
-    return results;
-  }, 'collect');
+    return {
+        success: true,
+        message: `Collected data for ${tickers.join(', ')}`,
+        details
+    };
+  }, 'collect', ErrorCode.EXTERNAL_API_ERROR);
 }

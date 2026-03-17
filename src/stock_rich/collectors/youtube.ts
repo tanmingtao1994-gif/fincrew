@@ -3,12 +3,14 @@
  * 通过 YouTube RSS 获取最新视频，再提取字幕文本
  */
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { XMLParser } from 'fast-xml-parser';
-import { YoutubeTranscript } from 'youtube-transcript';
+// @ts-ignore - youtube-transcript ESM import issue
+import { YoutubeTranscript } from 'youtube-transcript/dist/youtube-transcript.esm.js';
 import { writeDailyData } from '../utils/cache.js';
 
-const ROOT = new URL('../../', import.meta.url).pathname;
+// Refactored to use process.cwd()
+const PROJECT_ROOT = resolve(process.cwd());
 
 interface YouTubeVideo {
   kolId: string;
@@ -29,7 +31,7 @@ interface KolConfig {
 
 /** 从 kols.json 提取 YouTube KOL（兼容大小写 YouTube/youtube, channelId/channelid） */
 async function getYouTubeKols(): Promise<{ kolId: string; kolName: string; channelId: string }[]> {
-  const raw = await readFile(join(ROOT, 'config', 'kols.json'), 'utf-8');
+  const raw = await readFile(join(PROJECT_ROOT, 'config', 'kols.json'), 'utf-8');
   const config = JSON.parse(raw) as { kols: KolConfig[] };
   const results: { kolId: string; kolName: string; channelId: string }[] = [];
 

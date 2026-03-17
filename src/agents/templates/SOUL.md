@@ -1,11 +1,10 @@
-# Agent Soul
+# Soul: {{AGENT_NAME}}
 
 ## Core Objective
-State the ultimate goal of this agent.
+{{CORE_OBJECTIVE}}
 
-## Principles
-1. Principle 1: Description
-2. Principle 2: Description
+## Decision Principles
+{{DECISION_PRINCIPLES}}
 
-## Decision Framework
-Describe how the agent makes decisions.
+## Key Behaviors
+{{KEY_BEHAVIORS}}

@@ -1,8 +1,8 @@
 import { memoryStorage } from '../../../utils/storage';
 import { MemoryNode } from '../../../types/memory';
-import { withErrorHandling } from '../../../utils/error';
+import { withErrorHandling, ErrorCode } from '../../../utils/error';
 
-interface StoreMemoryInput {
+export interface StoreMemoryInput {
   title: string;
   content: string;
   type: MemoryNode['type'];
@@ -11,8 +11,12 @@ interface StoreMemoryInput {
   metadata?: Record<string, any>;
   children?: string[];
   relatedMemories?: string[];
+  parentId?: string;
 }
 
+/**
+ * Skill to store a new memory into long-term memory.
+ */
 export async function storeMemory(input: StoreMemoryInput): Promise<MemoryNode> {
   return withErrorHandling(async () => {
     // Ensure storage is initialized
@@ -22,6 +26,7 @@ export async function storeMemory(input: StoreMemoryInput): Promise<MemoryNode> 
       title: input.title,
       content: input.content,
       type: input.type,
+      parentId: input.parentId,
       children: input.children || [],
       relatedMemories: input.relatedMemories || [],
       relatedTickers: input.relatedTickers || [],
@@ -35,5 +40,5 @@ export async function storeMemory(input: StoreMemoryInput): Promise<MemoryNode> 
 
     const newMemory = await memoryStorage.addMemory(memory);
     return newMemory;
-  }, 'storeMemory');
+  }, 'storeMemory', ErrorCode.STORAGE_ERROR);
 }

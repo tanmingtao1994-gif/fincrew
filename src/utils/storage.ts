@@ -15,7 +15,7 @@ export class MemoryStorage {
   private isInitialized: boolean = false;
 
   constructor() {
-    this.baseDir = path.resolve(process.cwd(), config.memory.storagePath);
+    this.baseDir = config.memory.storagePath;
     this.memoryMap = new Map();
     this.index = this.createEmptyIndex();
   }
@@ -87,12 +87,13 @@ export class MemoryStorage {
   public async addMemory(memory: Omit<MemoryNode, 'id' | 'createdAt' | 'updatedAt' | 'lastAccessed' | 'accessCount' | 'effectiveness'>): Promise<MemoryNode> {
     this.checkInitialized();
     
+    const now = new Date().toISOString();
     const newNode: MemoryNode = {
       ...memory,
       id: randomUUID(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      lastAccessed: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
+      lastAccessed: now,
       accessCount: 0,
       effectiveness: 0.5, // Default
       children: memory.children || [],
@@ -113,7 +114,7 @@ export class MemoryStorage {
     if (memory) {
         memory.lastAccessed = new Date().toISOString();
         memory.accessCount++;
-        // Not saving on every read for performance
+        // Not saving on every read for performance, maybe save periodically or on exit
     }
     return memory;
   }
@@ -167,7 +168,8 @@ export class MemoryStorage {
     if (query.keywords && query.keywords.length > 0) {
       const keywordIds = new Set<string>();
       for (const kw of query.keywords) {
-        const ids = this.index.keywordIndex[kw] || [];
+        // Simple exact match on indexed keywords
+        const ids = this.index.keywordIndex[kw.toLowerCase()] || [];
         ids.forEach(id => keywordIds.add(id));
       }
       resultIds = keywordIds;
@@ -194,10 +196,8 @@ export class MemoryStorage {
     }
 
     if (!resultIds) {
-        // If no filters provided, return all? Or return empty?
-        // Usually search returns empty if no query.
-        // But if limit is provided and no query, maybe return recent?
-        // Let's assume return empty if no filters.
+        // If no filters provided, return all?
+        // Let's assume return empty if no filters for safety, unless explicit 'all' intent (not supported yet)
         return [];
     }
 
@@ -209,6 +209,9 @@ export class MemoryStorage {
         }
     }
 
+    // Sort by relevance? For now, no specific sort implemented, just arbitrary order.
+    // If we want sort, we need to implement it.
+    
     // Limit results
     if (query.limit && results.length > query.limit) {
         return results.slice(0, query.limit);
@@ -219,33 +222,41 @@ export class MemoryStorage {
 
   private addToIndex(memory: MemoryNode) {
     // Ticker Index
-    memory.relatedTickers.forEach(ticker => {
-        if (!this.index.tickerIndex[ticker]) {
-            this.index.tickerIndex[ticker] = [];
-        }
-        if (!this.index.tickerIndex[ticker].includes(memory.id)) {
-            this.index.tickerIndex[ticker].push(memory.id);
-        }
-    });
+    if (memory.relatedTickers) {
+      memory.relatedTickers.forEach(ticker => {
+          if (!this.index.tickerIndex[ticker]) {
+              this.index.tickerIndex[ticker] = [];
+          }
+          if (!this.index.tickerIndex[ticker].includes(memory.id)) {
+              this.index.tickerIndex[ticker].push(memory.id);
+          }
+      });
+    }
 
     // Type Index
-    if (!this.index.typeIndex[memory.type]) {
-        this.index.typeIndex[memory.type] = [];
-    }
-    if (!this.index.typeIndex[memory.type].includes(memory.id)) {
-        this.index.typeIndex[memory.type].push(memory.id);
+    if (memory.type) {
+      if (!this.index.typeIndex[memory.type]) {
+          this.index.typeIndex[memory.type] = [];
+      }
+      if (!this.index.typeIndex[memory.type].includes(memory.id)) {
+          this.index.typeIndex[memory.type].push(memory.id);
+      }
     }
 
     // Keyword Index (Simple implementation: title words)
-    const keywords = memory.title.toLowerCase().split(/\s+/);
-    keywords.forEach(kw => {
-        if (!this.index.keywordIndex[kw]) {
-            this.index.keywordIndex[kw] = [];
-        }
-        if (!this.index.keywordIndex[kw].includes(memory.id)) {
-            this.index.keywordIndex[kw].push(memory.id);
-        }
-    });
+    if (memory.title) {
+      const keywords = memory.title.toLowerCase().split(/\s+/);
+      keywords.forEach(kw => {
+          // Filter small words?
+          if (kw.length < 2) return;
+          if (!this.index.keywordIndex[kw]) {
+              this.index.keywordIndex[kw] = [];
+          }
+          if (!this.index.keywordIndex[kw].includes(memory.id)) {
+              this.index.keywordIndex[kw].push(memory.id);
+          }
+      });
+    }
     
     // Temporal Index
     // Assume we index by creation date
@@ -262,17 +273,19 @@ export class MemoryStorage {
 
   private removeFromIndex(memory: MemoryNode) {
     // Ticker Index
-    memory.relatedTickers.forEach(ticker => {
-        if (this.index.tickerIndex[ticker]) {
-            this.index.tickerIndex[ticker] = this.index.tickerIndex[ticker].filter(id => id !== memory.id);
-            if (this.index.tickerIndex[ticker].length === 0) {
-                delete this.index.tickerIndex[ticker];
-            }
-        }
-    });
+    if (memory.relatedTickers) {
+      memory.relatedTickers.forEach(ticker => {
+          if (this.index.tickerIndex[ticker]) {
+              this.index.tickerIndex[ticker] = this.index.tickerIndex[ticker].filter(id => id !== memory.id);
+              if (this.index.tickerIndex[ticker].length === 0) {
+                  delete this.index.tickerIndex[ticker];
+              }
+          }
+      });
+    }
 
     // Type Index
-    if (this.index.typeIndex[memory.type]) {
+    if (memory.type && this.index.typeIndex[memory.type]) {
         this.index.typeIndex[memory.type] = this.index.typeIndex[memory.type].filter(id => id !== memory.id);
         if (this.index.typeIndex[memory.type].length === 0) {
             delete this.index.typeIndex[memory.type];
@@ -280,15 +293,17 @@ export class MemoryStorage {
     }
 
     // Keyword Index
-    const keywords = memory.title.toLowerCase().split(/\s+/);
-    keywords.forEach(kw => {
-        if (this.index.keywordIndex[kw]) {
-            this.index.keywordIndex[kw] = this.index.keywordIndex[kw].filter(id => id !== memory.id);
-            if (this.index.keywordIndex[kw].length === 0) {
-                delete this.index.keywordIndex[kw];
-            }
-        }
-    });
+    if (memory.title) {
+      const keywords = memory.title.toLowerCase().split(/\s+/);
+      keywords.forEach(kw => {
+          if (this.index.keywordIndex[kw]) {
+              this.index.keywordIndex[kw] = this.index.keywordIndex[kw].filter(id => id !== memory.id);
+              if (this.index.keywordIndex[kw].length === 0) {
+                  delete this.index.keywordIndex[kw];
+              }
+          }
+      });
+    }
 
     // Temporal Index
     const dateStr = new Date(memory.createdAt).toISOString().split('T')[0];

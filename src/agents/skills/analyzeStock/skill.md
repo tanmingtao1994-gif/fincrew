@@ -72,12 +72,12 @@ interface AnalyzeStockOutput {
 ### Steps (Example)
 ```bash
 # 1) Collect necessary data for the ticker
-node ./stock_rich/dist/index.js collect --ticker ${TICKER} --range 1d
-node ./stock_rich/dist/index.js options --ticker ${TICKER} --date 2026-03-20
-node ./stock_rich/dist/index.js news --ticker ${TICKER} --days 3
+node /Users/bytedance/projects/ai/financial-agent/src/stock_rich/dist/index.js collect --ticker ${TICKER} --range 1d
+node /Users/bytedance/projects/ai/financial-agent/src/stock_rich/dist/index.js options --ticker ${TICKER} --date 2026-03-20
+node /Users/bytedance/projects/ai/financial-agent/src/stock_rich/dist/index.js news --ticker ${TICKER} --days 3
 
 # 2) Aggregation and Scoring (TODO: Integrate actual script)
-# node ./scripts/analyze/stock.js --ticker ${TICKER} --timeframe 1d --out ./output/${TICKER}-analysis.json
+# node /Users/bytedance/projects/ai/financial-agent/scripts/analyze/stock.js --ticker ${TICKER} --timeframe 1d --out ./output/${TICKER}-analysis.json
 ```
 
 ### Gates

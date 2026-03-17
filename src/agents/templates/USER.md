@@ -1,12 +1,10 @@
-# User Profile
+# User: {{AGENT_NAME}}
 
-## Overview
-Describe the user or system component interacting with this agent.
+## Profile
+{{USER_PROFILE}}
 
 ## Preferences
-- Risk Tolerance: Low/Medium/High
-- Communication Style: Brief/Detailed/Data-driven
+{{USER_PREFERENCES}}
 
-## Focus Areas
-- Area 1
-- Area 2
+## Constraints
+{{USER_CONSTRAINTS}}

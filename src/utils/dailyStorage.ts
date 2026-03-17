@@ -12,28 +12,40 @@ export class DailyStorage {
     this.baseDir = path.resolve(process.cwd(), baseDir);
   }
 
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   /**
    * Get the directory path for a specific date.
    * If date is not provided, uses today's date (local time).
+   * If date is a string, it MUST be in YYYY-MM-DD format.
    */
   getDailyDir(date?: Date | string): string {
-    let d: Date;
-    if (typeof date === 'string') {
-        d = new Date(date);
-    } else if (date instanceof Date) {
-        d = date;
+    let dateStr: string;
+
+    if (!date) {
+      dateStr = this.formatDate(new Date());
+    } else if (typeof date === 'string') {
+      // Validate YYYY-MM-DD format strictly
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        // If not strictly YYYY-MM-DD, try to parse as Date but warn
+        console.warn(`Warning: Date string '${date}' is not YYYY-MM-DD. Parsing as Date object.`);
+        const d = new Date(date);
+        if (isNaN(d.getTime())) {
+             throw new Error(`Invalid date provided: ${date}`);
+        }
+        dateStr = this.formatDate(d);
+      } else {
+          dateStr = date;
+      }
     } else {
-        d = new Date();
+      dateStr = this.formatDate(date);
     }
 
-    if (isNaN(d.getTime())) {
-      throw new Error(`Invalid date provided: ${date}`);
-    }
-
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
     return path.join(this.baseDir, dateStr);
   }
 

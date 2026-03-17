@@ -1,17 +1,26 @@
 import { stockRichAdapter } from '../../utils/stockRichAdapter';
 import { MarketAnalysis } from '../../types/domain';
-import { withErrorHandling } from '../../utils/error';
+import { withErrorHandling, ErrorCode } from '../../utils/error';
 import { randomUUID } from 'crypto';
 
-interface AnalyzeMarketInput {
+// Note: stockRichAdapter.getMacroSnapshot() was defined in original adapter but removed in refactor.
+// We need to either re-add it or use other data sources.
+// For now, let's implement basic analysis based on what we have (Stock Data)
+// Or we can assume getMacroSnapshot exists if we re-implement it in adapter.
+// The refactor removed getMacroSnapshot from stockRichAdapter.ts because it wasn't in the new flattened stock_rich structure's index.ts exports clearly.
+// But we can import it directly from src/stock_rich/utils/yahoo.ts if we want.
+
+export interface AnalyzeMarketInput {
   indices?: string[]; // e.g. ['^GSPC', '^IXIC']
   timeframe?: string; // e.g. '1d'
+  date?: string;
 }
 
 export async function analyzeMarket(input: AnalyzeMarketInput): Promise<MarketAnalysis> {
   return withErrorHandling(async () => {
-    // 1. Get Macro Snapshot (VIX, 10Y Yield)
-    const snapshot = await stockRichAdapter.getMacroSnapshot();
+    // Dynamically import from stock_rich utils to get macro data
+    const { getMacroSnapshot } = await import('../../stock_rich/utils/yahoo.js');
+    const snapshot = await getMacroSnapshot();
     
     // 2. Map to MarketAnalysis
     let sentimentScore = 0;
@@ -29,7 +38,7 @@ export async function analyzeMarket(input: AnalyzeMarketInput): Promise<MarketAn
         
         // Yield Logic
         if (snapshot.tenYearYield) {
-            if (snapshot.tenYearYield > 0.045) {
+            if (snapshot.tenYearYield > 4.5) { // 4.5%
                 sentimentScore -= 0.3; // High yield bad for stocks
             }
         }
@@ -62,10 +71,10 @@ export async function analyzeMarket(input: AnalyzeMarketInput): Promise<MarketAn
     if (snapshot?.vix && snapshot.vix > 25) {
         analysis.riskFactors.push(`High VIX: ${snapshot.vix}`);
     }
-    if (snapshot?.tenYearYield && snapshot.tenYearYield > 0.05) {
-        analysis.riskFactors.push(`High 10Y Yield: ${(snapshot.tenYearYield * 100).toFixed(2)}%`);
+    if (snapshot?.tenYearYield && snapshot.tenYearYield > 5) { // 5%
+        analysis.riskFactors.push(`High 10Y Yield: ${(snapshot.tenYearYield).toFixed(2)}%`);
     }
 
     return analysis;
-  }, 'analyzeMarket');
+  }, 'analyzeMarket', ErrorCode.EXTERNAL_API_ERROR);
 }

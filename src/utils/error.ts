@@ -1,11 +1,28 @@
 /**
+ * Standard error codes for tools.
+ */
+export enum ErrorCode {
+  INVALID_INPUT = 'INVALID_INPUT',
+  MISSING_DEPENDENCY = 'MISSING_DEPENDENCY',
+  EXTERNAL_API_ERROR = 'EXTERNAL_API_ERROR',
+  STORAGE_ERROR = 'STORAGE_ERROR',
+  CONFIG_ERROR = 'CONFIG_ERROR',
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
+  NOT_FOUND = 'NOT_FOUND',
+  TIMEOUT = 'TIMEOUT',
+  UNKNOWN = 'UNKNOWN',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  RISK_CONTROL_ERROR = 'RISK_CONTROL_ERROR',
+}
+
+/**
  * Base class for tool execution errors.
  */
 export class ToolError extends Error {
   public code: string;
   public details?: any;
 
-  constructor(message: string, code: string = 'UNKNOWN_ERROR', details?: any) {
+  constructor(message: string, code: ErrorCode | string = ErrorCode.UNKNOWN, details?: any) {
     super(message);
     this.name = 'ToolError';
     this.code = code;
@@ -29,33 +46,19 @@ export class ToolError extends Error {
 }
 
 /**
- * Standard error codes for tools.
- */
-export enum ErrorCode {
-  INVALID_INPUT = 'INVALID_INPUT',
-  MISSING_DEPENDENCY = 'MISSING_DEPENDENCY',
-  EXTERNAL_API_ERROR = 'EXTERNAL_API_ERROR',
-  STORAGE_ERROR = 'STORAGE_ERROR',
-  CONFIG_ERROR = 'CONFIG_ERROR',
-  PERMISSION_DENIED = 'PERMISSION_DENIED',
-  NOT_FOUND = 'NOT_FOUND',
-  TIMEOUT = 'TIMEOUT',
-  UNKNOWN = 'UNKNOWN',
-}
-
-/**
  * Helper to wrap tool execution with error handling.
  */
 export async function withErrorHandling<T>(
   operation: () => Promise<T>,
-  context: string
+  context: string,
+  errorCode: ErrorCode = ErrorCode.UNKNOWN
 ): Promise<T> {
   try {
     return await operation();
   } catch (error) {
     if (error instanceof ToolError) {
-      // Re-throw if it's already a ToolError
-      // We might want to add context if it's missing
+      // If it's already a ToolError, preserve it but maybe add context if needed
+      // For now, we just rethrow to avoid masking the original error code
       throw error;
     }
     
@@ -63,8 +66,8 @@ export async function withErrorHandling<T>(
     const message = error instanceof Error ? error.message : String(error);
     throw new ToolError(
       `Error in ${context}: ${message}`,
-      ErrorCode.UNKNOWN,
-      error
+      errorCode,
+      { originalError: error }
     );
   }
 }
@@ -74,7 +77,8 @@ export async function withErrorHandling<T>(
  */
 export function formatError(error: unknown): string {
   if (error instanceof ToolError) {
-    return `[${error.code}] ${error.message}`;
+    const details = error.details ? ` Details: ${JSON.stringify(error.details)}` : '';
+    return `[${error.code}] ${error.message}${details}`;
   }
   if (error instanceof Error) {
     return `[ERROR] ${error.message}`;

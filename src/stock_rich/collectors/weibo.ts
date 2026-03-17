@@ -3,10 +3,11 @@
  * 使用 WEIBO_COOKIE 中的 SUB/SUBP 认证
  */
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { writeDailyData } from '../utils/cache.js';
 
-const ROOT = new URL('../../', import.meta.url).pathname;
+// Refactored to use process.cwd()
+const PROJECT_ROOT = resolve(process.cwd());
 
 interface WeiboPost {
   kolId: string;
@@ -28,7 +29,7 @@ interface KolConfig {
 }
 
 async function getWeiboKols(): Promise<{ kolId: string; kolName: string; uid: string }[]> {
-  const raw = await readFile(join(ROOT, 'config', 'kols.json'), 'utf-8');
+  const raw = await readFile(join(PROJECT_ROOT, 'config', 'kols.json'), 'utf-8');
   const config = JSON.parse(raw) as { kols: KolConfig[] };
   return config.kols
     .filter(k => k.platforms.weibo?.uid)

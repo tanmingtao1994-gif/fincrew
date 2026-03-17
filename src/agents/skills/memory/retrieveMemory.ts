@@ -1,24 +1,30 @@
 import { memoryStorage } from '../../../utils/storage';
-import { MemoryNode, MemoryQuery } from '../../../types/memory';
-import { withErrorHandling } from '../../../utils/error';
+import { MemoryNode } from '../../../types/memory';
+import { withErrorHandling, ErrorCode } from '../../../utils/error';
 
-interface RetrieveMemoryInput {
+export interface RetrieveMemoryInput {
   query: string; // Natural language query or keywords
   tickers?: string[];
   types?: MemoryNode['type'][];
   limit?: number;
 }
 
+/**
+ * Skill to retrieve memories from long-term memory.
+ */
 export async function retrieveMemory(input: RetrieveMemoryInput): Promise<MemoryNode[]> {
   return withErrorHandling(async () => {
     // Ensure storage is initialized
     await memoryStorage.init();
 
     // Convert query string to keywords (simple split for now)
+    // In a real system, we might use an LLM or more sophisticated NLP here
     const keywords = input.query
-      .toLowerCase()
-      .split(/\s+/)
-      .filter(w => w.length > 2); // Filter short words
+      ? input.query
+          .toLowerCase()
+          .split(/\s+/)
+          .filter(w => w.length > 2) // Filter short words
+      : [];
 
     const searchParams: {
       keywords?: string[];
@@ -34,5 +40,5 @@ export async function retrieveMemory(input: RetrieveMemoryInput): Promise<Memory
 
     const results = await memoryStorage.searchMemories(searchParams);
     return results;
-  }, 'retrieveMemory');
+  }, 'retrieveMemory', ErrorCode.STORAGE_ERROR);
 }

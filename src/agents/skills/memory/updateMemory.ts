@@ -1,12 +1,15 @@
 import { memoryStorage } from '../../../utils/storage';
 import { MemoryNode } from '../../../types/memory';
-import { withErrorHandling } from '../../../utils/error';
+import { withErrorHandling, ErrorCode, ToolError } from '../../../utils/error';
 
-interface UpdateMemoryInput {
+export interface UpdateMemoryInput {
   id: string;
   updates: Partial<Omit<MemoryNode, 'id' | 'createdAt'>>;
 }
 
+/**
+ * Skill to update an existing memory.
+ */
 export async function updateMemory(input: UpdateMemoryInput): Promise<MemoryNode> {
   return withErrorHandling(async () => {
     await memoryStorage.init();
@@ -14,7 +17,7 @@ export async function updateMemory(input: UpdateMemoryInput): Promise<MemoryNode
     // Fetch existing memory to merge metadata deeply if needed
     const existing = await memoryStorage.getMemory(input.id);
     if (!existing) {
-        throw new Error(`Memory ${input.id} not found`);
+        throw new ToolError(`Memory ${input.id} not found`, ErrorCode.NOT_FOUND);
     }
     
     const updates = { ...input.updates };
@@ -29,5 +32,5 @@ export async function updateMemory(input: UpdateMemoryInput): Promise<MemoryNode
     
     const updated = await memoryStorage.updateMemory(input.id, updates);
     return updated;
-  }, 'updateMemory');
+  }, 'updateMemory', ErrorCode.STORAGE_ERROR);
 }
