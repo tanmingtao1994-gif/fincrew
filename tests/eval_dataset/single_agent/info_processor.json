@@ -1,39 +1,41 @@
 [
   {
-    "test_id": "info_processor_collect_market_data",
+    "test_id": "info_processor_fuzzy_collect_kol",
     "agent_target": "workspace-info-processor",
-    "input_prompt": "我需要关于 NVDA 和 AAPL 今天的最新市场数据（新闻、股票价格、KOL观点），请帮我收集一下。",
+    "input_prompt": "去帮我看看最近社交平台上（推特或者微博），财经大V们都在聊些什么？有没有关于半导体板块的热门观点？",
     "expected_behavior": {
       "must_use_skill": ["collect"],
-      "must_contain": ["NVDA", "AAPL"],
-      "llm_judge": "助手需要主动调用收集市场数据的工具，并且在最终回答中整理输出关于 NVDA 和 AAPL 的市场数据，至少包含股票价格或相关新闻。格式应当清晰易读。"
+      "llm_judge": "1. 助手在模糊语境中准确识别出需要收集KOL和社交数据，并主动调用了社交平台数据收集工具（例如使用 collect skill 采集 social 数据或执行 npm run collect）。2. 助手在最终回答中总结了提取的所有KOL观点，且对半导体板块的情绪倾向进行了合理的逻辑推断。"
     }
   },
   {
-    "test_id": "info_processor_noise_reduction_chat",
+    "test_id": "info_processor_fuzzy_data_fundamentals",
     "agent_target": "workspace-info-processor",
-    "input_prompt": "帮我看看这段聊天记录里有没有关于特斯拉的基本面关键信息：'今天天真热，下午要去开会，昨天看了一眼特斯拉的财报，PE好像是40，然后马斯克说下个月交付量能达到1万台。晚上吃火锅吧！'",
+    "input_prompt": "我对 TSLA 比较感兴趣，想知道它最近的财务状况和盘面走势怎样，从各项指标看有没有出现潜在的买入信号？",
     "expected_behavior": {
-      "must_contain": ["PE", "40", "交付", "1万"],
-      "llm_judge": "助手需要准确提取出特斯拉的PE（40）和下个月交付量（1万台），并且必须明确排除或者不包含跟特斯拉基本面无关的噪音信息（如天气热、开会、吃火锅）。"
+      "must_use_skill": ["collect"],
+      "must_contain": ["TSLA"],
+      "llm_judge": "1. 助手在模糊语境中准确识别出需要收集市场盘面数据，主动调用股票数据工具（例如使用 collect skill 采集 market 数据或执行 npm run data）获取 TSLA 基本面和技术面指标。2. 返回结果中必须正确呈现如PE或RSI等核心财务/技术指标，并能基于数据背后的关联（如RSI超卖或指标金叉）推断出当前是否有买入信号。"
     }
   },
   {
-    "test_id": "info_processor_proactive_memory_update",
+    "test_id": "info_processor_fuzzy_options_analysis",
     "agent_target": "workspace-info-processor",
-    "input_prompt": "我非常不喜欢做空操作，记住我的这个偏好，不要在未来的策略中给我推荐做空的期权。",
+    "input_prompt": "我感觉最近 NVDA 波动很大，帮我看看它近期到期的看涨期权的情况，有哪些值得关注的阻力位或行权价？",
     "expected_behavior": {
-      "must_use_skill": ["storeMemory", "updateMemory"],
-      "llm_judge": "系统应识别出用户表达了强烈的投资偏好，需要调用存储或更新记忆的工具来保存'不喜欢做空'这一偏好，并在回复中明确告知用户已记录该偏好。"
+      "must_use_skill": ["collect"],
+      "must_contain": ["NVDA"],
+      "llm_judge": "1. 助手在模糊语境中识别出需要期权数据，并主动调用期权获取工具（通过执行 npm run options 检索 NVDA 看涨期权数据和最大痛点等）。2. 在总结中，不仅要呈现具体的期权数据结果（如最大痛点或未平仓量），还能基于这些期权持仓分布逻辑推断出市场的短期阻力位及期权交易者的看多/看空情绪。"
     }
   },
   {
-    "test_id": "info_processor_news_summarization",
+    "test_id": "info_processor_fuzzy_news_impact",
     "agent_target": "workspace-info-processor",
-    "input_prompt": "从你最近收集的数据中，帮我总结一下昨天关于加密货币市场（特别是 BTC 和 MSTR）的核心新闻，用要点列表的形式告诉我。",
+    "input_prompt": "最近有没有什么关于 AAPL 和 MSFT 的重磅消息或大额内部交易？近期的新闻事件会对它们接下来的股价走势产生哪些直接影响？",
     "expected_behavior": {
-      "must_use_skill": ["collect", "readDailyData"],
-      "llm_judge": "助手应该尝试去查询昨天相关的采集数据文件（可以调用 collect 甚至直接读取 daily data），并在输出中以要点列表的形式总结 BTC 和 MSTR 相关的内容。如果缺失数据，应当如实说明而不是编造幻觉。"
+      "must_use_skill": ["collect"],
+      "must_contain": ["AAPL", "MSFT"],
+      "llm_judge": "1. 助手在模糊语境中识别出需要新闻或内部交易动态，并主动调用新闻数据收集工具（例如使用 collect skill 采集 news 数据或执行 npm run news）搜集 AAPL 和 MSFT 的最新资讯。2. 助手需准确归纳搜索出的核心新闻事实，并围绕事实进行因果推断（例如新闻提及的销售数据或财报预期将如何反映在股价上），不可凭空捏造无事实根据的结论。"
     }
   }
 ]
