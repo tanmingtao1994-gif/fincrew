@@ -13,6 +13,7 @@ interface EvalCase {
   input_prompt: string;
   expected_behavior: {
     must_call?: string[];
+    must_use_skill?: string[];
     must_contain?: string[];
     must_reject?: boolean;
     llm_judge?: string;
@@ -65,12 +66,13 @@ function getLatestInvokeDir(): string | null {
 }
 
 // Parse JSONL to extract tool calls and assistant texts
-function parseSessionData(jsonlPath: string): { toolCalls: Set<string>, assistantTexts: string } {
+function parseSessionData(jsonlPath: string): { toolCalls: Set<string>, usedSkills: Set<string>, assistantTexts: string } {
   const toolCalls = new Set<string>();
+  const usedSkills = new Set<string>();
   let assistantTexts = "";
 
   if (!fs.existsSync(jsonlPath)) {
-    return { toolCalls, assistantTexts };
+    return { toolCalls, usedSkills, assistantTexts };
   }
 
   const lines = fs.readFileSync(jsonlPath, 'utf-8').split('\n').filter(l => l.trim().length > 0);
@@ -83,6 +85,15 @@ function parseSessionData(jsonlPath: string): { toolCalls: Set<string>, assistan
           for (const item of contentArr) {
             if (item.type === 'toolCall' && item.name) {
               toolCalls.add(item.name);
+              // Check for skill usage via the read tool
+              if (item.name === 'read' && item.arguments && item.arguments.path) {
+                const p = item.arguments.path as string;
+                // e.g. path like ".../skills/collect/SKILL.md" or ".../skills/collect.ts"
+                const match = p.match(/skills\/([^\/]+)\//) || p.match(/skills\/([^.]+)\.(ts|js|md)/);
+                if (match && match[1]) {
+                  usedSkills.add(match[1]);
+                }
+              }
             } else if (item.type === 'text' && item.text) {
               assistantTexts += item.text + "\n";
             }
@@ -94,7 +105,7 @@ function parseSessionData(jsonlPath: string): { toolCalls: Set<string>, assistan
     }
   }
 
-  return { toolCalls, assistantTexts };
+  return { toolCalls, usedSkills, assistantTexts };
 }
 
 // A simple LLM judge call. Assumes a CLI or API call that returns a score.
@@ -150,7 +161,7 @@ async function evaluateCase(evalCase: EvalCase, targetDir: string): Promise<Test
     };
   }
 
-  const { toolCalls, assistantTexts } = parseSessionData(resultFile);
+  const { toolCalls, usedSkills, assistantTexts } = parseSessionData(resultFile);
 
   // Assert must_call
   if (evalCase.expected_behavior.must_call && Array.isArray(evalCase.expected_behavior.must_call)) {
@@ -159,6 +170,18 @@ async function evaluateCase(evalCase: EvalCase, targetDir: string): Promise<Test
         details.push(`✅ 工具调用 [${tool}] 符合预期`);
       } else {
         details.push(`❌ 预期调用工具 [${tool}]，但未在 session 中找到`);
+        pass = false;
+      }
+    }
+  }
+
+  // Assert must_use_skill
+  if (evalCase.expected_behavior.must_use_skill && Array.isArray(evalCase.expected_behavior.must_use_skill)) {
+    for (const skill of evalCase.expected_behavior.must_use_skill) {
+      if (usedSkills.has(skill)) {
+        details.push(`✅ 技能使用 [${skill}] 符合预期 (通过 read 记录)`);
+      } else {
+        details.push(`❌ 预期使用技能 [${skill}]，但未在 session 中找到相关调用的读取记录`);
         pass = false;
       }
     }

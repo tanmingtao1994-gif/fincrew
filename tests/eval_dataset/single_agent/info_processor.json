@@ -1,19 +1,39 @@
 [
   {
-    "test_id": "test_info_processor_collect",
+    "test_id": "info_processor_collect_market_data",
     "agent_target": "workspace-info-processor",
-    "input_prompt": "收集今天关于 NVDA 的市场观点",
+    "input_prompt": "我需要关于 NVDA 和 AAPL 今天的最新市场数据（新闻、股票价格、KOL观点），请帮我收集一下。",
     "expected_behavior": {
-      "must_call": ["collect"]
+      "must_use_skill": ["collect"],
+      "must_contain": ["NVDA", "AAPL"],
+      "llm_judge": "助手需要主动调用收集市场数据的工具，并且在最终回答中整理输出关于 NVDA 和 AAPL 的市场数据，至少包含股票价格或相关新闻。格式应当清晰易读。"
     }
   },
   {
-    "test_id": "test_info_processor_noise_reduction",
+    "test_id": "info_processor_noise_reduction_chat",
     "agent_target": "workspace-info-processor",
-    "input_prompt": "从以下聊天记录中提取关于特斯拉基本面的关键数据：今天天真热，特斯拉昨天的PE好像是40，我中午想吃面，对了马斯克说下个月交付1万台车。",
+    "input_prompt": "帮我看看这段聊天记录里有没有关于特斯拉的基本面关键信息：'今天天真热，下午要去开会，昨天看了一眼特斯拉的财报，PE好像是40，然后马斯克说下个月交付量能达到1万台。晚上吃火锅吧！'",
     "expected_behavior": {
       "must_contain": ["PE", "40", "交付", "1万"],
-      "llm_judge": "助手需要准确提取出特斯拉的PE（40）和下个月交付量（1万台），并且不能包含跟特斯拉基本面无关的信息（如天气热、吃面）。"
+      "llm_judge": "助手需要准确提取出特斯拉的PE（40）和下个月交付量（1万台），并且必须明确排除或者不包含跟特斯拉基本面无关的噪音信息（如天气热、开会、吃火锅）。"
+    }
+  },
+  {
+    "test_id": "info_processor_proactive_memory_update",
+    "agent_target": "workspace-info-processor",
+    "input_prompt": "我非常不喜欢做空操作，记住我的这个偏好，不要在未来的策略中给我推荐做空的期权。",
+    "expected_behavior": {
+      "must_use_skill": ["storeMemory", "updateMemory"],
+      "llm_judge": "系统应识别出用户表达了强烈的投资偏好，需要调用存储或更新记忆的工具来保存'不喜欢做空'这一偏好，并在回复中明确告知用户已记录该偏好。"
+    }
+  },
+  {
+    "test_id": "info_processor_news_summarization",
+    "agent_target": "workspace-info-processor",
+    "input_prompt": "从你最近收集的数据中，帮我总结一下昨天关于加密货币市场（特别是 BTC 和 MSTR）的核心新闻，用要点列表的形式告诉我。",
+    "expected_behavior": {
+      "must_use_skill": ["collect", "readDailyData"],
+      "llm_judge": "助手应该尝试去查询昨天相关的采集数据文件（可以调用 collect 甚至直接读取 daily data），并在输出中以要点列表的形式总结 BTC 和 MSTR 相关的内容。如果缺失数据，应当如实说明而不是编造幻觉。"
     }
   }
 ]
