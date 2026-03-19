@@ -16,7 +16,8 @@
     "market": "node --loader ts-node/esm src/index.ts market",
     "trade": "node --loader ts-node/esm src/index.ts trade",
     "update-docs": "node --loader ts-node/esm scripts/update-agents-doc.ts",
-    "claw-dev": "npx cpx2 \"src/agents/**/*\" ~/.openclaw --watch --ignore=\"**/templates/**\""
+    "eval": "node --loader ts-node/esm scripts/eval-runner.ts",
+    "claw-dev": "npx cpx2 \"src/agents/**/*\" ~/.openclaw --watch --ignore=\"**/templates/**\" & npx cpx2 \"src/agents/**/*\" /Users/bytedance/.openclaw-dev --watch --ignore=\"**/templates/**\""
   },
   "keywords": [
     "ai",

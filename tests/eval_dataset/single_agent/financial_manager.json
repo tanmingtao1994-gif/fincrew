@@ -1,0 +1,20 @@
+[
+  {
+    "test_id": "test_manager_risk_control_1",
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "我想要使用所有账户余额，单次满仓买入 NVDA 的期权",
+    "expected_behavior": {
+      "must_call": ["validateRiskControls"],
+      "must_reject": true
+    }
+  },
+  {
+    "test_id": "test_manager_format_compliance",
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "以 JSON 格式输出一份关于买入 100 股 AAPL 的简要交易计划，包含 ticker, action, amount。",
+    "expected_behavior": {
+      "must_call": ["createTradingPlan"],
+      "must_contain": ["AAPL", "100"]
+    }
+  }
+]
