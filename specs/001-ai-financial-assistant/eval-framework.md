@@ -52,47 +52,44 @@
 ```text
 tests/eval_dataset/
   ├── single_agent/                  # 单体Agent评测集
-  │    ├── info_processor_noise.json # 对应场景1的输入文本和期望
-  │    ├── macro_bear_market.json    # 对应场景3的宏观崩盘数据
+  │    ├── info_processor.json       # 针对信息处理Agent的测试用例集(Array形式)
+  │    ├── financial_manager.json    # 针对经理的测试用例集
   │    └── ...
   ├── workflow/                      # 协同级评测集
-  │    ├── conflict_signals.json     # 对应场景6
-  │    ├── memory_loop.json          # 对应场景7
   │    └── ...
-  └── mocks/                         # 用于替换真实网络的 Mock 桩数据
-       └── data/daily/2026-03-xx/    # 注入的虚拟日期市场数据快照
 ```
-每个 `.json` 配置文件应包含：
-*   `test_id`: 用例唯一标识
-*   `agent_target`: 测试目标 Agent（或 Workflow）
-*   `input_prompt`: 模拟用户的输入指令
-*   `mock_date`: 需要注入的时间上下文（如锁定为 2026-01-01）
-*   `expected_behavior`: 预期行为（如“must_call: collect”, “must_reject: true”）
 
-### B. 评测过程数据存储 (Session Storage)
-OpenClaw 框架在运行中会产生复杂的思维链和工具调用，评测脚本必须将这些过程数据完整录制下来，以便与评测数据做比对。
-
-1.  **Session ID 注入:** 每次执行一个评测 Case，`eval-runner` 脚本都会生成一个唯一的 UUID 作为 `eval_session_id`。
-2.  **过程快照目录:** 在 `tests/eval_results/<eval_session_id>/` 下保存该次运行的所有黑盒输入输出：
-    *   `messages.log`: 记录 OpenClaw Agent 间交互的所有原始 Message。
-    *   `tool_calls.json`: 记录此次 Session 中 Agent 调用了哪些 Tool，传入了什么参数，Tool 返回了什么结果。
-    *   `final_output.md`: Agent 最终输出给用户的回答。
+### B. 评测过程数据存储 (LLM Invoke Results)
+由 `eval-runner.ts` 驱动，执行完后将抓取的 session 按执行时间戳保存至 `tests/llm_invoke_results/<timestamp>/`。
+这只是包含中间对话记录的 Raw 数据，不包含判断结果。
 
 ### C. 评测对比与打分逻辑 (Evaluation Engine)
-在收集完 Session 数据后，如何进行评测对比？
+由 `eval-compare.ts` (类似 promptfoo) 驱动，读取 `llm_invoke_results` 的结果。
+在比对后，最终生成的**可视化的测评报告**，将被存储于 `tests/eval_results/<timestamp>/report.md`。
 
 1.  **硬性规则比对 (Hard Rules):** 
-    读取 `tool_calls.json`，根据 Benchmark 里的 `expected_behavior` 进行断言。
-    *   *例：如果预期是测试风控拦截，就断言 `tool_calls.json` 中必须出现 `validateRiskControls`，并且最终 `messages.log` 中包含“拒绝”或“超限”等关键词。*
-2.  **LLM-as-a-Judge (大模型裁判模型比对):**
-    对于生成的自然语言分析报告，传统的断言无效。此时调用外部低成本模型（如 GPT-4o-mini）。
-    *   *Prompt 示例给裁判模型：* “这是系统生成的技术分析报告 `final_output.md`。这是底层的原始输入数据 `mock_date` 的 `stockdata.json`。请检查报告中引用的各项数据是否有捏造（幻觉），请回答 PASS 或 FAIL，并附上理由。”
+    通过解析 JSONL 找到所有 ToolCalls 和 Assistant 的文本，根据 Dataset 里的 `expected_behavior` 进行断言：
+    *   `must_call`: 断言必须调用过指定的 tool。
+    *   `must_contain`: 断言输出文本中包含了预期关键词。
+    *   `must_reject`: 断言未调用 executeTrade 或输出了明显的拒绝动作。
+2.  **LLM-as-a-Judge (大模型裁判模型比对) [未来扩展]:**
+    对于生成的自然语言分析报告，引入外部模型对比 `llm_invoke_results` 和真实的 Mock 数据。
 
 ---
 
-## 3. 落地步骤
+## 3. 落地步骤与指令
 
-1.  **第一步（建设基建）：** 开发 `scripts/run-eval.ts`，实现能根据 `eval_dataset` 里的某一个 JSON 文件，自动起一个 OpenClaw 实例，强行注入 mock 数据，并把执行的 log 落盘到 `tests/eval_results` 中。
-2.  **第二步（撰写用例）：** 优先编写一个 `Financial Manager 风控拦截` 的单一 Agent 测试用例。
-3.  **第三步（加入裁判）：** 引入 LLM-as-a-Judge 脚本，读取上一步的落盘文件，输出自动化评分。
-4.  **第四步（CI 整合）：** 所有的用例串联，配置入 package.json 中的 `npm run test:eval`。
+1.  **准备或运行数据收集**: 
+    ```bash
+    npm run eval -- --target single_agent/info_processor
+    ```
+    执行后，会在 `tests/llm_invoke_results/` 生成对应的时间戳和 session.jsonl 文件。
+2.  **执行评测并生成报告**: 
+    ```bash
+    npm run eval:compare
+    ```
+    该指令会读取最新一次 `llm_invoke_results` 的执行结果，执行各类断言比对，并将最终评测报告输出至 `tests/eval_results/` 对应的时间戳目录下。
+3.  **全量执行 (一键评测)**:
+    ```bash
+    npm run eval:all
+    ```

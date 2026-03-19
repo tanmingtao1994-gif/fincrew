@@ -12,7 +12,8 @@
     "agent_target": "workspace-info-processor",
     "input_prompt": "从以下聊天记录中提取关于特斯拉基本面的关键数据：今天天真热，特斯拉昨天的PE好像是40，我中午想吃面，对了马斯克说下个月交付1万台车。",
     "expected_behavior": {
-      "must_contain": ["PE", "40", "交付", "1万"]
+      "must_contain": ["PE", "40", "交付", "1万"],
+      "llm_judge": "助手需要准确提取出特斯拉的PE（40）和下个月交付量（1万台），并且不能包含跟特斯拉基本面无关的信息（如天气热、吃面）。"
     }
   }
 ]

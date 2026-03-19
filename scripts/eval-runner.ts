@@ -7,7 +7,7 @@ const execAsync = promisify(execSync);
 
 // Configuration
 const DATASET_DIR = path.join(process.cwd(), 'tests', 'eval_dataset');
-const BASE_RESULTS_DIR = path.join(process.cwd(), 'tests', 'eval_results');
+const BASE_RESULTS_DIR = path.join(process.cwd(), 'tests', 'llm_invoke_results');
 // .openclaw-dev base directory
 const OPENCLAW_DEV_DIR = path.join(process.env.HOME || '', '.openclaw-dev');
 

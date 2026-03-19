@@ -17,6 +17,8 @@
     "trade": "node --loader ts-node/esm src/index.ts trade",
     "update-docs": "node --loader ts-node/esm scripts/update-agents-doc.ts",
     "eval": "node --loader ts-node/esm scripts/eval-runner.ts",
+    "eval:compare": "node --loader ts-node/esm scripts/eval-compare.ts",
+    "eval:all": "npm run eval && npm run eval:compare",
     "claw-dev": "npx cpx2 \"src/agents/**/*\" ~/.openclaw --watch --ignore=\"**/templates/**\" & npx cpx2 \"src/agents/**/*\" /Users/bytedance/.openclaw-dev --watch --ignore=\"**/templates/**\""
   },
   "keywords": [
