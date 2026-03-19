@@ -1,10 +1,14 @@
 /**
  * yahoo-finance2 封装 — 限速、重试、缓存
  */
-import YahooFinance from 'yahoo-finance2';
+import yahooFinance from 'yahoo-finance2';
 import { readCache, writeCache, isCacheStale } from './cache.js';
 
-const yf = new YahooFinance({ suppressNotices: ['yahooSurvey'] });
+// The yahoo-finance2 module exports a default instance rather than a class constructor
+const yf = typeof yahooFinance === 'function' ? new (yahooFinance as any)() : ((yahooFinance as any).default || yahooFinance);
+if (yf && typeof yf.suppressNotices === 'function') {
+    yf.suppressNotices(['yahooSurvey']);
+}
 
 /** 请求间隔 (ms) */
 const REQUEST_INTERVAL = 1500;

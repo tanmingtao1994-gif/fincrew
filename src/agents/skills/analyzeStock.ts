@@ -74,12 +74,12 @@ export async function analyzeStock(input: AnalyzeStockInput): Promise<AnalyzeSto
         risk: {
             level: 'medium',
             factors: [],
-            stopLoss: tech?.priceLevels?.support1 ?? 0
+            stopLoss: Number(tech?.priceLevels?.support1) || 0
         },
         recommendation: {
             action: 'watch',
-            entryPrice: tech?.timeframes?.daily?.close ?? 0,
-            targetPrice: tech?.priceLevels?.targetPrice ?? 0,
+            entryPrice: Number(tech?.timeframes?.daily?.close) || 0,
+            targetPrice: Number(tech?.priceLevels?.targetPrice) || 0,
             timeHorizon: '1 month',
             positionSize: 0
         },

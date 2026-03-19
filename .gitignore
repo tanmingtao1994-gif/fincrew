@@ -19,3 +19,5 @@ output/
 .idea/
 # OS
 Thumbs.db
+tests/eval_results/
+tests/llm_invoke_results/

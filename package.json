@@ -35,7 +35,7 @@
     "dotenv": "^16.4.0",
     "fast-xml-parser": "^4.3.0",
     "inquirer": "^8.2.6",
-    "rettiwt-api": "^6.1.7",
+    "rettiwt-api": "^6.2.1",
     "technicalindicators": "^3.1.0",
     "uuid": "^9.0.0",
     "yahoo-finance2": "^3.13.0",

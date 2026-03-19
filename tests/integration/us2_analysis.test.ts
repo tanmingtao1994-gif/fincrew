@@ -1,9 +1,9 @@
-import { analyzeMarket } from '../../src/agents/skills/analyzeMarket';
-import { analyzeStock } from '../../src/agents/skills/analyzeStock';
-import { createTradingPlan } from '../../src/agents/skills/createTradingPlan';
-import { validateRiskControls } from '../../src/agents/skills/validateRiskControls';
-import { checkRiskLimits } from '../../src/agents/skills/checkRiskLimits';
-import { UserPortfolio, UserPreference } from '../../src/types/domain';
+import { analyzeMarket } from '../../src/agents/skills/analyzeMarket.js';
+import { analyzeStock } from '../../src/agents/skills/analyzeStock.js';
+import { createTradingPlan } from '../../src/agents/skills/createTradingPlan.js';
+import { validateRiskControls } from '../../src/agents/skills/validateRiskControls.js';
+import { checkRiskLimits } from '../../src/agents/skills/checkRiskLimits.js';
+import { UserPortfolio, UserPreference } from '../../src/types/domain.js';
 
 async function runTest() {
   console.log('Running US2 Analysis Integration Test...');

@@ -1,11 +1,11 @@
 import readline from 'readline';
-import { collect } from './agents/skills/collect.ts';
-import { analyzeMarket } from './agents/skills/analyzeMarket.ts';
-import { analyzeStock } from './agents/skills/analyzeStock.ts';
-import { validateTradeRequest } from './agents/skills/validateTradeRequest.ts';
-import { createTradingPlan } from './agents/skills/createTradingPlan.ts';
-import { executeTrade } from './agents/skills/executeTrade.ts';
-import { config } from './utils/config.ts';
+import { collect } from './agents/skills/collect.js';
+import { analyzeMarket } from './agents/skills/analyzeMarket.js';
+import { analyzeStock } from './agents/skills/analyzeStock.js';
+import { validateTradeRequest } from './agents/skills/validateTradeRequest.js';
+import { createTradingPlan } from './agents/skills/createTradingPlan.js';
+import { executeTrade } from './agents/skills/executeTrade.js';
+import { config } from './utils/config.js';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -133,6 +133,7 @@ function startRepl() {
   });
 }
 
-if (require.main === module) {
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
     main();
 }

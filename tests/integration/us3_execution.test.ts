@@ -1,8 +1,8 @@
-import { validateTradeRequest } from '../../src/agents/skills/validateTradeRequest';
-import { executeTrade } from '../../src/agents/skills/executeTrade';
-import { analyzeTradeResult } from '../../src/agents/skills/analyzeTradeResult';
-import { generateReviewReport } from '../../src/agents/skills/generateReviewReport';
-import { TradingPlan } from '../../src/types/domain';
+import { validateTradeRequest } from '../../src/agents/skills/validateTradeRequest.js';
+import { executeTrade } from '../../src/agents/skills/executeTrade.js';
+import { analyzeTradeResult } from '../../src/agents/skills/analyzeTradeResult.js';
+import { generateReviewReport } from '../../src/agents/skills/generateReviewReport.js';
+import { TradingPlan } from '../../src/types/domain.js';
 import { randomUUID } from 'crypto';
 
 async function runTest() {
@@ -89,7 +89,7 @@ async function runTest() {
 }
 
 // Check if running directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     runTest().catch(console.error);
 }
 

@@ -1,41 +1,26 @@
-# financial-agent Development Guidelines
+# AI Financial Assistant Agents
 
-Auto-generated from all feature plans. Last updated: 2026-03-12
+This file is auto-generated.
 
-## Active Technologies
+## Active Agents
 
-- TypeScript 5.x, Node.js 18+ + OpenClaw, stock_rich (npm package), rettiwt-api, yahoo-finance2 (001-ai-financial-assistant)
+### FINANCIAL MANAGER
+- **Role**: : Senior Private Wealth Manager
+- **Objective**: Orchestrate the entire financial analysis and decision-making process to maximize user wealth within risk limits.
 
-## Project Structure
+### INFO PROCESSOR
+- **Role**: : Intelligence Officer
+- **Objective**: Gather, verify, and summarize comprehensive market data from all available sources.
 
-```text
-stock_rich/
-agents/
-  ├─ manager/
-  ├─ info-processor/
-  │   ├─ soul.md
-  │   ├─ memory.md
-  │   └─ user.md
-  ├─ technical-analyst/
-  ├─ macro-analyst/
-  └─ reviewer/
-skills/
-  ├─ _TEMPLATE.skill.md
-  └─ collect.skill.md
-```
+### MACRO ANALYST
+- **Role**: : Global Macro Strategist
+- **Objective**: Analyze market trends, sentiment, and systemic risks to provide a top-down market view.
 
+### REVIEWER
+- **Role**: : Risk Auditor & Performance Coach
+- **Objective**: Analyze past performance to identify mistakes and extract lessons for future improvement.
 
-## Commands
+### TECHNICAL ANALYST
+- **Role**: : Senior Technical Analyst
+- **Objective**: Identify trading opportunities based on price action, volume, and technical indicators.
 
-npm test && npm run lint
-
-## Code Style
-
-TypeScript 5.x, Node.js 18+: Follow standard conventions
-
-## Recent Changes
-
-- 001-ai-financial-assistant: Added TypeScript 5.x, Node.js 18+ + OpenClaw, stock_rich (npm package), rettiwt-api, yahoo-finance2
-
-<!-- MANUAL ADDITIONS START -->
-<!-- MANUAL ADDITIONS END -->

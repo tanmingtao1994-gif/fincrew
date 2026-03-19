@@ -28,17 +28,19 @@ export async function analyzeMarket(input: AnalyzeMarketInput): Promise<MarketAn
     
     if (snapshot) {
         // VIX Logic
-        if (snapshot.vix) {
-            if (snapshot.vix > 30) {
+        const vix = Number(snapshot.vix);
+        if (!isNaN(vix)) {
+            if (vix > 30) {
                 sentimentScore -= 0.5; // High fear
-            } else if (snapshot.vix < 15) {
+            } else if (vix < 15) {
                 sentimentScore += 0.3; // Low fear
             }
         }
         
         // Yield Logic
-        if (snapshot.tenYearYield) {
-            if (snapshot.tenYearYield > 4.5) { // 4.5%
+        const tenYearYield = Number(snapshot.tenYearYield);
+        if (!isNaN(tenYearYield)) {
+            if (tenYearYield > 4.5) { // 4.5%
                 sentimentScore -= 0.3; // High yield bad for stocks
             }
         }
@@ -64,15 +66,15 @@ export async function analyzeMarket(input: AnalyzeMarketInput): Promise<MarketAn
         sectors: {}, // Need sector data (not available in MacroSnapshot)
         hotTopics: [],
         hotStocks: [],
-        riskLevel: snapshot?.vix && snapshot.vix > 20 ? 'high' : 'medium',
+        riskLevel: snapshot?.vix && Number(snapshot.vix) > 20 ? 'high' : 'medium',
         riskFactors: []
     };
     
-    if (snapshot?.vix && snapshot.vix > 25) {
+    if (snapshot?.vix && Number(snapshot.vix) > 25) {
         analysis.riskFactors.push(`High VIX: ${snapshot.vix}`);
     }
-    if (snapshot?.tenYearYield && snapshot.tenYearYield > 5) { // 5%
-        analysis.riskFactors.push(`High 10Y Yield: ${(snapshot.tenYearYield).toFixed(2)}%`);
+    if (snapshot?.tenYearYield && Number(snapshot.tenYearYield) > 5) { // 5%
+        analysis.riskFactors.push(`High 10Y Yield: ${Number(snapshot.tenYearYield).toFixed(2)}%`);
     }
 
     return analysis;

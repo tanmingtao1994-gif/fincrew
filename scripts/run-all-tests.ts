@@ -1,7 +1,7 @@
-import { runTest as runUS1 } from '../tests/integration/us1_perception.test';
-import { runTest as runUS2 } from '../tests/integration/us2_analysis.test';
-import { runTest as runUS3 } from '../tests/integration/us3_execution.test';
-import { runTest as runUS4 } from '../tests/integration/us4_learning.test';
+import { runTest as runUS1 } from '../tests/integration/us1_perception.test.js';
+import { runTest as runUS2 } from '../tests/integration/us2_analysis.test.js';
+import { runTest as runUS3 } from '../tests/integration/us3_execution.test.js';
+import { runTest as runUS4 } from '../tests/integration/us4_learning.test.js';
 
 async function main() {
   console.log('Starting End-to-End System Test...\n');
@@ -26,6 +26,6 @@ async function main() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     main();
 }

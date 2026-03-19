@@ -63,7 +63,12 @@ export async function withErrorHandling<T>(
     }
     
     // Wrap unknown errors
-    const message = error instanceof Error ? error.message : String(error);
+    let message = 'Unknown error';
+    try {
+        message = error instanceof Error ? error.message : String(error);
+    } catch (e) {
+        message = 'Could not stringify error';
+    }
     throw new ToolError(
       `Error in ${context}: ${message}`,
       errorCode,

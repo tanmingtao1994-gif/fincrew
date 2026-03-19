@@ -1,9 +1,9 @@
-import { storeMemory } from '../../src/agents/skills/memory/storeMemory';
-import { updateMemory } from '../../src/agents/skills/memory/updateMemory';
-import { validateAgainstMemory } from '../../src/agents/skills/validateAgainstMemory';
-import { processLearningMaterial } from '../../src/agents/skills/processLearningMaterial';
-import { extractLessons } from '../../src/agents/skills/extractLessons';
-import { ReviewResult } from '../../src/types/domain';
+import { storeMemory } from '../../src/agents/skills/memory/storeMemory.js';
+import { updateMemory } from '../../src/agents/skills/memory/updateMemory.js';
+import { validateAgainstMemory } from '../../src/agents/skills/validateAgainstMemory.js';
+import { processLearningMaterial } from '../../src/agents/skills/processLearningMaterial.js';
+import { extractLessons } from '../../src/agents/skills/extractLessons.js';
+import { ReviewResult } from '../../src/types/domain.js';
 
 async function runTest() {
   console.log('Running US4 Learning Integration Test...');
@@ -75,7 +75,7 @@ async function runTest() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     runTest().catch(console.error);
 }
 

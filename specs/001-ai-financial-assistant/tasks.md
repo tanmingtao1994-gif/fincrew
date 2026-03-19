@@ -66,33 +66,33 @@
 *目标：实现安全的交易执行和结果复盘。*
 *依赖：阶段 4*
 
-- [ ] T025 [US3] 配置 `financial-manager` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md, MEMORY.md 于 `src/agents/workspace-financial-manager/`
-- [ ] T026 [US3] 配置 `reviewer` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md 于 `src/agents/workspace-reviewer/`
-- [ ] T027 [P] [US3] 实现 `validateTradeRequest` Skill 逻辑于 `src/agents/skills/validateTradeRequest.ts`
-- [ ] T028 [P] [US3] 实现 `requestUserConfirmation` Skill 逻辑（CLI 交互）于 `src/agents/skills/requestUserConfirmation.ts`
-- [ ] T029 [US3] 实现 `executeTrade` Skill 逻辑（模拟/Mock，记录到 Daily Storage）于 `src/agents/skills/executeTrade.ts`
-- [ ] T030 [P] [US3] 实现 `rollbackTrade` Skill 逻辑于 `src/agents/skills/rollbackTrade.ts`
-- [ ] T031 [US3] 实现 `analyzeTradeResult` Skill 逻辑（从 Daily Storage 读取）于 `src/agents/skills/analyzeTradeResult.ts`
-- [ ] T032 [P] [US3] 实现 `generateReviewReport` Skill 逻辑（生成周报/日报）于 `src/agents/skills/generateReviewReport.ts`
-- [ ] T033 [US3] 创建执行与复盘流程的集成测试于 `tests/integration/us3_execution.test.ts`
+- [x] T025 [US3] 配置 `financial-manager` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md, MEMORY.md 于 `src/agents/workspace-financial-manager/`
+- [x] T026 [US3] 配置 `reviewer` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md 于 `src/agents/workspace-reviewer/`
+- [x] T027 [P] [US3] 实现 `validateTradeRequest` Skill 逻辑于 `src/agents/skills/validateTradeRequest.ts`
+- [x] T028 [P] [US3] 实现 `requestUserConfirmation` Skill 逻辑（CLI 交互）于 `src/agents/skills/requestUserConfirmation.ts`
+- [x] T029 [US3] 实现 `executeTrade` Skill 逻辑（模拟/Mock，记录到 Daily Storage）于 `src/agents/skills/executeTrade.ts`
+- [x] T030 [P] [US3] 实现 `rollbackTrade` Skill 逻辑于 `src/agents/skills/rollbackTrade.ts`
+- [x] T031 [US3] 实现 `analyzeTradeResult` Skill 逻辑（从 Daily Storage 读取）于 `src/agents/skills/analyzeTradeResult.ts`
+- [x] T032 [P] [US3] 实现 `generateReviewReport` Skill 逻辑（生成周报/日报）于 `src/agents/skills/generateReviewReport.ts`
+- [x] T033 [US3] 创建执行与复盘流程的集成测试于 `tests/integration/us3_execution.test.ts`
 
 ## 阶段 6：[US4] 长期记忆与持续学习 (Learning & Memory)
 
 *目标：从经验和外部来源中学习，实现系统进化。*
 *依赖：阶段 5*
 
-- [ ] T034 [P] [US4] 实现 `extractLessons` Skill 逻辑于 `src/agents/skills/extractLessons.ts`
-- [ ] T035 [P] [US4] 实现 `validateAgainstMemory` Skill 逻辑于 `src/agents/skills/validateAgainstMemory.ts`
-- [ ] T036 [US4] 实现 `processLearningMaterial` Skill 逻辑于 `src/agents/skills/processLearningMaterial.ts`
-- [ ] T037 [US4] 增强 `updateMemory` 以支持学习沉淀于 `src/agents/skills/memory/updateMemory.ts`
-- [ ] T038 [US4] 在 Financial Manager 中集成学习闭环逻辑于 `src/agents/workspace-financial-manager/soul.md`
-- [ ] T039 [US4] 创建学习闭环的集成测试于 `tests/integration/us4_learning.test.ts`
+- [x] T034 [P] [US4] 实现 `extractLessons` Skill 逻辑于 `src/agents/skills/extractLessons.ts`
+- [x] T035 [P] [US4] 实现 `validateAgainstMemory` Skill 逻辑于 `src/agents/skills/validateAgainstMemory.ts`
+- [x] T036 [US4] 实现 `processLearningMaterial` Skill 逻辑于 `src/agents/skills/processLearningMaterial.ts`
+- [x] T037 [US4] 增强 `updateMemory` 以支持学习沉淀于 `src/agents/skills/memory/updateMemory.ts`
+- [x] T038 [US4] 在 Financial Manager 中集成学习闭环逻辑于 `src/agents/workspace-financial-manager/soul.md`
+- [x] T039 [US4] 创建学习闭环的集成测试于 `tests/integration/us4_learning.test.ts`
 
 ## 阶段 7：打磨与集成 (Polish)
 
-- [ ] T040 创建助手的主 CLI 入口点于 `src/index.ts`
-- [ ] T041 创建文档更新脚本以维护 `AGENTS.md`
-- [ ] T042 进行最终的端到端系统测试，验证所有 Agent 协作
+- [x] T040 创建助手的主 CLI 入口点于 `src/index.ts`
+- [x] T041 创建文档更新脚本以维护 `AGENTS.md`
+- [x] T042 进行最终的端到端系统测试，验证所有 Agent 协作
 
 ## 依赖关系图
 
