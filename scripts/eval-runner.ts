@@ -132,6 +132,16 @@ async function runTest(evalCase: EvalCase, resultsDir: string) {
 }
 
 async function main() {
+  const args = process.argv.slice(2);
+  let targetFile: string | null = null;
+  
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--target' && args[i + 1]) {
+      targetFile = args[i + 1];
+      break;
+    }
+  }
+
   const timestamp = getTimestampString();
   const currentResultsDir = path.join(BASE_RESULTS_DIR, timestamp);
 
@@ -143,20 +153,29 @@ async function main() {
   // Find all json files in dataset dirs
   const testFiles: string[] = [];
   
-  const scanDir = (dir: string) => {
-    if (!fs.existsSync(dir)) return;
-    const files = fs.readdirSync(dir);
-    for (const file of files) {
-      const fullPath = path.join(dir, file);
-      if (fs.statSync(fullPath).isDirectory()) {
-        scanDir(fullPath);
-      } else if (file.endsWith('.json')) {
-        testFiles.push(fullPath);
-      }
+  if (targetFile) {
+    const fullPath = path.join(DATASET_DIR, targetFile.endsWith('.json') ? targetFile : `${targetFile}.json`);
+    if (fs.existsSync(fullPath)) {
+      testFiles.push(fullPath);
+    } else {
+      console.error(`❌ 指定的目标文件不存在: ${fullPath}`);
+      return;
     }
-  };
-
-  scanDir(DATASET_DIR);
+  } else {
+    const scanDir = (dir: string) => {
+      if (!fs.existsSync(dir)) return;
+      const files = fs.readdirSync(dir);
+      for (const file of files) {
+        const fullPath = path.join(dir, file);
+        if (fs.statSync(fullPath).isDirectory()) {
+          scanDir(fullPath);
+        } else if (file.endsWith('.json')) {
+          testFiles.push(fullPath);
+        }
+      }
+    };
+    scanDir(DATASET_DIR);
+  }
 
   if (testFiles.length === 0) {
     console.log("未找到任何评测用例文件 (.json)。");
