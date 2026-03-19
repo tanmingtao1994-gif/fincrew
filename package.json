@@ -36,6 +36,7 @@
     "fast-xml-parser": "^4.3.0",
     "inquirer": "^8.2.6",
     "rettiwt-api": "^6.2.1",
+    "rss-parser": "^3.13.0",
     "technicalindicators": "^3.1.0",
     "uuid": "^9.0.0",
     "yahoo-finance2": "^3.13.0",

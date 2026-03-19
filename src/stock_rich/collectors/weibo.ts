@@ -73,12 +73,31 @@ function isTargetDate(weiboDate: string, targetDate: string): boolean {
 /** 通过 weibo.com AJAX API 获取用户微博 */
 async function fetchUserWeibo(uid: string, cookie: string): Promise<any[]> {
   const url = `https://weibo.com/ajax/statuses/mymblog?uid=${uid}&page=1&feature=0`;
+  
+  // 提取 xsrf token
+  const xsrfMatch = cookie.match(/XSRF-TOKEN=([^;]+)/);
+  const xsrfToken = xsrfMatch ? xsrfMatch[1] : (process.env.WEIBO_XSRF_TOKEN || '');
+  
   const resp = await fetch(url, {
     headers: {
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'application/json',
-      'Referer': `https://weibo.com/u/${uid}`,
-      'Cookie': cookie,
+      'accept': 'application/json, text/plain, */*',
+      'accept-language': 'zh,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh-CN;q=0.6',
+      'cache-control': 'no-cache',
+      'client-version': '3.0.0',
+      'dnt': '1',
+      'pragma': 'no-cache',
+      'priority': 'u=1, i',
+      'referer': `https://weibo.com/u/${uid}`,
+      'sec-ch-ua': '"Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"macOS"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'same-origin',
+      'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+      'x-requested-with': 'XMLHttpRequest',
+      'x-xsrf-token': xsrfToken,
+      'cookie': cookie,
     },
   });
 
