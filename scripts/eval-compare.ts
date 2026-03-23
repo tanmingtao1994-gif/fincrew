@@ -228,7 +228,16 @@ async function evaluateCase(evalCase: EvalCase, targetDir: string): Promise<Test
 }
 
 async function main() {
-  const latestDirName = getLatestInvokeDir();
+  const args = process.argv.slice(2);
+  let forcedTimestamp: string | null = null;
+  
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--timestamp' && args[i + 1]) {
+      forcedTimestamp = args[i + 1];
+    }
+  }
+
+  const latestDirName = forcedTimestamp || getLatestInvokeDir();
   if (!latestDirName) {
     console.error("未找到任何 llm_invoke_results 记录。请先运行 npm run eval。");
     process.exit(1);

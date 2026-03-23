@@ -134,15 +134,18 @@ async function runTest(evalCase: EvalCase, resultsDir: string) {
 async function main() {
   const args = process.argv.slice(2);
   let targetFile: string | null = null;
+  let forcedTimestamp: string | null = null;
   
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--target' && args[i + 1]) {
       targetFile = args[i + 1];
-      break;
+    }
+    if (args[i] === '--timestamp' && args[i + 1]) {
+      forcedTimestamp = args[i + 1];
     }
   }
 
-  const timestamp = getTimestampString();
+  const timestamp = forcedTimestamp || getTimestampString();
   const currentResultsDir = path.join(BASE_RESULTS_DIR, timestamp);
 
   // Ensure results dir exists
