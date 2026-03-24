@@ -51,20 +51,17 @@ specs/002-eval-results-viewer/
 
 ```text
 # Source Code
-src/viewer/
-├── cli.ts               # CLI entry point (npm run view)
-├── parser/              # Data processing and joining logic
-│   └── index.ts
-└── ui/                  # React SPA (Vite project)
-    ├── src/
-    │   ├── components/  # Message bubbles, Code blocks
-    │   ├── pages/       # List, Detail
-    │   └── App.tsx
-    ├── index.html
-    └── package.json     # Or integrated into root package.json
+eval-view.ts             # CLI entry point (npm run view)
+ui/                      # React SPA (Vite project)
+├── src/
+│   ├── components/      # Message bubbles, Code blocks
+│   ├── pages/           # List, Detail
+│   └── App.tsx
+├── index.html
+└── package.json         # UI dependencies
 ```
 
-**Structure Decision**: 采用本地脚本加静态 SPA 的模式。视图相关代码统一放在 `src/viewer` 目录下，`cli.ts` 负责读取 `tests` 数据、组装为 JSON 并启动 Vite 服务器预览 `ui/` 目录中的前端应用。
+**Structure Decision**: 采用本地脚本加静态 SPA 的模式。根目录下直接提供 `eval-view.ts` 作为启动入口负责读取 `tests` 数据并启动服务。前端展示代码统一放在 `ui/` 目录下。
 
 ## Complexity Tracking
 
