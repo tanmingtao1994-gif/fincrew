@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { Layout, Typography, Spin, Alert } from 'antd';
 import { fetchRuns } from '../api';
 import { EvalRun } from '../types';
 import { SummaryList } from '../components/SummaryList';
+
+const { Header, Content } = Layout;
+const { Title } = Typography;
 
 interface Props {
   onSelectTest: (testId: string) => void;
@@ -25,19 +29,19 @@ export const HomePage: React.FC<Props> = ({ onSelectTest }) => {
       });
   }, []);
 
-  if (loading) return <div className="flex items-center justify-center h-full text-gray-500">Loading evaluation runs...</div>;
-  if (error) return <div className="flex items-center justify-center h-full text-red-500">{error}</div>;
+  if (loading) return <div className="flex items-center justify-center h-full"><Spin size="large" /></div>;
+  if (error) return <div className="p-8"><Alert message="Error" description={error} type="error" showIcon /></div>;
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden bg-white">
-      <header className="bg-white border-b px-6 py-4 flex items-center shadow-sm z-10 shrink-0">
-        <h1 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+    <Layout className="h-full w-full bg-white">
+      <Header className="bg-white border-b px-6 flex items-center h-14" style={{ padding: '0 24px', background: '#fff' }}>
+        <Title level={4} style={{ margin: 0 }} className="flex items-center gap-2">
           <span>📊</span> Eval Results Viewer
-        </h1>
-      </header>
-      <main className="flex-1 overflow-hidden">
+        </Title>
+      </Header>
+      <Content className="overflow-hidden bg-white">
         <SummaryList runs={runs} onSelectTest={onSelectTest} />
-      </main>
-    </div>
+      </Content>
+    </Layout>
   );
 };

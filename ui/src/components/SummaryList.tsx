@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
+import { Layout, Menu, Table, Tag, Typography, Button, Space, Badge, Tooltip } from 'antd';
+import { SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { EvalRun, TestCase } from '../types';
+
+const { Sider, Content } = Layout;
+const { Text } = Typography;
 
 interface Props {
   runs: EvalRun[];
@@ -7,7 +12,7 @@ interface Props {
 }
 
 export const SummaryList: React.FC<Props> = ({ runs, onSelectTest }) => {
-  const [selectedRunId, setSelectedRunId] = useState<string | null>(runs[0]?.run_id || null);
+  const [selectedRunId, setSelectedRunId] = useState<string>(runs[0]?.run_id || '');
 
   if (runs.length === 0) {
     return <div className="text-center p-8 text-gray-500">No evaluation runs found.</div>;
@@ -15,140 +20,140 @@ export const SummaryList: React.FC<Props> = ({ runs, onSelectTest }) => {
 
   const selectedRun = runs.find(r => r.run_id === selectedRunId) || runs[0];
 
-  const passRate = selectedRun.total > 0 ? Math.round((selectedRun.passed / selectedRun.total) * 100) : 0;
+  const columns = [
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status: string) => (
+        status === 'pass' 
+          ? <Tag icon={<CheckCircleOutlined />} color="success">PASS</Tag>
+          : <Tag icon={<CloseCircleOutlined />} color="error">FAIL</Tag>
+      ),
+      filters: [
+        { text: 'Pass', value: 'pass' },
+        { text: 'Fail', value: 'fail' },
+      ],
+      onFilter: (value: any, record: TestCase) => record.status === value,
+    },
+    {
+      title: 'Test Case',
+      dataIndex: 'name',
+      key: 'name',
+      width: '25%',
+      render: (text: string, record: TestCase) => (
+        <div>
+          <div className="font-medium">{text}</div>
+          <Text type="secondary" className="text-xs font-mono">{record.test_id}</Text>
+        </div>
+      ),
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      width: '35%',
+      render: (text: string) => (
+        <Tooltip title={text} placement="topLeft">
+          <div className="line-clamp-2 text-gray-600 text-sm">{text}</div>
+        </Tooltip>
+      ),
+    },
+    {
+      title: 'Reason',
+      dataIndex: 'judge_reason',
+      key: 'judge_reason',
+      render: (text: string, record: TestCase) => (
+        record.status === 'pass' ? null : (
+          <Tooltip title={text} placement="topLeft">
+            <div className="line-clamp-2 text-red-600 text-sm">{text}</div>
+          </Tooltip>
+        )
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      width: 100,
+      render: (_: any, record: TestCase) => (
+        <Button 
+          type="link" 
+          size="small" 
+          icon={<SearchOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelectTest(record.test_id);
+          }}
+        >
+          Inspect
+        </Button>
+      ),
+    },
+  ];
 
   return (
-    <div className="flex h-full w-full">
-      {/* Sidebar for runs */}
-      <div className="w-64 border-r border-gray-200 bg-gray-50 overflow-y-auto hidden md:block shrink-0">
-        <div className="p-4 border-b border-gray-200 sticky top-0 bg-gray-50/95 backdrop-blur z-10">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Evaluation Runs</h2>
+    <Layout className="h-full bg-white flex-row">
+      <Sider width={260} className="bg-gray-50 border-r border-gray-200 overflow-y-auto" theme="light">
+        <div className="p-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
+          <Text strong type="secondary" className="uppercase text-xs tracking-wider">Evaluation Runs</Text>
         </div>
-        <div className="p-2 space-y-1">
-          {runs.map(run => {
-             const runPassRate = run.total > 0 ? Math.round((run.passed / run.total) * 100) : 0;
-             return (
-              <div 
-                key={run.run_id}
-                className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedRunId === run.run_id ? 'bg-blue-50 border border-blue-200' : 'border border-transparent hover:bg-gray-200/50'}`}
-                onClick={() => setSelectedRunId(run.run_id)}
-              >
-                <div className={`text-sm font-medium truncate ${selectedRunId === run.run_id ? 'text-blue-900' : 'text-gray-800'}`}>
-                  {run.run_id}
+        <Menu
+          mode="inline"
+          selectedKeys={[selectedRunId]}
+          className="border-r-0 bg-transparent"
+          items={runs.map(run => {
+            const passRate = run.total > 0 ? Math.round((run.passed / run.total) * 100) : 0;
+            return {
+              key: run.run_id,
+              onClick: () => setSelectedRunId(run.run_id),
+              label: (
+                <div className="py-2 flex flex-col gap-1 leading-tight h-auto">
+                  <div className="text-sm font-medium truncate" title={run.run_id}>{run.run_id}</div>
+                  <div className="flex items-center justify-between text-xs">
+                    <Text type="secondary">{run.total} cases</Text>
+                    <Badge 
+                      count={`${passRate}%`} 
+                      style={{ 
+                        backgroundColor: passRate === 100 ? '#52c41a' : '#ff4d4f',
+                        fontSize: '11px'
+                      }} 
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
-                    {run.total} cases
-                  </span>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded ${runPassRate === 100 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {runPassRate}% Pass
-                  </span>
-                </div>
-              </div>
-            );
+              ),
+            };
           })}
-        </div>
-      </div>
+        />
+      </Sider>
 
-      {/* Main content for test cases */}
-      <div className="flex-1 flex flex-col h-full bg-white overflow-hidden">
-        {/* Top metrics bar */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white shrink-0">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold text-gray-800 tracking-tight">{selectedRun.run_id}</h1>
-            <div className="flex gap-2">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                Total: {selectedRun.total}
-              </span>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-                Passed: {selectedRun.passed}
-              </span>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
-                Failed: {selectedRun.failed}
-              </span>
-            </div>
-          </div>
+      <Content className="flex flex-col h-full bg-white overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between shrink-0">
+          <Space size="large">
+            <Text strong className="text-lg">{selectedRun.run_id}</Text>
+            <Space>
+              <Tag>Total: {selectedRun.total}</Tag>
+              <Tag color="success">Passed: {selectedRun.passed}</Tag>
+              <Tag color="error">Failed: {selectedRun.failed}</Tag>
+            </Space>
+          </Space>
         </div>
-
-        {/* Table container */}
-        <div className="flex-1 overflow-auto bg-gray-50/30">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50 sticky top-0 z-10">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                  Test Case
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">
-                  Description
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Result Reason
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {selectedRun.cases.map((tc: TestCase) => {
-                const isPass = tc.status === 'pass';
-                return (
-                  <tr 
-                    key={tc.test_id} 
-                    className="hover:bg-blue-50/50 transition-colors group cursor-pointer"
-                    onClick={() => onSelectTest(tc.test_id)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium ${isPass ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {isPass ? 'PASS' : 'FAIL'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 break-words">
-                      {tc.name}
-                      <div className="text-xs text-gray-400 font-normal mt-1 font-mono">{tc.test_id}</div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      <div className="line-clamp-3" title={tc.description}>
-                        {tc.description}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {!isPass && tc.judge_reason ? (
-                        <div className="line-clamp-3 text-red-600" title={tc.judge_reason}>
-                          {tc.judge_reason}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 italic">No specific reason logged</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectTest(tc.test_id);
-                        }}
-                        className="text-blue-600 hover:text-blue-900 opacity-0 group-hover:opacity-100 transition-opacity bg-blue-50 px-3 py-1 rounded"
-                      >
-                        Inspect
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-              {selectedRun.cases.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-500 italic">
-                    No test cases in this run.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        
+        <div className="flex-1 overflow-auto p-4">
+          <Table 
+            columns={columns} 
+            dataSource={selectedRun.cases} 
+            rowKey="test_id"
+            pagination={false}
+            size="middle"
+            onRow={(record) => ({
+              onClick: () => onSelectTest(record.test_id),
+              className: 'cursor-pointer hover:bg-blue-50/30'
+            })}
+            rowClassName={(record) => record.status === 'fail' ? 'bg-red-50/20' : ''}
+          />
         </div>
-      </div>
-    </div>
+      </Content>
+    </Layout>
   );
 };
