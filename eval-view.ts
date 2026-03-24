@@ -178,6 +178,12 @@ async function start() {
   // Data to expose to Vite UI
   const invocationsObj = Object.fromEntries(invocations);
 
+  const dataFilePath = path.join(__dirname, 'ui', 'public', 'eval-data.json');
+  await fs.writeFile(dataFilePath, JSON.stringify({
+    runs: formattedRuns,
+    invocations: invocationsObj
+  }));
+
   const vite = await createServer({
     root: path.join(__dirname, 'ui'),
     server: {
@@ -186,15 +192,9 @@ async function start() {
     },
     plugins: [
       {
-        name: 'inject-eval-data',
+        name: 'remove-inject-placeholder',
         transformIndexHtml(html) {
-          return html.replace(
-            '<!-- INJECT_DATA -->',
-            `<script>
-              window.__EVAL_RUNS__ = ${JSON.stringify(formattedRuns)};
-              window.__EVAL_INVOCATIONS__ = ${JSON.stringify(invocationsObj)};
-            </script>`
-          );
+          return html.replace('<!-- INJECT_DATA -->', '');
         }
       }
     ]
