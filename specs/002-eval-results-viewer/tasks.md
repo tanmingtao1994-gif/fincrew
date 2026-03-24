@@ -22,10 +22,10 @@ description: "Task list for implementing Eval Results Viewer"
 
 **Purpose**: Project initialization and basic structure for the CLI tool and Vite SPA
 
-- [ ] T001 Create `eval-view.ts` CLI script entry point
-- [ ] T002 Initialize `ui/` directory with Vite + React + TypeScript setup
-- [ ] T003 [P] Configure Tailwind CSS in `ui/` project
-- [ ] T004 [P] Update root `package.json` to include `"view": "npx tsx eval-view.ts"` script
+- [x] T001 Create `eval-view.ts` CLI script entry point
+- [x] T002 Initialize `ui/` directory with Vite + React + TypeScript setup
+- [x] T003 [P] Configure Tailwind CSS in `ui/` project
+- [x] T004 [P] Update root `package.json` to include `"view": "npx tsx eval-view.ts"` script
 
 ---
 
@@ -33,10 +33,10 @@ description: "Task list for implementing Eval Results Viewer"
 
 **Purpose**: Core data parsing and serving infrastructure that MUST be complete before UI user stories can be implemented
 
-- [ ] T005 Create data model TypeScript interfaces in `ui/src/types.ts`
-- [ ] T006 Implement test data file reading logic (`eval_dataset`, `eval_results`, `llm_invoke_results`) in `eval-view.ts`
-- [ ] T007 Implement data joining logic to assemble `TestCase` and `EvalRun` data in `eval-view.ts`
-- [ ] T008 Implement local Vite server startup logic in `eval-view.ts` to serve the `ui/` app and provide the merged JSON payload
+- [x] T005 Create data model TypeScript interfaces in `ui/src/types.ts`
+- [x] T006 Implement test data file reading logic (`eval_dataset`, `eval_results`, `llm_invoke_results`) in `eval-view.ts`
+- [x] T007 Implement data joining logic to assemble `TestCase` and `EvalRun` data in `eval-view.ts`
+- [x] T008 Implement local Vite server startup logic in `eval-view.ts` to serve the `ui/` app and provide the merged JSON payload
 
 **Checkpoint**: Foundation ready - local CLI can read data and serve the Vite app.
 
@@ -50,11 +50,11 @@ description: "Task list for implementing Eval Results Viewer"
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Create API fetching/mocking wrapper to consume data injected by CLI in `ui/src/api.ts`
-- [ ] T010 [P] [US1] Implement `SummaryList` component in `ui/src/components/SummaryList.tsx`
-- [ ] T011 [P] [US1] Implement `TestCaseRow` component in `ui/src/components/TestCaseRow.tsx`
-- [ ] T012 [US1] Assemble list view page in `ui/src/pages/HomePage.tsx`
-- [ ] T013 [US1] Integrate `HomePage` into `ui/src/App.tsx` router/layout
+- [x] T009 [US1] Create API fetching/mocking wrapper to consume data injected by CLI in `ui/src/api.ts`
+- [x] T010 [P] [US1] Implement `SummaryList` component in `ui/src/components/SummaryList.tsx`
+- [x] T011 [P] [US1] Implement `TestCaseRow` component in `ui/src/components/TestCaseRow.tsx`
+- [x] T012 [US1] Assemble list view page in `ui/src/pages/HomePage.tsx`
+- [x] T013 [US1] Integrate `HomePage` into `ui/src/App.tsx` router/layout
 
 **Checkpoint**: At this point, User Story 1 should be fully functional (Summary List displays).
 
@@ -68,10 +68,10 @@ description: "Task list for implementing Eval Results Viewer"
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Update `ui/src/api.ts` to fetch/filter specific `LLMInvocation` details by `test_id`
-- [ ] T015 [P] [US2] Create basic `MessageList` layout component in `ui/src/components/MessageList.tsx`
-- [ ] T016 [P] [US2] Create `DetailViewPage` in `ui/src/pages/DetailViewPage.tsx`
-- [ ] T017 [US2] Implement navigation (React Router or state-based) from `TestCaseRow` to `DetailViewPage` in `ui/src/App.tsx`
+- [x] T014 [US2] Update `ui/src/api.ts` to fetch/filter specific `LLMInvocation` details by `test_id`
+- [x] T015 [P] [US2] Create basic `MessageList` layout component in `ui/src/components/MessageList.tsx`
+- [x] T016 [P] [US2] Create `DetailViewPage` in `ui/src/pages/DetailViewPage.tsx`
+- [x] T017 [US2] Implement navigation (React Router or state-based) from `TestCaseRow` to `DetailViewPage` in `ui/src/App.tsx`
 
 **Checkpoint**: At this point, clicking a row navigates to a details page displaying raw message flow.
 
@@ -85,11 +85,11 @@ description: "Task list for implementing Eval Results Viewer"
 
 ### Implementation for User Story 3
 
-- [ ] T018 [P] [US3] Add `react-markdown` dependency and configure in `ui/`
-- [ ] T019 [US3] Implement role-based (user/assistant) styling wrapper `MessageBubble` in `ui/src/components/MessageBubble.tsx`
-- [ ] T020 [P] [US3] Implement `ThinkingBlock` component (collapsible) in `ui/src/components/ThinkingBlock.tsx`
-- [ ] T021 [P] [US3] Implement `ToolCallBlock` and `ToolResultBlock` (with max-height) in `ui/src/components/ToolBlocks.tsx`
-- [ ] T022 [US3] Update `MessageList.tsx` to map `content.type` to the newly created specific blocks
+- [x] T018 [P] [US3] Add `react-markdown` dependency and configure in `ui/`
+- [x] T019 [US3] Implement role-based (user/assistant) styling wrapper `MessageBubble` in `ui/src/components/MessageBubble.tsx`
+- [x] T020 [P] [US3] Implement `ThinkingBlock` component (collapsible) in `ui/src/components/ThinkingBlock.tsx`
+- [x] T021 [P] [US3] Implement `ToolCallBlock` and `ToolResultBlock` (with max-height) in `ui/src/components/ToolBlocks.tsx`
+- [x] T022 [US3] Update `MessageList.tsx` to map `content.type` to the newly created specific blocks
 
 **Checkpoint**: All user stories should now be independently functional. The UI should look polished and distinct.
 
@@ -99,9 +99,9 @@ description: "Task list for implementing Eval Results Viewer"
 
 **Purpose**: Edge cases and error handling
 
-- [ ] T023 Handle edge case: graceful fallback in `eval-view.ts` when `llm_invoke_results` directory is missing
-- [ ] T024 Handle edge case: graceful fallback in UI when JSON parsing fails for a specific test case
-- [ ] T025 Validate and format `quickstart.md` execution flow
+- [x] T023 Handle edge case: graceful fallback in `eval-view.ts` when `llm_invoke_results` directory is missing
+- [x] T024 Handle edge case: graceful fallback in UI when JSON parsing fails for a specific test case
+- [x] T025 Validate and format `quickstart.md` execution flow
 
 ---
 
