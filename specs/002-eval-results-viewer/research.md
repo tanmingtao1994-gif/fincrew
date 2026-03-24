@@ -1,14 +1,13 @@
 # Technical Research: Eval Results Viewer
 
-## Unknown 1: Technical Stack for Local HTTP Service & Web UI
-**Decision**: Use Express.js (Node.js) for the local HTTP server and React (Next.js or Create React App) or a lightweight bundled static site for the frontend UI. Given the requirement is a simple viewer similar to `promptfoo view`, a Node.js script that serves static files and an API is the most straightforward approach.
-**Rationale**: Node.js is excellent for reading local files and serving them quickly. React provides a robust ecosystem for building complex UIs, particularly for rendering distinct visual elements for different message types (text, thinking, toolCall) efficiently.
-**Alternatives considered**: Python (FastAPI + Jinja/React), Go. Node.js is selected assuming the primary project context or typical AI toolchain (like promptfoo) leans towards JavaScript/TypeScript.
+## Unknown 1: Technical Stack for Local UI
+**Decision**: Use an SPA (React/Next.js/Vite) or a simple script that generates an HTML file. Given the feedback, a heavy backend is not needed. The visualization can be achieved by reading local files directly via a local script or a very lightweight dev server (like Vite) serving a purely client-side app that fetches local JSON.
+**Rationale**: The user pointed out this should be like `npm analyze` - a local visualization tool. No complex backend routing is needed since data source is purely static local files in `tests`.
+**Alternatives considered**: Express.js backend + React frontend. Rejected based on user feedback to simplify the architecture and treat it as a local CLI/visualization tool rather than a full web service.
 
 ## Unknown 2: Parsing and Correlating Multi-source JSON/JSONL Data
-**Decision**: The backend service will read the `tests` directory on startup or on-demand, parsing `eval_dataset`, `eval_results`, and `llm_invoke_results`. It will join these datasets in-memory based on the common identifier (`test_id`).
-**Rationale**: Reading from local file system directly avoids the need for a database. In-memory joins are extremely fast and perfectly suitable for viewing evaluation results locally where data size is bounded.
-**Alternatives considered**: Loading data into a local SQLite database on startup. Too heavy for a simple local viewer.
+**Decision**: A local Node.js script will parse the `tests` directory (`eval_dataset`, `eval_results`, and `llm_invoke_results`) and either inject the joined data directly into a static HTML file, or serve them statically via a minimal local server (e.g., using `vite` or `http-server`) so the frontend SPA can fetch them as static assets.
+**Rationale**: Simplifies the architecture. In-memory joins or static JSON generation perfectly suits a local viewer where data size is bounded.
 
 ## Unknown 3: Handling Long Outputs and Multi-modal Content
 **Decision**: Use distinct React components for different `role` and `content.type`. Implement CSS `max-height` with an `overflow-y: auto` and a "Show More" toggle for `toolResult` or large text blocks.

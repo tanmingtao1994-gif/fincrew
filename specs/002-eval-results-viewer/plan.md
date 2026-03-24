@@ -7,16 +7,16 @@
 
 ## Summary
 
-构建一个类似 promptfoo view 的本地 Web 可视化工具。后端使用 Node.js (Express) 读取并解析本地 `tests` 目录下的多源文件（评测描述、结果、LLM日志），前端使用 React 渲染列表和详情页，着重区分并格式化多模态的 LLM 对话日志（文本、思考过程、工具调用等）。
+构建一个类似 promptfoo view / webpack-bundle-analyzer 的本地 Web 可视化工具。不再需要厚重的后端服务。整体架构转变为一个本地执行的 Node.js 脚本，该脚本读取 `tests` 目录下的源文件，进行数据组装，然后启动一个轻量级的本地静态服务器（如 Vite）来展示预构建的 React/前端页面，数据可以直接作为静态资源注入或由前端直接请求本地文件。开发代码放置在主项目的 `src/viewer` 或 `scripts` 目录中。
 
 ## Technical Context
 
-**Language/Version**: TypeScript / Node.js 18+ (Backend), React (Frontend)
-**Primary Dependencies**: Express (Backend), Tailwind CSS & react-markdown (Frontend)
+**Language/Version**: TypeScript / Node.js 18+, React (Frontend)
+**Primary Dependencies**: Vite (for local serving/building), Tailwind CSS & react-markdown (UI)
 **Storage**: Local JSON/JSONL files (Read-only)
 **Testing**: Jest or Vitest
-**Target Platform**: Local developer environment
-**Project Type**: Local Web application (Fullstack monorepo style script/tool)
+**Target Platform**: Local developer environment (CLI tool -> Browser)
+**Project Type**: Local CLI visualization tool + SPA
 **Performance Goals**: Startup < 5s, List render < 1s
 **Constraints**: Zero database dependencies, must handle large toolResult texts gracefully
 **Scale/Scope**: Local scoped, handles hundreds of test cases and corresponding JSONL logs smoothly
@@ -25,12 +25,12 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **Atomicity**: The backend API endpoints and frontend components are designed with single responsibilities (e.g., separate parsing logic from routing).
-- **Interface Contract**: Strict TypeScript interfaces will be defined for `TestCase`, `EvalRun`, and `LLMMessage` shared between frontend and backend.
-- **Dependency Inversion**: No circular dependencies. The data parsing layer will be abstracted from the Express routing layer.
-- **Exception Propagation**: The backend will return structured JSON error responses that the frontend can display gracefully (e.g., when `llm_invoke_results` are missing).
-- **Documented Code**: Core parsers and UI components will include JSDoc.
-- **Language Presentation**: UI and documentation will use Chinese, while code identifiers and APIs use English.
+- **Atomicity**: 数据解析逻辑与 UI 渲染逻辑分离。
+- **Interface Contract**: Strict TypeScript interfaces will be defined for `TestCase`, `EvalRun`, and `LLMMessage` shared between data parser and UI.
+- **Dependency Inversion**: 脚本层面避免循环依赖。
+- **Exception Propagation**: 解析错误在命令行输出友好提示，并在 UI 层面优雅降级。
+- **Documented Code**: 核心解析器和 UI 组件将包含 JSDoc。
+- **Language Presentation**: UI 和文档使用中文，代码标识符和 API 使用英文。
 
 ## Project Structure
 
@@ -42,31 +42,29 @@ specs/002-eval-results-viewer/
 ├── research.md          # Phase 0 output (/speckit.plan command)
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
 └── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
+
+*(Note: API contracts directory is removed as we are not building a REST API backend anymore)*
 
 ### Source Code (repository root)
 
 ```text
-# Web application
-viewer/
-├── backend/
-│   ├── src/
-│   │   ├── parser/      # Reads and joins local files
-│   │   ├── api/         # Express routes
-│   │   └── types.ts     # Shared contracts
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/  # Message bubbles, Code blocks
-│   │   ├── pages/       # List, Detail
-│   │   └── api.ts       # Fetch wrappers
-│   └── package.json
-└── package.json         # Workspace/runner scripts (npm run view)
+# Source Code
+src/viewer/
+├── cli.ts               # CLI entry point (npm run view)
+├── parser/              # Data processing and joining logic
+│   └── index.ts
+└── ui/                  # React SPA (Vite project)
+    ├── src/
+    │   ├── components/  # Message bubbles, Code blocks
+    │   ├── pages/       # List, Detail
+    │   └── App.tsx
+    ├── index.html
+    └── package.json     # Or integrated into root package.json
 ```
 
-**Structure Decision**: The project will utilize a simple frontend/backend split nested under a `viewer` or `scripts/viewer` directory in the repository to keep it cleanly separated from the core agent logic while providing the necessary UI capabilities.
+**Structure Decision**: 采用本地脚本加静态 SPA 的模式。视图相关代码统一放在 `src/viewer` 目录下，`cli.ts` 负责读取 `tests` 数据、组装为 JSON 并启动 Vite 服务器预览 `ui/` 目录中的前端应用。
 
 ## Complexity Tracking
 
