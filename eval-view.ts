@@ -186,25 +186,15 @@ async function start() {
     },
     plugins: [
       {
-        name: 'serve-eval-data',
-        configureServer(server) {
-          server.middlewares.use('/api/runs', (req, res) => {
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(formattedRuns));
-          });
-          server.middlewares.use('/api/invocations', (req, res) => {
-            const url = new URL(req.url || '/', `http://${req.headers.host}`);
-            const testId = url.searchParams.get('test_id');
-            res.setHeader('Content-Type', 'application/json');
-            if (testId && invocationsObj[testId]) {
-              res.end(JSON.stringify({ test_id: testId, messages: invocationsObj[testId] }));
-            } else if (!testId) {
-               res.end(JSON.stringify(invocationsObj));
-            } else {
-              res.statusCode = 404;
-              res.end(JSON.stringify({ error: 'Not found' }));
-            }
-          });
+        name: 'inject-eval-data',
+        transformIndexHtml(html) {
+          return html.replace(
+            '<!-- INJECT_DATA -->',
+            `<script>
+              window.__EVAL_RUNS__ = ${JSON.stringify(formattedRuns)};
+              window.__EVAL_INVOCATIONS__ = ${JSON.stringify(invocationsObj)};
+            </script>`
+          );
         }
       }
     ]
