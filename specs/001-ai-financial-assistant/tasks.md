@@ -19,47 +19,47 @@
 
 ## 阶段 1：初始化与基础设施 (Setup)
 
-- [ ] T001 [P] 实现按日数据路径生成和读写工具于 `src/utils/dailyStorage.ts`
-- [ ] T002 [P] 根据 data-model.md 创建共享类型定义于 `src/types/domain.ts`
-- [ ] T003 [P] 实现带验证的配置加载器于 `src/utils/config.ts`
-- [ ] T004 [P] 实现标准化的 `ToolError` 类和错误处理工具于 `src/utils/error.ts`
-- [ ] T005 创建 Agent 基础配置模板（IDENTITY/SOUL/USER/TOOLS/BOOTSTRAP）于 `src/agents/templates/`
+- [x] T001 [P] 实现按日数据路径生成和读写工具于 `src/utils/dailyStorage.ts`
+- [x] T002 [P] 根据 data-model.md 创建共享类型定义于 `src/types/domain.ts`
+- [x] T003 [P] 实现带验证的配置加载器于 `src/utils/config.ts`
+- [x] T004 [P] 实现标准化的 `ToolError` 类和错误处理工具于 `src/utils/error.ts`
+- [x] T005 创建 Agent 基础配置模板（IDENTITY/SOUL/USER/TOOLS/BOOTSTRAP）于 `src/agents/templates/`
 
 ## 阶段 2：基础能力 (Foundational - Memory & Data Layer)
 
 *依赖：阶段 1*
 
-- [ ] T006 [P] 实现 MemoryNode 和 MemoryIndex 接口于 `src/types/memory.ts`
-- [ ] T007 实现基于文件的 JSON 记忆存储机制于 `src/utils/storage.ts` (Financial Manager Workspace)
-- [ ] T008 实现 `storeMemory` Skill 逻辑于 `src/agents/skills/memory/storeMemory.ts`
-- [ ] T009 实现 `retrieveMemory` Skill 逻辑（含基础索引）于 `src/agents/skills/memory/retrieveMemory.ts`
-- [ ] T010 实现 `updateMemory` Skill 逻辑于 `src/agents/skills/memory/updateMemory.ts`
-- [ ] T011 [P] 创建 `stock_rich` 市场数据（股票、新闻）适配器于 `src/utils/stockRichAdapter.ts`
-- [ ] T012 [P] 创建 `stock_rich` 期权数据适配器于 `src/utils/optionAdapter.ts`
+- [x] T006 [P] 实现 MemoryNode 和 MemoryIndex 接口于 `src/types/memory.ts`
+- [x] T007 实现基于文件的 JSON 记忆存储机制于 `src/utils/storage.ts` (Financial Manager Workspace)
+- [x] T008 实现 `storeMemory` Skill 逻辑于 `src/agents/skills/memory/storeMemory.ts`
+- [x] T009 实现 `retrieveMemory` Skill 逻辑（含基础索引）于 `src/agents/skills/memory/retrieveMemory.ts`
+- [x] T010 实现 `updateMemory` Skill 逻辑于 `src/agents/skills/memory/updateMemory.ts`
+- [x] T011 [P] 创建 `stock_rich` 市场数据（股票、新闻）适配器于 `src/utils/stockRichAdapter.ts`
+- [x] T012 [P] 创建 `stock_rich` 期权数据适配器于 `src/utils/optionAdapter.ts`
 
 ## 阶段 3：[US1] 市场信息感知 (Market Perception)
 
 *目标：使系统具备收集和整理市场数据的能力。*
 *依赖：阶段 2*
 
-- [ ] T013 [US1] 配置 `info-processor` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md 于 `src/agents/workspace-info-processor/`
-- [ ] T014 [P] [US1] 实现 `collect` Skill（集成 stock_rich 并输出到 Daily Storage）于 `src/agents/skills/collect.ts`
-- [ ] T015 [US1] 实现 `searchHotKeywords` Skill 逻辑于 `src/agents/skills/searchHotKeywords.ts`
-- [ ] T016 [US1] 创建 Info Processor 数据收集的集成测试于 `tests/integration/us1_perception.test.ts`
+- [x] T013 [US1] 配置 `info-processor` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md 于 `src/agents/workspace-info-processor/`
+- [x] T014 [P] [US1] 实现 `collect` Skill（集成 stock_rich 并输出到 Daily Storage）于 `src/agents/skills/collect.ts`
+- [x] T015 [US1] 实现 `searchHotKeywords` Skill 逻辑于 `src/agents/skills/searchHotKeywords.ts`
+- [x] T016 [US1] 创建 Info Processor 数据收集的集成测试于 `tests/integration/us1_perception.test.ts`
 
 ## 阶段 4：[US2] 投资决策分析 (Analysis & Decision)
 
 *目标：实现市场分析和交易预案制定。*
 *依赖：阶段 3*
 
-- [ ] T017 [US2] 配置 `macro-analyst` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md 于 `src/agents/workspace-macro-analyst/`
-- [ ] T018 [US2] 配置 `technical-analyst` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md 于 `src/agents/workspace-technical-analyst/`
-- [ ] T019 [P] [US2] 实现 `analyzeMarket` Skill 逻辑（从 Daily Storage 读取）于 `src/agents/skills/analyzeMarket.ts`
-- [ ] T020 [P] [US2] 实现 `analyzeStock` Skill 逻辑（从 Daily Storage 读取）于 `src/agents/skills/analyzeStock.ts`
-- [ ] T021 [US2] 实现 `validateRiskControls` Skill 逻辑于 `src/agents/skills/validateRiskControls.ts`
-- [ ] T022 [US2] 实现 `checkRiskLimits` Skill 逻辑于 `src/agents/skills/checkRiskLimits.ts`
-- [ ] T023 [US2] 实现 `createTradingPlan` Skill 逻辑（输出到 Daily Storage）于 `src/agents/skills/createTradingPlan.ts`
-- [ ] T024 [US2] 创建分析与决策流程的集成测试于 `tests/integration/us2_analysis.test.ts`
+- [x] T017 [US2] 配置 `macro-analyst` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md 于 `src/agents/workspace-macro-analyst/`
+- [x] T018 [US2] 配置 `technical-analyst` Agent：创建 IDENTITY.md, SOUL.md, USER.md, TOOLS.md 于 `src/agents/workspace-technical-analyst/`
+- [x] T019 [P] [US2] 实现 `analyzeMarket` Skill 逻辑（从 Daily Storage 读取）于 `src/agents/skills/analyzeMarket.ts`
+- [x] T020 [P] [US2] 实现 `analyzeStock` Skill 逻辑（从 Daily Storage 读取）于 `src/agents/skills/analyzeStock.ts`
+- [x] T021 [US2] 实现 `validateRiskControls` Skill 逻辑于 `src/agents/skills/validateRiskControls.ts`
+- [x] T022 [US2] 实现 `checkRiskLimits` Skill 逻辑于 `src/agents/skills/checkRiskLimits.ts`
+- [x] T023 [US2] 实现 `createTradingPlan` Skill 逻辑（输出到 Daily Storage）于 `src/agents/skills/createTradingPlan.ts`
+- [x] T024 [US2] 创建分析与决策流程的集成测试于 `tests/integration/us2_analysis.test.ts`
 
 ## 阶段 5：[US3] 交易执行与复盘 (Execution & Review)
 
