@@ -52,8 +52,8 @@ specs/002-eval-results-viewer/
 ```text
 # Source Code
 eval-view.ts             # CLI entry point (npm run view)
-ui/                      # React SPA (Vite project)
-├── src/
+src/                      # React SPA (Vite project)
+├── eval-view/
 │   ├── components/      # Message bubbles, Code blocks
 │   ├── pages/           # List, Detail
 │   └── App.tsx

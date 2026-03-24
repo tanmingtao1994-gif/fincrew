@@ -19,6 +19,7 @@
     "eval": "node --loader ts-node/esm scripts/eval-runner.ts",
     "eval:compare": "node --loader ts-node/esm scripts/eval-compare.ts",
     "eval:all": "TS=$(date +\"%Y-%m-%d-%H-%M-%S\") && npm run eval -- --timestamp $TS && npm run eval:compare -- --timestamp $TS",
+    "view": "npx tsx eval-view.ts",
     "claw-dev": "npx cpx2 \"src/agents/**/*\" ~/.openclaw --watch --ignore=\"**/templates/**\" & npx cpx2 \"src/agents/**/*\" /Users/bytedance/.openclaw-dev --watch --ignore=\"**/templates/**\""
   },
   "keywords": [
