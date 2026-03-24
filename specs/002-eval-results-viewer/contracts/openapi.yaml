@@ -1,0 +1,126 @@
+openapi: 3.0.0
+info:
+  title: Eval Results Viewer API
+  description: API for retrieving evaluation results and LLM interaction logs.
+  version: 1.0.0
+paths:
+  /api/runs:
+    get:
+      summary: List all evaluation runs
+      responses:
+        '200':
+          description: A list of evaluation runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EvalRun'
+  /api/runs/{runId}/cases:
+    get:
+      summary: List all test cases for a specific run
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of test cases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestCase'
+  /api/cases/{testId}/invocations:
+    get:
+      summary: Get the LLM interaction logs for a specific test case
+      parameters:
+        - name: testId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: LLM invocation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMInvocation'
+        '404':
+          description: Invocation logs not found
+
+components:
+  schemas:
+    EvalRun:
+      type: object
+      properties:
+        run_id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        total:
+          type: integer
+        passed:
+          type: integer
+        failed:
+          type: integer
+    TestCase:
+      type: object
+      properties:
+        test_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        expected_behavior:
+          type: string
+        status:
+          type: string
+        score:
+          type: number
+        judge_reason:
+          type: string
+        duration:
+          type: integer
+        has_logs:
+          type: boolean
+    LLMInvocation:
+      type: object
+      properties:
+        test_id:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LLMMessage'
+    LLMMessage:
+      type: object
+      properties:
+        role:
+          type: string
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageContent'
+        timestamp:
+          type: string
+          format: date-time
+    MessageContent:
+      type: object
+      properties:
+        type:
+          type: string
+        text:
+          type: string
+        name:
+          type: string
+        arguments:
+          type: object
+        result:
+          type: object
