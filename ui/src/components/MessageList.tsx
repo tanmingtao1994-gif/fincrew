@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { LLMMessage } from '../types';
+import type { LLMMessage } from '../types';
 import { MessageBubble } from './MessageBubble';
 import { ThinkingBlock } from './ThinkingBlock';
 import { ToolCallBlock, ToolResultBlock } from './ToolBlocks';

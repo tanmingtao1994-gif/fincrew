@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Layout, Menu, Table, Tag, Typography, Button, Space, Badge, Tooltip } from 'antd';
 import { SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { EvalRun, TestCase } from '../types';
+import type { EvalRun, TestCase } from '../types';
 
 const { Sider, Content } = Layout;
 const { Text } = Typography;

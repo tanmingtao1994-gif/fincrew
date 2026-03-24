@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Spin, Alert } from 'antd';
 import { fetchRuns } from '../api';
-import { EvalRun } from '../types';
+import type { EvalRun } from '../types';
 import { SummaryList } from '../components/SummaryList';
 
 const { Header, Content } = Layout;

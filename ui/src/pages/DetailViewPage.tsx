@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Drawer, Spin, Alert, Typography } from 'antd';
 import { fetchInvocations } from '../api';
-import { LLMInvocation } from '../types';
+import type { LLMInvocation } from '../types';
 import { MessageList } from '../components/MessageList';
 
 const { Text } = Typography;

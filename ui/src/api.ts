@@ -1,4 +1,4 @@
-import { EvalRun, LLMInvocation } from './types';
+import type { EvalRun, LLMInvocation } from './types';
 
 // State to cache the loaded data
 let cachedData: { runs: EvalRun[], invocations: Record<string, any> } | null = null;
