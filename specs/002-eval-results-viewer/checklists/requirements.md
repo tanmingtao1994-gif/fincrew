@@ -1,8 +1,8 @@
 # Specification Quality Checklist: Eval Results Viewer
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-03-23
-**Feature**: ../spec.md
+**Created**: 2026-03-24
+**Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 
@@ -31,4 +31,4 @@
 
 ## Notes
 
-- All requirements appear complete and focused on user experience rather than implementation details. The success criteria specify clear limits for loading times and render lengths. Ready for planning phase.
+- Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`

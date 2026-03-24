@@ -1,15 +1,14 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
-- Modified principles: 新增 VI. 语言呈现规范 (Language Presentation)
-- Added sections: VI. 语言呈现规范 (Language Presentation)
+- Version change: 1.2.0 → 1.3.0
+- Modified principles: None
+- Added sections: VII. Git 操作限制 (Git Operation Restriction)
 - Removed sections: 无
 - Templates requiring updates:
   ✅ plan-template.md - 无需改动（宪章检查自动引用本文件）
   ✅ spec-template.md - 无需改动
   ✅ tasks-template.md - 无需改动
-- Follow-up TODOs:
-  - TODO(RATIFICATION_DATE): 如需记录历史最初通过日期的确切来源，请补充佐证说明（当前保留既有日期）
+- Follow-up TODOs: None
 -->
 
 # Stock Rich Agent Constitution
@@ -268,7 +267,7 @@ async function getStockPrice(
 }
 ```
 
-❌� **错误示例：**
+❌ **错误示例：**
 ```typescript
 // 缺少 JSDoc 或 JSDoc 不完整
 async function getStockPrice(ticker: string, options?: any) {
@@ -295,6 +294,21 @@ async function getStockPrice(ticker: string, options?: any) {
 - 模板/注释中的中英混排遵循“中文句式，英文专名内联”。
 
 **理由：** 统一语言风格有助于团队协作与审阅，保留英文专名确保与生态（API、库、规范）对齐。
+
+---
+
+### VII. Git 操作限制 (Git Operation Restriction)
+
+**禁止 AI 代理主动执行 Git 操作，将版本控制的决定权完全交还给用户。**
+
+**规则（MUST）：**
+- 绝不（NEVER）自动创建或切换 Git 分支（branch）
+- 绝不（NEVER）自动创建 Git 提交（commit）
+- 绝不（NEVER）自动推送（push）、拉取（pull）或合并（merge）代码
+- 所有 Git 状态变更操作必须由用户手动在终端或 IDE 中执行
+- 可以使用只读的 Git 命令（如 `git status`、`git diff`、`git log`）来获取上下文信息，但不得修改代码库的状态
+
+**理由：** 版本控制是软件开发中的关键环节，包含大量人为意图。由 AI 代理自动进行 Git 操作容易导致不必要的提交历史污染、错误的分支管理，甚至可能覆盖用户正在进行的工作。保持 Git 操作的手动性，确保了代码演进历史的清晰与安全。
 
 ---
 
@@ -339,4 +353,4 @@ async function getStockPrice(ticker: string, options?: any) {
 
 ---
 
-**Version**: 1.1.0 | **Ratified**: 2026-03-11 | **Last Amended**: 2026-03-12
+**Version**: 1.3.0 | **Ratified**: 2026-03-11 | **Last Amended**: 2026-03-24

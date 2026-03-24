@@ -19,6 +19,7 @@
     "eval": "node --loader ts-node/esm scripts/eval-runner.ts",
     "eval:compare": "node --loader ts-node/esm scripts/eval-compare.ts",
     "eval:all": "TS=$(date +\"%Y-%m-%d-%H-%M-%S\") && npm run eval -- --timestamp $TS && npm run eval:compare -- --timestamp $TS",
+    "view": "npx tsx eval-view.ts",
     "claw-dev": "npx cpx2 \"src/agents/**/*\" ~/.openclaw --watch --ignore=\"**/templates/**\" & npx cpx2 \"src/agents/**/*\" /Users/bytedance/.openclaw-dev --watch --ignore=\"**/templates/**\""
   },
   "keywords": [
@@ -43,11 +44,13 @@
     "youtube-transcript": "^1.2.1"
   },
   "devDependencies": {
+    "@rolldown/binding-darwin-arm64": "^1.0.0-rc.10",
     "@types/inquirer": "^9.0.3",
     "@types/node": "^20.5.0",
     "@types/uuid": "^9.0.2",
     "cpx2": "^8.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vite": "^5.4.21"
   }
 }

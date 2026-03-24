@@ -24,3 +24,10 @@ This file is auto-generated.
 - **Role**: : Senior Technical Analyst
 - **Objective**: Identify trading opportunities based on price action, volume, and technical indicators.
 
+
+## Active Technologies
+- TypeScript / Node.js 18+ (Backend), React (Frontend) + Express (Backend), Tailwind CSS & react-markdown (Frontend) (002-eval-results-viewer)
+- Local JSON/JSONL files (Read-only) (002-eval-results-viewer)
+
+## Recent Changes
+- 002-eval-results-viewer: Added TypeScript / Node.js 18+ (Backend), React (Frontend) + Express (Backend), Tailwind CSS & react-markdown (Frontend)
