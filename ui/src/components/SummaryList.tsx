@@ -94,7 +94,7 @@ export const SummaryList: React.FC<Props> = ({ runs, onSelectTest }) => {
 
   return (
     <Layout className="h-full bg-white flex-row">
-      <Sider width={260} className="bg-gray-50 border-r border-gray-200 overflow-y-auto" theme="light">
+      <Sider width={260} className="bg-gray-50 border-r border-gray-200" theme="light">
         <div className="p-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
           <Text strong type="secondary" className="uppercase text-xs tracking-wider">Evaluation Runs</Text>
         </div>
@@ -111,12 +111,13 @@ export const SummaryList: React.FC<Props> = ({ runs, onSelectTest }) => {
                 <div className="py-2 flex flex-col gap-1 leading-tight h-auto">
                   <div className="text-sm font-medium truncate" title={run.run_id}>{run.run_id}</div>
                   <div className="flex items-center justify-between text-xs">
-                    <Text type="secondary">{run.total} cases</Text>
+                    <Text type="secondary" className="truncate mr-4">{run.total} cases</Text>
                     <Badge 
                       count={`${passRate}%`} 
                       style={{ 
                         backgroundColor: passRate === 100 ? '#52c41a' : '#ff4d4f',
-                        fontSize: '11px'
+                        fontSize: '11px',
+                        marginLeft: '8px'
                       }} 
                     />
                   </div>

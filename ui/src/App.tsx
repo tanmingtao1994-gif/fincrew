@@ -3,6 +3,8 @@ import { HomePage } from './pages/HomePage';
 import { DetailViewPage } from './pages/DetailViewPage';
 import { ConfigProvider } from 'antd';
 
+import './App.css'
+
 function App() {
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
 

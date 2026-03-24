@@ -182,3 +182,7 @@
     border-right-color: var(--border);
   }
 }
+
+.ant-menu-item {
+  height: auto !important;
+}
