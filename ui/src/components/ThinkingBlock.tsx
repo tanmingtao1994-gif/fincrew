@@ -22,7 +22,7 @@ export const ThinkingBlock: React.FC<Props> = ({ text }) => {
         <span>{isExpanded ? '▼' : '▶'}</span>
       </div>
       {isExpanded && (
-        <div className="p-3 text-sm text-gray-700 font-mono whitespace-pre-wrap bg-gray-50 border-t border-gray-200">
+        <div className="p-3 text-sm text-gray-700 font-mono whitespace-pre-wrap break-words bg-gray-50 border-t border-gray-200">
           {text}
         </div>
       )}

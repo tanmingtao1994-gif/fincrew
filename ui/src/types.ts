@@ -22,8 +22,10 @@ export interface EvalRun {
 export interface MessageContent {
   type: string;
   text?: string;
+  thinking?: string;
   name?: string;
   arguments?: any;
+  input?: any;
   result?: any;
 }
 

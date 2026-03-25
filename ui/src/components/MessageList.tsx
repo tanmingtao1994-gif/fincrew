@@ -22,11 +22,11 @@ export const MessageList: React.FC<Props> = ({ messages }) => {
              <div className="prose prose-sm max-w-none prose-blue">
                <ReactMarkdown>{msg.content}</ReactMarkdown>
              </div>
-          ) : (
+          ) : Array.isArray(msg.content) ? (
             <>
               {msg.content.map((block, bIdx) => {
-                if (block.type === 'thinking' && block.text) {
-                  return <ThinkingBlock key={bIdx} text={block.text} />;
+                if (block.type === 'thinking' && (block.text || block.thinking)) {
+                  return <ThinkingBlock key={bIdx} text={block.text || block.thinking || ''} />;
                 }
                 if (block.type === 'text' && block.text) {
                   return (
@@ -36,7 +36,7 @@ export const MessageList: React.FC<Props> = ({ messages }) => {
                   );
                 }
                 if (block.type === 'toolCall' || block.type === 'tool_use') {
-                   return <ToolCallBlock key={bIdx} name={block.name || 'unknown'} args={block.arguments} />;
+                   return <ToolCallBlock key={bIdx} name={block.name || 'unknown'} args={block.arguments || block.input} />;
                 }
                 if (block.type === 'toolResult' || block.type === 'tool_result') {
                    return <ToolResultBlock key={bIdx} result={block.result || block.text || 'No result data'} />;
@@ -51,6 +51,8 @@ export const MessageList: React.FC<Props> = ({ messages }) => {
                 );
               })}
             </>
+          ) : (
+            <div className="text-red-500">Invalid message content format</div>
           )}
         </MessageBubble>
       ))}

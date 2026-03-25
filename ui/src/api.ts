@@ -23,10 +23,12 @@ export async function fetchRuns(): Promise<EvalRun[]> {
 
 export async function fetchInvocations(testId: string): Promise<LLMInvocation> {
   const data = await loadData();
-  if (data.invocations && data.invocations[testId]) {
+  // Try exact testId match first, then fallback to testId + '_result'
+  const messages = data.invocations?.[testId] || data.invocations?.[`${testId}_result`];
+  if (messages) {
     return {
       test_id: testId,
-      messages: data.invocations[testId]
+      messages: messages
     };
   }
   return { test_id: testId, messages: [] };

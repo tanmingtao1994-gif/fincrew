@@ -5,11 +5,11 @@ export const ToolCallBlock: React.FC<{ name: string; args: any }> = ({ name, arg
     <div className="bg-indigo-50 border border-indigo-200 rounded-md overflow-hidden mt-2">
       <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 text-xs font-bold uppercase flex items-center gap-2">
         <span>🔧 Tool Call</span>
-        <code className="bg-white px-1 py-0.5 rounded text-indigo-900 normal-case">{name}</code>
+        <code className="bg-white px-1.5 py-0.5 rounded text-indigo-900 normal-case">{name}</code>
       </div>
       <div className="p-3 bg-gray-900 overflow-x-auto">
         <pre className="text-green-400 text-xs m-0 whitespace-pre-wrap break-all">
-          {JSON.stringify(args, null, 2)}
+          {typeof args === 'string' ? args : JSON.stringify(args, null, 2)}
         </pre>
       </div>
     </div>
@@ -30,7 +30,7 @@ export const ToolResultBlock: React.FC<{ result: any }> = ({ result }) => {
       <div className="relative bg-gray-900">
         <div className={`p-3 overflow-x-auto ${!isExpanded && isLong ? 'max-h-64 overflow-y-hidden' : ''}`}>
           <pre className="text-blue-300 text-xs m-0 font-mono whitespace-pre-wrap break-all">
-            {contentStr}
+            {typeof result === 'string' ? result : JSON.stringify(result, null, 2)}
           </pre>
         </div>
         {!isExpanded && isLong && (

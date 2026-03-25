@@ -117,7 +117,18 @@ async function getInvocations() {
              const content = await fs.readFile(path.join(fullTsDirPath, file), 'utf-8');
              const lines = content.split('\n').filter(Boolean);
              const messages = lines.map(line => {
-               try { return JSON.parse(line); } catch (e) { 
+               try { 
+                 const obj = JSON.parse(line); 
+                 if (obj.type === 'message' && obj.message) {
+                   return {
+                     role: obj.message.role,
+                     content: obj.message.content,
+                     timestamp: obj.timestamp,
+                     source: obj
+                   };
+                 }
+                 return null;
+               } catch (e) { 
                  console.warn(`Warning: Could not parse line in ${file}`);
                  return null; 
                }
@@ -158,7 +169,8 @@ async function start() {
          score: res.score,
          judge_reason: res.reason,
          duration: res.duration_ms,
-         has_logs: invocations.has(res.test_id)
+         has_logs: invocations.has(res.test_id),
+         llm_messages: invocations.get(res.test_id) || []
        };
     });
 

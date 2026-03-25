@@ -21,3 +21,4 @@ output/
 Thumbs.db
 tests/eval_results/
 tests/llm_invoke_results/
+ui/public/eval-data.json
