@@ -8,21 +8,18 @@ export const ThinkingBlock: React.FC<Props> = ({ text }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-gray-100 rounded-md border border-gray-200 overflow-hidden">
+    <div className="my-1">
       <div 
-        className="px-3 py-2 bg-gray-200 text-gray-600 text-xs font-semibold uppercase flex items-center justify-between cursor-pointer hover:bg-gray-300 transition-colors"
+        className="text-sm text-gray-800 flex items-center gap-1 cursor-pointer w-fit select-none font-mono"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-2">
-          <span>🧠 Thinking</span>
-          <span className="text-gray-400 font-normal normal-case">
-             ({text.length} chars)
-          </span>
-        </div>
+        <span>🧠 Thinking({text.length} chars)</span>
+      </div>
+      <div className="text-sm text-gray-800 flex items-center gap-1 cursor-pointer w-fit select-none font-mono mt-1" onClick={() => setIsExpanded(!isExpanded)}>
         <span>{isExpanded ? '▼' : '▶'}</span>
       </div>
       {isExpanded && (
-        <div className="p-3 text-sm text-gray-700 font-mono whitespace-pre-wrap break-words bg-gray-50 border-t border-gray-200">
+        <div className="mt-1 text-sm text-gray-800 font-mono whitespace-pre-wrap break-words">
           {text}
         </div>
       )}
