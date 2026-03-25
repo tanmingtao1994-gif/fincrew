@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer } from 'vite';
+import {EvalData} from './ui/types/eval-data';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -102,7 +103,7 @@ async function getResults() {
 
 async function getInvocations() {
    const invokePath = path.join(TESTS_DIR, 'llm_invoke_results');
-   const invocations = new Map();
+   const invocationsByRun = new Map();
    try {
      const timestampDirs = await fs.readdir(invokePath);
      for (const tsDir of timestampDirs) {
@@ -110,6 +111,7 @@ async function getInvocations() {
        const fullTsDirPath = path.join(invokePath, tsDir);
        const stat = await fs.stat(fullTsDirPath);
        if (stat.isDirectory()) {
+         const runInvocations = new Map();
          const files = await fs.readdir(fullTsDirPath);
          for (const file of files) {
            if (file.endsWith('.jsonl')) {
@@ -133,15 +135,16 @@ async function getInvocations() {
                  return null; 
                }
              }).filter(Boolean);
-             invocations.set(testId, messages);
+             runInvocations.set(testId, messages);
            }
          }
+         invocationsByRun.set(tsDir, runInvocations);
        }
      }
    } catch (err) {
      console.warn(`Notice: Could not read llm_invoke_results dir. Details: ${err}. The viewer will still function but details will be empty.`);
    }
-   return invocations;
+   return invocationsByRun;
 }
 
 async function start() {
@@ -156,10 +159,12 @@ async function start() {
   const rawRuns = await getResults();
   const invocations = await getInvocations();
 
-  const formattedRuns = rawRuns.map(run => {
+  const formattedRuns: EvalData[]  = rawRuns.map(run => {
     // Process results to form TestCase objects
+    const runInvocations = invocations.get(run.run_id) || new Map();
     const cases = (run.results || []).map((res: any) => {
        const datasetInfo = datasets.get(res.test_id) || {};
+       const messages = runInvocations.get(res.test_id) || runInvocations.get(`${res.test_id}_result`) || [];
        return {
          test_id: res.test_id,
          name: datasetInfo.name || res.test_id,
@@ -169,8 +174,8 @@ async function start() {
          score: res.score,
          judge_reason: res.reason,
          duration: res.duration_ms,
-         has_logs: invocations.has(res.test_id),
-         llm_messages: invocations.get(res.test_id) || []
+         has_logs: messages.length > 0,
+         llm_messages: messages
        };
     });
 
@@ -188,12 +193,9 @@ async function start() {
   formattedRuns.sort((a, b) => b.run_id.localeCompare(a.run_id));
 
   // Data to expose to Vite UI
-  const invocationsObj = Object.fromEntries(invocations);
-
   const dataFilePath = path.join(__dirname, 'ui', 'public', 'eval-data.json');
   await fs.writeFile(dataFilePath, JSON.stringify({
     runs: formattedRuns,
-    invocations: invocationsObj
   }));
 
   const vite = await createServer({

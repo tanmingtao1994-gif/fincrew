@@ -1,8 +1,8 @@
 import React from 'react';
-import { TestCase } from '../types';
+import type { EvalTestCase } from '../../types/eval-data';
 
 interface Props {
-  testCase: TestCase;
+  testCase: EvalTestCase;
   onClick: (testId: string) => void;
 }
 

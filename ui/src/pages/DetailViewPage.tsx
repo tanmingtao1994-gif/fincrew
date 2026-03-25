@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Drawer, Spin, Alert, Typography } from 'antd';
 import { fetchInvocations } from '../api';
-import type { LLMInvocation } from '../types';
+import type { LLMMessage } from '../../types/eval-data';
 import { MessageList } from '../components/MessageList';
 
 const { Text } = Typography;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const DetailViewPage: React.FC<Props> = ({ testId, onClose }) => {
-  const [invocation, setInvocation] = useState<LLMInvocation | null>(null);
+  const [invocation, setInvocation] = useState<{ test_id: string, messages: LLMMessage[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

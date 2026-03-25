@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import type { LLMMessage } from '../types';
+import type { LLMMessage } from '../../types/eval-data';
 import { MessageBubble } from './MessageBubble';
 import { ThinkingBlock } from './ThinkingBlock';
 import { ToolCallBlock, ToolResultBlock } from './ToolBlocks';
@@ -24,7 +24,7 @@ export const MessageList: React.FC<Props> = ({ messages }) => {
              </div>
           ) : Array.isArray(msg.content) ? (
             <>
-              {msg.content.map((block, bIdx) => {
+              {msg.content.map((block: any, bIdx: number) => {
                 if (block.type === 'thinking' && (block.text || block.thinking)) {
                   return <ThinkingBlock key={bIdx} text={block.text || block.thinking || ''} />;
                 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Typography, Spin, Alert } from 'antd';
 import { fetchRuns } from '../api';
-import type { EvalRun } from '../types';
+import type { EvalData } from '../../types/eval-data';
 import { SummaryList } from '../components/SummaryList';
 
 const { Header, Content } = Layout;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const HomePage: React.FC<Props> = ({ onSelectTest }) => {
-  const [runs, setRuns] = useState<EvalRun[]>([]);
+  const [runs, setRuns] = useState<EvalData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

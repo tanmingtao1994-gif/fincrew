@@ -1,7 +1,7 @@
-import type { EvalRun, LLMInvocation } from './types';
+import type { EvalData, LLMMessage } from '../types/eval-data';
 
 // State to cache the loaded data
-let cachedData: { runs: EvalRun[], invocations: Record<string, any> } | null = null;
+let cachedData: { runs: EvalData[] } | null = null;
 
 async function loadData() {
   if (cachedData) return cachedData;
@@ -12,24 +12,31 @@ async function loadData() {
     return cachedData!;
   } catch (err) {
     console.error('Error loading eval data:', err);
-    return { runs: [], invocations: {} };
+    return { runs: [] };
   }
 }
 
-export async function fetchRuns(): Promise<EvalRun[]> {
+export async function fetchRuns(): Promise<EvalData[]> {
   const data = await loadData();
   return data.runs || [];
 }
 
-export async function fetchInvocations(testId: string): Promise<LLMInvocation> {
+export async function fetchInvocations(testId: string): Promise<{ test_id: string, messages: LLMMessage[] }> {
   const data = await loadData();
-  // Try exact testId match first, then fallback to testId + '_result'
-  const messages = data.invocations?.[testId] || data.invocations?.[`${testId}_result`];
-  if (messages) {
-    return {
-      test_id: testId,
-      messages: messages
-    };
+  
+  if (data.runs && data.runs.length > 0) {
+    for (const run of data.runs) {
+      if (run.cases) {
+        const testCase = run.cases.find(c => c.test_id === testId);
+        if (testCase && testCase.llm_messages && testCase.llm_messages.length > 0) {
+          return {
+            test_id: testId,
+            messages: testCase.llm_messages
+          };
+        }
+      }
+    }
   }
+  
   return { test_id: testId, messages: [] };
 }

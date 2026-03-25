@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Layout, Menu, Table, Tag, Typography, Button, Space, Badge, Tooltip } from 'antd';
-import { SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import type { EvalRun, TestCase } from '../types';
+import { SearchOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import type { EvalData, EvalTestCase } from '../../types/eval-data';
 
 const { Sider, Content } = Layout;
 const { Text } = Typography;
 
 interface Props {
-  runs: EvalRun[];
+  runs: EvalData[];
   onSelectTest: (testId: string) => void;
 }
 
@@ -35,14 +35,14 @@ export const SummaryList: React.FC<Props> = ({ runs, onSelectTest }) => {
         { text: 'Pass', value: 'pass' },
         { text: 'Fail', value: 'fail' },
       ],
-      onFilter: (value: any, record: TestCase) => record.status === value,
+      onFilter: (value: any, record: EvalTestCase) => record.status === value,
     },
     {
       title: 'Test Case',
       dataIndex: 'name',
       key: 'name',
       width: '25%',
-      render: (text: string, record: TestCase) => (
+      render: (text: string, record: EvalTestCase) => (
         <div>
           <div className="font-medium">{text}</div>
           <Text type="secondary" className="text-xs font-mono">{record.test_id}</Text>
@@ -64,7 +64,7 @@ export const SummaryList: React.FC<Props> = ({ runs, onSelectTest }) => {
       title: 'Reason',
       dataIndex: 'judge_reason',
       key: 'judge_reason',
-      render: (text: string, record: TestCase) => (
+      render: (text: string, record: EvalTestCase) => (
         record.status === 'pass' ? null : (
           <Tooltip title={text} placement="topLeft">
             <div className="line-clamp-2 text-red-600 text-sm">{text}</div>
@@ -76,7 +76,7 @@ export const SummaryList: React.FC<Props> = ({ runs, onSelectTest }) => {
       title: 'Action',
       key: 'action',
       width: 100,
-      render: (_: any, record: TestCase) => (
+      render: (_: any, record: EvalTestCase) => (
         <Button 
           type="link" 
           size="small" 

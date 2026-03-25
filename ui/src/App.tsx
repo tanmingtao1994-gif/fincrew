@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { HomePage } from './pages/HomePage';
 import { DetailViewPage } from './pages/DetailViewPage';
 import { ConfigProvider } from 'antd';
