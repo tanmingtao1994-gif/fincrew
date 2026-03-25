@@ -36,7 +36,7 @@ export const DetailViewPage: React.FC<Props> = ({ testId, onClose }) => {
     <Drawer
       title={
         <div className="flex flex-col">
-          <span className="text-lg font-bold">Detail View</span>
+          <span className="text-lg font-bold mr-4" style={{marginRight: '8px'}}>Detail View</span>
           <Text type="secondary" className="font-mono text-xs">{testId}</Text>
         </div>
       }
