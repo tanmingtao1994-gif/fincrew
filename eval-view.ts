@@ -128,6 +128,21 @@ async function getInvocations() {
                      timestamp: obj.timestamp,
                      source: obj
                    };
+                 } else if (obj.type === 'toolCall' || obj.type === 'tool_use') {
+                   // Some files may log tool calls as top-level objects, convert to message format
+                   return {
+                     role: 'assistant',
+                     content: [obj],
+                     timestamp: obj.timestamp || new Date().toISOString(),
+                     source: obj
+                   };
+                 } else if (obj.type === 'toolResult' || obj.type === 'tool_result') {
+                   return {
+                     role: 'tool',
+                     content: [obj],
+                     timestamp: obj.timestamp || new Date().toISOString(),
+                     source: obj
+                   };
                  }
                  return null;
                } catch (e) { 
