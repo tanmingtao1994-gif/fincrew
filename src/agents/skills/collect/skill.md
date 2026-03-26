@@ -10,12 +10,14 @@ description: Collect market data, technical indicators, news, KOL views, and opt
 
 ## 使用方法
 此 skill 通过直接调用项目根目录下的 npm script 来执行底层的数据采集和分析工具。需要预先执行 `npm run build` 进行编译。
-**重要：执行任何 npm script 前，必须先通过 cd 命令切换到项目的绝对路径下（例如：`cd /Users/bytedance/projects/ai/financial-agent`），然后再执行相应的 npm run 命令。**
+**重要：执行任何 npm script 前，必须先通过 cd 命令切换到项目的绝对路径下（例如：`cd ~/projects/ai/financial-agent`），然后再执行相应的 npm run 命令。**
+
+**【非常重要的时间约束】**：所有示例命令中的 `--date`（如 2026-02-19 等）都仅仅是 **举例**！你在实际调用时，**必须使用执行当天的现实真实日期**（格式 YYYY-MM-DD）。如果未要求特定过去某一天的数据，请不要使用硬编码的假日期！
 
 ### 示例命令
 ```bash
 # 进入项目绝对根目录
-cd /Users/bytedance/projects/ai/financial-agent
+cd ~/projects/ai/financial-agent
 
 # 采集 KOL 数据
 npm run collect -- --date 2026-02-19 --platform twitter
@@ -44,7 +46,7 @@ npm run news -- --symbols AAPL --date 2026-02-19
 ## Actions
 
 ### readDailyData
-读取位于项目绝对路径下的数据文件。具体固定为读取 `/Users/bytedance/projects/ai/financial-agent/data/daily/<date>/<filename>.json`。
+读取位于项目绝对路径下的数据文件。具体固定为读取 `~/projects/ai/financial-agent/data/daily/<date>/<filename>.json`。
 因为 script 脚本将采集的数据保存在这个位置，Agent 可以通过这个 Action 并指定日期和文件名提取采集到的原始 JSON 数据供进一步分析。
 
 #### 输入
