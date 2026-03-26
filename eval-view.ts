@@ -216,7 +216,7 @@ async function start() {
   const vite = await createServer({
     root: path.join(__dirname, 'ui'),
     server: {
-      port: 3000,
+      port: 13999,
       open: true
     },
     plugins: [
@@ -230,7 +230,7 @@ async function start() {
   });
 
   await vite.listen();
-  console.log(`Viewer started at http://localhost:3000`);
+  console.log(`Viewer started at http://localhost:13999`);
 }
 
 start().catch(err => {
