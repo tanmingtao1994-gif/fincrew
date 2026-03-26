@@ -20,16 +20,16 @@ description: Collect market data, technical indicators, news, KOL views, and opt
 cd ~/projects/ai/financial-agent
 
 # 采集 KOL 数据
-npm run collect -- --date 2026-02-19 --platform twitter
+npm run collect -- --platform twitter
 
 # 获取股票数据
-npm run data -- --symbols AAPL,TSLA --date 2026-02-19
+npm run data -- --symbols AAPL,TSLA
 
 # 获取期权数据
-npm run options -- --symbol NVDA --expiry 2026-02-27 --direction call --date 2026-02-19
+npm run options -- --symbol NVDA --direction call
 
 # 获取新闻数据
-npm run news -- --symbols AAPL --date 2026-02-19
+npm run news -- --symbols AAPL
 ```
 
 ## 参数说明

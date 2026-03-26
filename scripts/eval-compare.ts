@@ -1,6 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const DATASET_DIR = path.join(process.cwd(), 'tests', 'eval_dataset');
 const LLM_INVOKE_RESULTS_DIR = path.join(process.cwd(), 'tests', 'llm_invoke_results');
@@ -112,17 +117,10 @@ function parseSessionData(jsonlPath: string): { toolCalls: Set<string>, usedSkil
 // Since you mentioned using 'coco', we'll simulate or call the relevant CLI/API here.
 async function callLLMJudge(assistantTexts: string, judgePrompt: string): Promise<{ score: number, reason: string }> {
   // Construct the prompt for the LLM judge
-  const fullPrompt = `你是一个严格的评测法官。请根据下面的预期描述，对给定的助手输出进行评分。
-【预期描述】:
-${judgePrompt}
-
-【助手输出】:
-${assistantTexts}
-
-请给出评分（0-5分，5分表示完全符合，0分表示完全不符合），并简要说明理由。
-请严格输出JSON格式，不要输出其他多余文字：
-{"score": <数字>, "reason": "<理由>"}
-`;
+  const promptTemplatePath = path.join(__dirname, 'prompt', 'llm-judge.md');
+  let fullPrompt = fs.readFileSync(promptTemplatePath, 'utf-8');
+  const currentDate = new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  fullPrompt = fullPrompt.replace('{{judgePrompt}}', judgePrompt).replace('{{assistantTexts}}', assistantTexts).replace('{{currentDate}}', currentDate);
 
   try {
     // 假设 coco 有相应的命令行可以直接执行并返回标准输出。这里使用 execSync 模拟。
