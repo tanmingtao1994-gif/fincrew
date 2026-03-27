@@ -33,8 +33,9 @@ interface TestResult {
 }
 
 // Read all eval cases from dataset
-function loadAllEvalCases(): EvalCase[] {
+function loadAllEvalCases(targetDir?: string): EvalCase[] {
   const cases: EvalCase[] = [];
+  
   const scanDir = (dir: string) => {
     if (!fs.existsSync(dir)) return;
     const files = fs.readdirSync(dir);
@@ -56,7 +57,29 @@ function loadAllEvalCases(): EvalCase[] {
       }
     }
   };
-  scanDir(DATASET_DIR);
+
+  let basePath = DATASET_DIR;
+  if (targetDir) {
+      basePath = path.join(DATASET_DIR, targetDir);
+      if (!fs.existsSync(basePath) || !fs.statSync(basePath).isDirectory()) {
+          const fileFallback = basePath.endsWith('.json') ? basePath : `${basePath}.json`;
+          if (fs.existsSync(fileFallback) && fs.statSync(fileFallback).isFile()) {
+              try {
+                  const content = JSON.parse(fs.readFileSync(fileFallback, 'utf-8'));
+                  if (Array.isArray(content)) {
+                    cases.push(...content);
+                  } else {
+                    cases.push(content);
+                  }
+              } catch (e) {
+                  console.error(`❌ 解析数据集失败: ${fileFallback}`, e);
+              }
+              return cases;
+          }
+      }
+  }
+
+  scanDir(basePath);
   return cases;
 }
 
@@ -228,10 +251,14 @@ async function evaluateCase(evalCase: EvalCase, targetDir: string): Promise<Test
 async function main() {
   const args = process.argv.slice(2);
   let forcedTimestamp: string | null = null;
+  let targetDir: string | null = null;
   
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--timestamp' && args[i + 1]) {
       forcedTimestamp = args[i + 1];
+    }
+    if (args[i] === '--dir' && args[i + 1]) {
+        targetDir = args[i + 1];
     }
   }
 
@@ -245,7 +272,7 @@ async function main() {
   console.log(`\n==============================================`);
   console.log(`📊 开始评估报告，目标运行批次: ${latestDirName}`);
   
-  const evalCases = loadAllEvalCases();
+  const evalCases = loadAllEvalCases(targetDir || undefined);
   if (evalCases.length === 0) {
     console.error("未找到任何测试用例定义。");
     process.exit(1);

@@ -18,7 +18,7 @@
     "update-docs": "node --loader ts-node/esm scripts/update-agents-doc.ts",
     "eval": "node --loader ts-node/esm scripts/eval-runner.ts",
     "eval:compare": "node --loader ts-node/esm scripts/eval-compare.ts",
-    "eval:all": "TS=$(date +\"%Y-%m-%d-%H-%M-%S\") && npm run eval -- --timestamp $TS && npm run eval:compare -- --timestamp $TS",
+    "eval:all": "sh -c 'TS=$(date +\"%Y-%m-%d-%H-%M-%S\") && if [ -z \"$1\" ]; then npm run eval -- --timestamp $TS && npm run eval:compare -- --timestamp $TS; else npm run eval -- --timestamp $TS --dir \"$1\" && npm run eval:compare -- --timestamp $TS --dir \"$1\"; fi' --",
     "view": "npx tsx eval-view.ts",
     "claw-dev": "npx cpx2 \"src/agents/**/*\" ~/.openclaw --watch --ignore=\"**/templates/**\" & npx cpx2 \"src/agents/**/*\" /Users/taotanming/.openclaw-dev --watch --ignore=\"**/templates/**\""
   },

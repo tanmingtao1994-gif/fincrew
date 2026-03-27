@@ -135,10 +135,14 @@ async function main() {
   const args = process.argv.slice(2);
   let targetFile: string | null = null;
   let forcedTimestamp: string | null = null;
+  let targetDir: string | null = null;
   
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--target' && args[i + 1]) {
       targetFile = args[i + 1];
+    }
+    if (args[i] === '--dir' && args[i + 1]) {
+      targetDir = args[i + 1];
     }
     if (args[i] === '--timestamp' && args[i + 1]) {
       forcedTimestamp = args[i + 1];
@@ -163,6 +167,32 @@ async function main() {
     } else {
       console.error(`❌ 指定的目标文件不存在: ${fullPath}`);
       return;
+    }
+  } else if (targetDir) {
+    const fullPath = path.join(DATASET_DIR, targetDir);
+    if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) {
+        // try adding .json in case they passed a file as a dir by mistake, or maybe it's just wrong
+        const fileFallback = fullPath.endsWith('.json') ? fullPath : `${fullPath}.json`;
+        if (fs.existsSync(fileFallback) && fs.statSync(fileFallback).isFile()) {
+           testFiles.push(fileFallback);
+        } else {
+            console.error(`❌ 指定的目标目录(或文件)不存在: ${fullPath}`);
+            return;
+        }
+    } else {
+        const scanDir = (dir: string) => {
+          if (!fs.existsSync(dir)) return;
+          const files = fs.readdirSync(dir);
+          for (const file of files) {
+            const currentPath = path.join(dir, file);
+            if (fs.statSync(currentPath).isDirectory()) {
+              scanDir(currentPath);
+            } else if (file.endsWith('.json')) {
+              testFiles.push(currentPath);
+            }
+          }
+        };
+        scanDir(fullPath);
     }
   } else {
     const scanDir = (dir: string) => {
