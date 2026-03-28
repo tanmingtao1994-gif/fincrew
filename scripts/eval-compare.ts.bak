@@ -114,8 +114,8 @@ function parseSessionData(jsonlPath: string): { toolCalls: Set<string>, usedSkil
             if (item.type === 'toolCall' && item.name) {
               toolCalls.add(item.name);
               // Check for skill usage via the read tool
-              if (item.name === 'read' && item.arguments && (item.arguments.file_path || item.arguments.path)) {
-                const p = (item.arguments.file_path || item.arguments.path) as string;
+              if (item.name === 'read' && item.arguments && item.arguments.file_path) {
+                const p = item.arguments.file_path as string;
                 // e.g. path like ".../skills/collect/SKILL.md" or ".../skills/collect.ts"
                 const match = p.match(/skills\/([^\/]+)\//) || p.match(/skills\/([^.]+)\.(ts|js|md)/);
                 if (match && match[1]) {
