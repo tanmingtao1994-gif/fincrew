@@ -1,0 +1,52 @@
+[
+  {
+    "test_id": "ta_single_stock_analysis",
+    "agent_target": "workspace-technical-analyst",
+    "input_prompt": "帮我从技术面分析一下AAPL，看看当前的趋势、动量、支撑阻力位情况，给个技术评分。",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeStock"],
+      "must_contain": ["AAPL", "RSI", "MACD"],
+      "llm_judge": "1. 助手识别出这是一个技术分析请求，并首先读取了 analyzeStock 的 SKILL.md 文档。2. 助手通过系统命令获取了当天的真实日期，并读取了 data/daily/<date>/stockdata.json 中 AAPL 的技术数据。3. 助手的分析必须包含以下维度且引用具体数值：(a) 趋势分析 — 价格与 MA30/MA60/MA120 的关系及具体数值；(b) 动量分析 — MACD 值、Signal 值、Histogram 值、RSI 值；(c) 支撑阻力位 — S1/S2/S3 和 R1/R2/R3 的具体价格；(d) Bollinger Band 的 Upper/Middle/Lower 值。4. 助手给出了量化的技术评分（0-100），并解释了评分的组成（趋势、动量、波动率、价位、Wyckoff 各维度得分）。5. 技术结论必须与引用的数据逻辑一致——例如如果 MACD 为负值且价格低于所有均线，不应得出'强烈看多'。6. 在最终回答中说明了获取真实日期和读取数据文件的过程。"
+    }
+  },
+  {
+    "test_id": "ta_multi_stock_comparison",
+    "agent_target": "workspace-technical-analyst",
+    "input_prompt": "对比一下NVDA和TSLA的技术面，哪只股票目前的技术形态更好？从均线、MACD、RSI各方面来对比。",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeStock"],
+      "must_contain": ["NVDA", "TSLA", "MACD", "RSI"],
+      "llm_judge": "1. 助手首先读取了 analyzeStock SKILL.md，并获取了当天真实日期。2. 助手读取了 stockdata.json 中 NVDA 和 TSLA 两只股票的技术数据。3. 助手对两只股票进行了横向对比分析，而不是仅仅独立描述每只股票。对比应包括：(a) 均线排列对比（哪只更偏多头/空头）；(b) MACD 对比（哪只动量更强/弱，引用具体数值）；(c) RSI 对比（哪只超买/超卖程度更大）；(d) Wyckoff 阶段对比。4. 最终给出了哪只技术形态更好的明确判断，且有数据支撑。5. 两只股票都有独立的技术评分，且评分差异与对比分析结论一致。6. 所有引用的数据必须来自实际读取的 stockdata.json 文件。"
+    }
+  },
+  {
+    "test_id": "ta_wyckoff_analysis",
+    "agent_target": "workspace-technical-analyst",
+    "input_prompt": "我想了解一下MSFT目前处于Wyckoff周期的哪个阶段？结合成交量和价格区间来分析。",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeStock"],
+      "must_contain": ["MSFT", "Wyckoff"],
+      "llm_judge": "1. 助手识别出这是一个专注于 Wyckoff 分析的技术请求，读取了 SKILL.md 并获取了真实日期。2. 助手读取了 stockdata.json 中 MSFT 的 wyckoff 字段数据，包括 phase、confidence、description、volumeProfile、priceRange、daysInPhase。3. 助手对 Wyckoff 阶段进行了解读，说明了该阶段的含义和市场意义（如 accumulation 暗示潜在上涨）。4. 助手引用了具体的量价关系（volumeProfile）和价格区间（high/low/rangePercent）数据来支撑其 Wyckoff 判断。5. 助手还结合了其他技术指标（MA、MACD、RSI）来验证 Wyckoff 阶段判断的合理性。6. 如果 Wyckoff phase 为 unknown 且 confidence 较低，助手应该诚实说明判断困难，而非强行编造一个明确的阶段结论。"
+    }
+  },
+  {
+    "test_id": "ta_multi_timeframe_analysis",
+    "agent_target": "workspace-technical-analyst",
+    "input_prompt": "TSLA的日线、周线、月线技术指标分别是什么情况？各个时间周期的信号是否一致？",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeStock"],
+      "must_contain": ["TSLA"],
+      "llm_judge": "1. 助手识别出这是一个多时间框架分析请求，读取了 SKILL.md 并获取了真实日期。2. 助手读取了 stockdata.json 中 TSLA 的 technical.timeframes 数据，分别提取了 daily、weekly、monthly 三个时间框架的指标。3. 助手对每个时间框架都给出了独立分析，引用具体数值：(a) Daily — close vs MA30/60/120、MACD、RSI 等；(b) Weekly — 同样维度的数据；(c) Monthly — 同样维度的数据。4. 助手明确评估了多时间框架的一致性（几个框架方向一致），并给出了一致性评分（如 2/3 或 3/3）。5. 如果时间框架之间存在分歧（如日线偏空但月线偏多），助手必须明确指出并解释这种分歧的含义。6. 如果某些月线数据为 null（如 MA60、MA120），助手必须说明'数据不可用'而非编造数值。"
+    }
+  },
+  {
+    "test_id": "ta_bearish_consistency",
+    "agent_target": "workspace-technical-analyst",
+    "input_prompt": "AAPL最近跌了不少，你觉得从技术面看是不是到了可以抄底的位置？",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeStock"],
+      "must_contain": ["AAPL"],
+      "llm_judge": "1. 助手识别出用户在询问是否可以抄底，将其理解为技术面买入机会评估。2. 助手读取了实际数据并引用了具体指标值。3. 【逻辑一致性核心检验】如果数据显示：(a) 价格低于 MA30/MA60/MA120（空头排列），(b) MACD 为负值且低于 Signal 线，(c) RSI 虽然偏低但尚未进入超卖区域（< 30），则助手的结论不应该是无条件建议抄底。4. 助手应该基于支撑位和 Bollinger Lower 来评估潜在的抄底区间——如果价格尚未触及 S2/S3 或 BB Lower，应该建议继续观望。5. 如果确实发现超卖信号（RSI < 30、价格触及 BB Lower），可以谨慎建议小仓位试探，但必须附带严格止损位。6. 助手必须区分'技术性超跌反弹'和'趋势反转'，如果 Wyckoff 阶段不支持底部形成，应该提醒用户。7. 给出的风险回报比必须基于具体的支撑位和阻力位计算。"
+    }
+  }
+]

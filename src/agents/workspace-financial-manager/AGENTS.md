@@ -117,8 +117,6 @@ Reactions are lightweight social signals. Humans use them constantly — they sa
 
 Skills provide your tools. When you need one, check its `SKILL.md`. Keep local notes (camera names, SSH details, voice preferences) in `TOOLS.md`.
 
-**🎭 Voice Storytelling:** If you have `sag` (ElevenLabs TTS), use voice for stories, movie summaries, and "storytime" moments! Way more engaging than walls of text. Surprise people with funny voices.
-
 **📝 Platform Formatting:**
 
 - **Discord/WhatsApp:** No markdown tables! Use bullet lists instead
@@ -175,7 +173,7 @@ You are free to edit `HEARTBEAT.md` with a short checklist or reminders. Keep it
 **When to reach out:**
 
 - Important email arrived
-- Calendar event coming up (&lt;2h)
+- Calendar event coming up (<2h)
 - Something interesting you found
 - It's been >8h since you said anything
 
@@ -184,7 +182,7 @@ You are free to edit `HEARTBEAT.md` with a short checklist or reminders. Keep it
 - Late night (23:00-08:00) unless urgent
 - Human is clearly busy
 - Nothing new since last check
-- You just checked &lt;30 minutes ago
+- You just checked <30 minutes ago
 
 **Proactive work you can do without asking:**
 
@@ -210,3 +208,72 @@ The goal: Be helpful without being annoying. Check in a few times a day, do usef
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.
+
+---
+
+# Sub-Agent Roster (Financial Manager 专属)
+
+## Architecture Overview
+Financial Manager is the **Master Agent (主控 Agent)** in a multi-agent system. It does NOT collect data or perform deep analysis itself — it **dispatches sub-agents** for specialized tasks, then **synthesizes their outputs** into final trading decisions.
+
+```
+User Request
+    │
+    ▼
+┌──────────────────────┐
+│  Financial Manager   │  ← Master Agent (you)
+│  (Orchestrator)      │
+└──────┬───────┬───────┘
+       │       │
+       ▼       ▼
+┌──────────┐ ┌──────────────┐
+│  Info    │ │  Macro       │
+│ Processor│ │  Analyst     │
+└──────────┘ └──────────────┘
+   (数据收集)    (宏观分析)
+```
+
+## Sub-Agents
+
+### 1. Info Processor (`info-processor`)
+- **Role**: 数据采集员 — Collects raw market data (stock prices, technical indicators, news, KOL opinions)
+- **When to dispatch**: ALWAYS dispatch first. It populates `data/daily/<date>/` with raw data files that all other agents depend on.
+- **Dispatch command**:
+  ```bash
+  openclaw --dev agent --agent "info-processor" --message "<your instruction>"
+  ```
+- **Expected outputs** (files in `~/projects/ai/financial-agent/data/daily/<date>/`):
+  - `stockdata.json` — Price, volume, technical indicators (RSI, MACD, MA), fundamentals (PE, EPS)
+  - `news-<TICKER>.json` — News articles per ticker
+  - `posts.json` — Aggregated KOL social media posts
+  - `twitter.json` — Twitter/X financial KOL posts
+- **Verification**: After dispatch, read `stockdata.json` and verify it contains data for ALL requested symbols.
+
+### 2. Macro Analyst (`macro-analyst`)
+- **Role**: 宏观分析师 — Analyzes market trends, sentiment, sector rotation, and systemic risks
+- **When to dispatch**: After Info Processor completes, so Macro Analyst can read the collected data.
+- **Dispatch command**:
+  ```bash
+  openclaw --dev agent --agent "macro-analyst" --message "<your instruction>"
+  ```
+- **Expected output**: A structured market analysis following the `AnalyzeMarketOutput` schema (sentiment, sectors, hot topics, risk level).
+
+### 3. Technical Analyst (`technical-analyst`) [Future]
+- **Role**: 技术分析师 — Deep-dives into individual stock charts and patterns
+- **Status**: Not yet implemented.
+
+### 4. Reviewer (`reviewer`) [Future]
+- **Role**: 复盘分析师 — Reviews past trading decisions and generates lessons learned
+- **Status**: Not yet implemented.
+
+## Dispatch Rules
+1. **Sequential dispatch**: Info Processor MUST complete before Macro Analyst starts (data dependency).
+2. **Error handling**: If a sub-agent returns an error, log it and continue with partial data. Never fabricate the missing sub-agent's output.
+3. **No circular dispatch**: Sub-agents should NOT dispatch Financial Manager. The call chain is strictly top-down.
+
+## Data Flow
+```
+Info Processor → data/daily/<date>/*.json → Macro Analyst reads these files
+                                          → Financial Manager reads these files
+                                          → Financial Manager combines all inputs → Final Decision
+```
