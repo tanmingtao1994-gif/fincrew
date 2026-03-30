@@ -95,7 +95,9 @@ async function runTest(evalCase: EvalCase, resultsDir: string) {
     const targetAgentId = getAgentId(evalCase.agent_target);
 
     // 1. 发送请求给 openclaw (使用 --dev 模式)
-    const command = `openclaw --dev agent --agent "${targetAgentId}" --message "${evalCase.input_prompt}"`;
+    // Shell-escape the prompt to prevent $variable expansion
+    const escapedPrompt = evalCase.input_prompt.replace(/'/g, "'\\''");
+    const command = `openclaw --dev agent --agent "${targetAgentId}" --message '${escapedPrompt}'`;
     console.log(`> 执行命令: ${command}`);
     
     // We use execSync here but wrapped in a try/catch. It might take a while depending on the LLM call.
