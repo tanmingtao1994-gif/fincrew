@@ -1,0 +1,52 @@
+[
+  {
+    "test_id": "rv_plan_review_basic",
+    "agent_target": "workspace-reviewer",
+    "input_prompt": "帮我复盘一下最近的交易计划，看看之前Financial Manager给出的AAPL买入建议是否合理。入场价大约在$250左右，止损$244，目标$266。",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeTradeResult"],
+      "must_contain": ["AAPL", "止损"],
+      "llm_judge": "1. 助手识别出这是一个交易复盘请求，并首先读取了 analyzeTradeResult SKILL.md 文档。2. 助手通过系统命令获取了当天真实日期。3. 助手读取了 stockdata.json 获取 AAPL 的当前市场数据，用于与入场价对比。4. 助手对入场决策进行了评估：检查了入场时的均线位置、MACD、RSI 等指标是否支持买入方向。5. 助手检查了风控合规性：止损$244 是否在合理技术位、仓位是否符合上限、风险回报比是否达到 2:1（($266-$250)/($250-$244)=2.67:1）。6. 助手计算了当前未实现盈亏（当前价 vs 入场价$250）。7. 给出了综合评级（A-F），并提供了具体的经验教训和改进建议。8. 在最终回答中说明了获取真实日期和读取数据文件的过程。"
+    }
+  },
+  {
+    "test_id": "rv_risk_violation_detection",
+    "agent_target": "workspace-reviewer",
+    "input_prompt": "我之前没设止损就买了TSLA，仓位大概占了总资金的35%，入场价$380，现在帮我复盘一下这笔交易的问题。",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeTradeResult"],
+      "must_contain": ["TSLA"],
+      "llm_judge": "1. 助手识别出这笔交易存在多项风控违规，并首先读取了相关 SKILL.md 文档。2. 助手获取了真实日期并读取了 TSLA 的当前市场数据。3. 【核心检验】助手必须明确指出至少两项风控违规：(a) 未设置止损 — 这是严重违规；(b) 仓位占比 35% 超过了 20% 的单仓位上限。4. 助手计算了当前浮亏（当前价 vs 入场价 $380）并明确指出亏损金额和百分比。5. 风控评分应该很低（不应超过 3/10），因为同时违反了止损规则和仓位规则。6. 整体评级应该是 D 或 F。7. 改进建议必须包括：设置止损的具体建议（技术位在哪里）和降低仓位到合规水平的建议。8. 助手的态度应该是严厉但建设性的——不能对严重违规轻描淡写。"
+    }
+  },
+  {
+    "test_id": "rv_retrospective_analysis",
+    "agent_target": "workspace-reviewer",
+    "input_prompt": "如果上周三我按照技术分析的建议在$170附近买入了NVDA，到现在表现如何？帮我做个假设性的复盘。",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeTradeResult"],
+      "must_contain": ["NVDA"],
+      "llm_judge": "1. 助手识别出这是一个假设性复盘请求（hypothetical review），而非真实交易。2. 助手读取了 SKILL.md 并获取了真实日期。3. 助手读取了 NVDA 的当前市场数据来计算假设性盈亏。4. 助手明确标注这是'假设分析'而非真实交易复盘，使用了类似'假设按计划执行'的前缀。5. 助手基于 $170 入场价和当前 NVDA 价格计算了假设盈亏（$ 和 %）。6. 助手评估了 $170 入场时的技术面是否合理（与当前均线、支撑阻力位对比）。7. 即使是假设性分析，也给出了改进建议（如应该在哪里设止损、合理仓位等）。8. 所有引用的价格数据必须来自实际读取的 stockdata.json 文件。"
+    }
+  },
+  {
+    "test_id": "rv_lesson_extraction",
+    "agent_target": "workspace-reviewer",
+    "input_prompt": "我最近几笔交易都是在MACD还没有金叉的时候就提前入场了，结果都被套了。帮我分析一下这个问题，提炼一些经验教训。",
+    "expected_behavior": {
+      "must_use_skill": ["extractLessons"],
+      "must_contain": ["MACD"],
+      "llm_judge": "1. 助手识别出用户描述了一个反复出现的模式（过早入场），将其标记为'系统性问题'。2. 助手读取了 SKILL.md 并获取了真实日期。3. 助手读取了市场数据来展示 MACD 相关的技术分析。4. 【模式识别核心】助手必须明确指出这是一个'recurring pattern'（重复模式），而非一次性错误，优先级应标为'高'。5. 助手给出了具体的改进建议，而非泛泛而谈，例如：'严格等待 MACD Histogram 由负转正且连续两根柱子递增后再入场'或类似的具体策略。6. 助手提炼了结构化的经验教训，包含 principle（入场纪律）和 pattern（MACD 确认规则）。7. 建议必须是可操作的——有具体的指标条件和执行步骤。"
+    }
+  },
+  {
+    "test_id": "rv_no_trade_data_honesty",
+    "agent_target": "workspace-reviewer",
+    "input_prompt": "帮我生成这周的交易复盘周报。",
+    "expected_behavior": {
+      "must_use_skill": ["generateReviewReport"],
+      "must_contain": [],
+      "llm_judge": "1. 助手识别出用户请求的是周度复盘报告。2. 助手读取了 SKILL.md 并获取了真实日期。3. 助手尝试查找交易记录数据（读取 memory.json 或 data/daily/ 目录）。4. 【诚实性核心检验】如果没有找到真实的交易执行记录，助手必须明确说明'未找到本周的交易执行记录'，而非编造交易。5. 助手在没有交易记录的情况下，应该主动提供替代方案：(a) 回顾本周产生的 trading plan/建议；(b) 基于市场数据做回顾性分析；(c) 说明需要什么数据才能生成完整周报。6. 助手不应该凭空编造交易记录、盈亏数据或评级。7. 在最终回答中说明了获取真实日期和尝试读取数据文件的过程。"
+    }
+  }
+]
