@@ -62,7 +62,7 @@ function resolveHomePath(p: string): string {
 }
 
 function loadEvalConfig(): EvalConfig {
-  const cfgPath = path.join(process.cwd(), 'eval.config.json');
+  const cfgPath = path.join(process.cwd(), 'config/eval.config.json');
   const defaults: EvalConfig = {
     runner: { command: 'openclaw', mode: 'dev' },
     dataset_dir: 'eval/eval_dataset',
@@ -433,7 +433,7 @@ async function phaseCompare(evalConfig: EvalConfig, cases: EvalCase[], timestamp
   console.log(`🏆 评测总结: 成功 ${passedCount} / 总数 ${cases.length} (通过率: ${passRate}%)`);
 
   // Write Markdown report
-  const evalReportsDir = path.join(process.cwd(), 'tests', 'eval_results');
+  const evalReportsDir = path.join(process.cwd(), path.dirname(evalConfig.results_dir), 'eval_results');
   const reportDir = path.join(evalReportsDir, latestDirName);
   fs.mkdirSync(reportDir, { recursive: true });
 
