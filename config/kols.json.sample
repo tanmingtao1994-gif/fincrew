@@ -1,24 +1,24 @@
 {
   "kols": [
     {
-      "id": "example-kol",
-      "name": "示例KOL",
+      "id": "混沌与概率1997",
+      "name": "混沌与概率1997",
       "platforms": {
-        "weibo": { "uid": "YOUR_WEIBO_UID" }
+        "weibo": { "uid": "1648195723" }
       },
       "expertise": ["宏观", "美股"],
       "reliability": 4,
       "language": "zh"
     },
     {
-      "id": "example-twitter-kol",
-      "name": "Example Twitter KOL",
+      "id": "James Lt",
+      "name": "James Lt",
       "platforms": {
-        "twitter": { "username": "YOUR_TWITTER_USERNAME" }
+        "twitter": { "username": "JamesLt196801" }
       },
-      "expertise": ["宏观", "加密货币"],
+      "expertise": ["宏观", "美股"],
       "reliability": 4,
-      "language": "EN"
+      "language": "zh"
     }
   ]
 }
