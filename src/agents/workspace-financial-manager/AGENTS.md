@@ -211,6 +211,7 @@ This is a starting point. Add your own conventions, style, and rules as you figu
 
 ---
 
+
 # Sub-Agent Roster (Financial Manager 专属)
 
 ## Architecture Overview
@@ -223,24 +224,24 @@ User Request
 ┌──────────────────────┐
 │  Financial Manager   │  ← Master Agent (you)
 │  (Orchestrator)      │
-└──────┬───────┬───────┘
-       │       │
-       ▼       ▼
-┌──────────┐ ┌──────────────┐
-│  Info    │ │  Macro       │
-│ Processor│ │  Analyst     │
-└──────────┘ └──────────────┘
-   (数据收集)    (宏观分析)
+└──┬───┬───┬───┬───────┘
+   │   │   │   │
+   ▼   ▼   ▼   ▼
+┌────┐┌────┐┌────┐┌────┐
+│ IP ││ MA ││ TA ││ RV │
+└────┘└────┘└────┘└────┘
+ 数据   宏观  技术   复盘
+ 收集   分析  分析   分析
 ```
 
 ## Sub-Agents
 
 ### 1. Info Processor (`info-processor`)
 - **Role**: 数据采集员 — Collects raw market data (stock prices, technical indicators, news, KOL opinions)
-- **When to dispatch**: ALWAYS dispatch first. It populates `data/daily/<date>/` with raw data files that all other agents depend on.
+- **When to dispatch**: **ALWAYS** dispatch first. It populates `data/daily/<date>/` with raw data files that all other agents depend on.
 - **Dispatch command**:
   ```bash
-  openclaw --dev agent --agent "info-processor" --message "<your instruction>"
+  openclaw --dev agent --agent "info-processor" --message '<your instruction>'
   ```
 - **Expected outputs** (files in `~/projects/ai/financial-agent/data/daily/<date>/`):
   - `stockdata.json` — Price, volume, technical indicators (RSI, MACD, MA), fundamentals (PE, EPS)
@@ -254,26 +255,56 @@ User Request
 - **When to dispatch**: After Info Processor completes, so Macro Analyst can read the collected data.
 - **Dispatch command**:
   ```bash
-  openclaw --dev agent --agent "macro-analyst" --message "<your instruction>"
+  openclaw --dev agent --agent "macro-analyst" --message '<your instruction>'
   ```
-- **Expected output**: A structured market analysis following the `AnalyzeMarketOutput` schema (sentiment, sectors, hot topics, risk level).
+- **Expected output**: A structured market analysis (sentiment, sectors, hot topics, risk level).
 
-### 3. Technical Analyst (`technical-analyst`) [Future]
-- **Role**: 技术分析师 — Deep-dives into individual stock charts and patterns
-- **Status**: Not yet implemented.
+### 3. Technical Analyst (`technical-analyst`)
+- **Role**: 技术分析师 — Deep-dives into individual stock charts, patterns, and multi-timeframe analysis
+- **When to dispatch**: After Info Processor completes. Can run in parallel with Macro Analyst.
+- **Dispatch command**:
+  ```bash
+  openclaw --dev agent --agent "technical-analyst" --message '<your instruction>'
+  ```
+- **Expected output**: Per-symbol structured technical analysis including:
+  - Technical Score (0-100) with weighted sub-scores across 7 dimensions
+  - Trend analysis (MA alignment, price position)
+  - Momentum (MACD, RSI signals)
+  - Volatility (Bollinger Bands, squeeze detection)
+  - Support/Resistance levels
+  - Wyckoff phase assessment
+  - Multi-timeframe alignment (daily/weekly/monthly)
+  - Options signals (max pain analysis)
+- **How to use TA output**: Incorporate the Technical Analyst's scores and analysis into your per-stock technical assessment.
 
-### 4. Reviewer (`reviewer`) [Future]
-- **Role**: 复盘分析师 — Reviews past trading decisions and generates lessons learned
-- **Status**: Not yet implemented.
+### 4. Reviewer (`reviewer`)
+- **Role**: 复盘分析师 — Reviews past trading decisions, evaluates quality, extracts lessons
+- **When to dispatch**: ONLY when the user explicitly requests a review/复盘/回顾, or when evaluating a previously made trading plan.
+- **Dispatch command**:
+  ```bash
+  openclaw --dev agent --agent "reviewer" --message '<your instruction>'
+  ```
+- **Expected output**: Structured review report with grade (A-F), lessons learned, pattern detection.
+- **Do NOT dispatch** for standard forward-looking analysis requests.
 
 ## Dispatch Rules
-1. **Sequential dispatch**: Info Processor MUST complete before Macro Analyst starts (data dependency).
-2. **Error handling**: If a sub-agent returns an error, log it and continue with partial data. Never fabricate the missing sub-agent's output.
-3. **No circular dispatch**: Sub-agents should NOT dispatch Financial Manager. The call chain is strictly top-down.
+1. **Sequential data dependency**: Info Processor MUST complete before Macro Analyst and Technical Analyst start.
+2. **Parallel where possible**: Macro Analyst and Technical Analyst CAN run in parallel (both read from stockdata.json independently). Sequential is also acceptable.
+3. **Conditional dispatch**: Reviewer is ONLY dispatched when review/复盘 is requested.
+4. **Error handling**: If a sub-agent returns an error, log it and continue with partial data. Never fabricate the missing sub-agent's output.
+5. **No circular dispatch**: Sub-agents should NOT dispatch Financial Manager. Strictly top-down.
 
 ## Data Flow
 ```
-Info Processor → data/daily/<date>/*.json → Macro Analyst reads these files
-                                          → Financial Manager reads these files
-                                          → Financial Manager combines all inputs → Final Decision
+Info Processor → data/daily/<date>/*.json
+                    ↓
+    ┌───────────────┼───────────────┐
+    ↓               ↓               ↓
+Macro Analyst  Technical Analyst  Reviewer (conditional)
+    ↓               ↓               ↓
+    └───────────────┼───────────────┘
+                    ↓
+         Financial Manager synthesizes
+                    ↓
+            Final Decision Report
 ```

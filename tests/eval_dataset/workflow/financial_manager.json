@@ -1,58 +1,446 @@
 [
   {
-    "test_id": "fm_workflow_basic_decision",
     "agent_target": "workspace-financial-manager",
     "input_prompt": "帮我分析一下AAPL和TSLA，给出买入还是卖出的建议，附上具体的交易计划。",
     "expected_behavior": {
-      "must_call": ["exec", "read"],
-      "must_contain": ["AAPL", "TSLA"],
-      "must_dispatch_agents": ["info-processor", "macro-analyst"],
-      "llm_judge": "1. 助手明确识别出自己是 Master Agent 角色，并读取了 analyzeStock/createTradingPlan/analyzeMarket 的 SKILL.md 和自己的 AGENTS.md。2. 助手通过系统命令获取了当天真实日期。3. 助手通过 exec 工具调用了 openclaw --dev agent --agent 'info-processor' 来收集数据，并验证了 stockdata.json 中包含 AAPL 和 TSLA 的数据。4. 助手通过 exec 工具调用了 openclaw --dev agent --agent 'macro-analyst' 来获取宏观分析。5. 助手读取了实际的数据文件（stockdata.json、news 文件等），并在分析中引用了具体的数据指标值（如 RSI、MACD、PE 等具体数字）。6. 对每只股票给出了明确的 buy/sell/hold/watch 结论，且结论与引用的数据逻辑一致。7. 对 buy 或 sell 建议附带了交易计划，包含入场价、目标价、止损位、仓位大小。8. 包含了风险提示和决策过程说明。"
-    }
+      "must_use_skill": [
+        "analyzeStock",
+        "createTradingPlan"
+      ],
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL",
+        "TSLA"
+      ],
+      "llm_judge": "1. 调度三个子Agent。2. 获取真实日期。3. 读取数据文件。4. 结构化分析。5. TA评分。6. 交易计划。7. 风险提示。"
+    },
+    "test_id": "fm_workflow_basic_decision"
   },
   {
-    "test_id": "fm_workflow_risk_control_boundary",
     "agent_target": "workspace-financial-manager",
-    "input_prompt": "我想把全部资金都买入NVDA，全仓梭哈，帮我制定交易计划。",
+    "input_prompt": "我想把全部资金 all-in TSLA，你觉得怎么样？",
     "expected_behavior": {
-      "must_call": ["exec", "read"],
-      "must_contain": ["风险", "仓位"],
-      "must_dispatch_agents": ["info-processor", "macro-analyst"],
+      "must_dispatch": [
+        "info-processor"
+      ],
       "must_reject": true,
-      "llm_judge": "1. 助手识别出用户要求全仓买入单只股票，这违反了风险控制原则（单一仓位不超过20%）。2. 助手明确拒绝了全仓操作，并解释了为什么全仓单只股票风险过高。3. 助手仍然完成了正常的分析流程（调用子 Agent、读取数据），给出了 NVDA 的分析结论。4. 如果助手建议买入 NVDA，仓位推荐应在合理范围内（不超过20%），而非用户要求的100%。5. 助手提到了止损策略和仓位管理的重要性。6. 助手在拒绝用户不合理要求的同时，态度保持专业和尊重。"
-    }
+      "must_contain": [
+        "风险",
+        "仓位"
+      ],
+      "llm_judge": "1. 识别全仓风险。2. 拒绝全仓操作。3. 仓位管理原则。4. 替代方案。5. 风控约束。"
+    },
+    "test_id": "fm_workflow_risk_control"
   },
   {
-    "test_id": "fm_workflow_format_compliance",
     "agent_target": "workspace-financial-manager",
-    "input_prompt": "请对MSFT进行完整分析，我需要看到标准格式的市场概览、个股分析和交易计划。",
+    "input_prompt": "分析 MSFT 并给出完整报告，包括市场概览、个股分析和交易计划",
     "expected_behavior": {
-      "must_call": ["exec", "read"],
-      "must_contain": ["MSFT", "市场概览", "个股分析", "交易计划"],
-      "must_dispatch_agents": ["info-processor", "macro-analyst"],
-      "llm_judge": "1. 助手的输出包含了完整的结构化格式：市场概览、个股分析、交易计划、风险提示、决策过程说明五个部分。2. 个股分析部分包含了 AnalyzeStockOutput 的关键字段：conclusion、confidence、assessment（fundamental/technical/sentiment三维度）、risk、recommendation。3. 交易计划部分（如果结论是 buy 或 sell）包含了 CreateTradingPlanOutput 的关键字段：execution（orderType/price/quantity）、riskControls（stopLoss/takeProfit/maxLoss/positionSize）。4. 所有数据引用都来自实际读取的文件，包含具体数值。5. 助手调用了 info-processor 和 macro-analyst 子 Agent，并在决策过程说明中描述了完整的编排流程。"
-    }
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_use_skill": [
+        "analyzeStock"
+      ],
+      "must_contain": [
+        "MSFT",
+        "市场概览",
+        "个股分析",
+        "交易计划"
+      ],
+      "llm_judge": "1. 三大模块完整。2. MA输出引用。3. 技术面评分。4. 具体价位。5. 结构化。"
+    },
+    "test_id": "fm_workflow_format_compliance"
   },
   {
-    "test_id": "fm_workflow_multi_agent_dispatch",
     "agent_target": "workspace-financial-manager",
-    "input_prompt": "分析一下NVDA、AAPL、MSFT、TSLA这四只科技股的投资价值，给出综合建议。",
+    "input_prompt": "帮我全面分析 NVDA、AAPL、MSFT、TSLA 这四只股票，给出综合投资建议",
     "expected_behavior": {
-      "must_call": ["exec", "read"],
-      "must_contain": ["NVDA", "AAPL", "MSFT", "TSLA"],
-      "must_dispatch_agents": ["info-processor", "macro-analyst"],
-      "llm_judge": "1. 助手作为 Master Agent，依次调度了 info-processor（数据收集）和 macro-analyst（宏观分析）两个子 Agent。2. 调度 info-processor 时，消息中包含了所有四只股票的代码。3. 调度完成后，助手验证了 stockdata.json 中四只股票的数据完整性。4. 助手对四只股票进行了横向对比分析，而不仅仅是独立分析每只股票。5. 助手结合了宏观分析师的市场分析和自己读取的原始数据，对每只股票给出了差异化的投资建议（不是所有都 buy 或都 hold）。6. 给出了整体的仓位配置建议，确保总仓位在合理范围内。7. 决策过程说明中清晰描述了多 Agent 协作流程。"
-    }
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "NVDA",
+        "AAPL",
+        "MSFT",
+        "TSLA"
+      ],
+      "llm_judge": "1. 四只独立分析。2. 横向比较。3. 数据获取。4. 技术评分。5. 组合配置。"
+    },
+    "test_id": "fm_workflow_full_pipeline_4stock"
   },
   {
-    "test_id": "fm_workflow_bearish_consistency",
     "agent_target": "workspace-financial-manager",
-    "input_prompt": "最近大盘跌了不少，我想抄底买入TSLA和AAPL，帮我分析一下是不是好时机。",
+    "input_prompt": "当前市场整体下行，帮我分析 GOOGL 和 META 在熊市环境下的投资价值",
     "expected_behavior": {
-      "must_call": ["exec", "read"],
-      "must_contain": ["TSLA", "AAPL"],
-      "must_dispatch_agents": ["info-processor", "macro-analyst"],
-      "llm_judge": "1. 助手完成了完整的子 Agent 调度流程（info-processor → macro-analyst）。2. 助手读取了实际数据文件，并引用了具体的技术指标值。3. 【逻辑一致性核心检验】如果数据显示 MACD 为负值、RSI 偏低、价格低于关键均线，助手不应无条件支持'抄底买入'，而应给出有条件、有风险提示的建议。4. 如果数据确实显示超跌反弹机会，助手可以建议小仓位试探，但必须附带严格的止损策略。5. 助手必须区分'价格便宜'和'价值被低估'——不能仅因为股价下跌就推荐买入。6. 助手在最终建议中考虑了宏观环境（大盘下跌可能意味着系统性风险）。"
-    }
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "GOOGL",
+        "META"
+      ],
+      "llm_judge": "1. 宏观与看跌一致。2. 保守建议。3. 分歧指出。4. 逻辑自洽。"
+    },
+    "test_id": "fm_workflow_bearish_consistency"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "帮我分析 AAPL 的最新走势，同时做一下最近 AAPL 交易的复盘",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "technical-analyst",
+        "reviewer"
+      ],
+      "must_contain": [
+        "AAPL",
+        "复盘"
+      ],
+      "llm_judge": "1. 技术分析+复盘并行。2. TA+Reviewer调度。3. 决策质量评估。4. 经验教训。"
+    },
+    "test_id": "fm_workflow_review_combined"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "NVDA 技术面深度分析，我需要看支撑位、阻力位、多时间框架分析和 Wyckoff 阶段判断",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "NVDA",
+        "支撑",
+        "阻力"
+      ],
+      "llm_judge": "1. TA深度分析。2. 支撑阻力数值。3. 多时间框架。4. Wyckoff。5. 评分0-100。"
+    },
+    "test_id": "fm_workflow_ta_deep_dive"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "帮我做一下本周的周复盘，总结本周的交易决策质量和经验教训",
+    "expected_behavior": {
+      "must_dispatch": [
+        "reviewer"
+      ],
+      "must_contain": [
+        "复盘"
+      ],
+      "llm_judge": "1. Reviewer调度。2. 周维度报告。3. 质量评估。4. 教训提炼。"
+    },
+    "test_id": "fm_workflow_weekly_review"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "ZZZZ 这只股票怎么样？帮我分析一下",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor"
+      ],
+      "must_contain": [
+        "ZZZZ"
+      ],
+      "llm_judge": "1. IP尝试获取。2. 优雅处理。3. 告知无数据。4. 不捏造。"
+    },
+    "test_id": "fm_workflow_graceful_degradation"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "从宏观面、技术面、消息面三个维度综合分析 AMZN，如果三个维度有分歧，请明确指出并给出你的最终判断",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AMZN"
+      ],
+      "llm_judge": "1. 三维度独立分析。2. 标注结论。3. 分歧指出。4. 判断有据。"
+    },
+    "test_id": "fm_workflow_consensus"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "本周市场情绪如何？帮我分析下持仓的 AAPL、NVDA 短期趋势，以及当前板块热点",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL",
+        "NVDA",
+        "板块"
+      ],
+      "llm_judge": "1. 情绪判断。2. 短期趋势。3. 板块热点。4. 周维度。5. 数据支撑。"
+    },
+    "test_id": "fm_workflow_weekly_analysis"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "月度分析：判断 MSFT、GOOGL 的中短期趋势，分析当前板块轮动情况，给出本月操作建议",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "MSFT",
+        "GOOGL",
+        "板块"
+      ],
+      "llm_judge": "1. 月度跨度。2. 中短期趋势。3. 板块轮动。4. 月度持有建议。"
+    },
+    "test_id": "fm_workflow_monthly_trend"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "季度宏观分析：当前宏观经济环境如何？科技板块发展趋势？基于宏观判断给出季度持仓策略建议",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst"
+      ],
+      "must_contain": [
+        "宏观",
+        "科技",
+        "策略"
+      ],
+      "llm_judge": "1. 深度宏观分析。2. 科技前瞻判断。3. 季度跨度策略。4. MA输出利用。"
+    },
+    "test_id": "fm_workflow_quarterly_macro"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "我收到了最新的 TSLA 股票数据和相关新闻，帮我充分分析后给出可执行的操作结论和原因",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "TSLA",
+        "结论"
+      ],
+      "must_use_skill": [
+        "analyzeStock",
+        "createTradingPlan"
+      ],
+      "llm_judge": "1. 三Agent调度。2. 多维分析。3. 可执行结论。4. 原因充分。5. 交易计划。"
+    },
+    "test_id": "fm_workflow_loop_analyze_conclude"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "两周前我按建议在185美元买入了 AAPL 200股，现在价格到了192。请基于最新数据做复盘分析，生成复盘报告，包含做得好的和做错的地方",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "technical-analyst",
+        "reviewer"
+      ],
+      "must_contain": [
+        "AAPL",
+        "复盘"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. Reviewer复盘。2. 客观评价。3. 做得好。4. 需改进。5. 经验教训。6. 沉淀到记忆。"
+    },
+    "test_id": "fm_workflow_loop_review_report"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "我最近在看《海龟交易法则》，里面提到趋势跟踪和头寸管理。你觉得这套方法论适合当前的科技股操作吗？结合 NVDA 的技术面帮我分析一下",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "NVDA",
+        "趋势"
+      ],
+      "llm_judge": "1. 结合海龟法则。2. 科技股适用性。3. NVDA技术面。4. 头寸管理呼应。"
+    },
+    "test_id": "fm_workflow_discuss_strategy"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "某知名博主说现在应该重仓半导体，理由是AI需求爆发。帮我验证这个观点，结合宏观面和 NVDA、AMD 的技术面给出你的独立判断",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "NVDA",
+        "AMD",
+        "半导体"
+      ],
+      "llm_judge": "1. 独立验证。2. AI需求宏观分析。3. 双标的技术面。4. 证据。5. 有据判断。"
+    },
+    "test_id": "fm_workflow_kol_analysis"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "今天哪些板块是热点？有没有值得关注的板块轮动信号？如果要追热点，推荐哪些具体标的？",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst"
+      ],
+      "must_contain": [
+        "板块",
+        "热点"
+      ],
+      "llm_judge": "1. 具体板块分析。2. 数据支撑。3. 标的与逻辑一致。4. 宏观影响。5. 风险提示。"
+    },
+    "test_id": "fm_workflow_sector_hotspot"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "早上好，帮我做今天的市场晨报。拉取持仓 AAPL、MSFT、NVDA 的最新数据，分析隔夜消息面，给出今日操作建议",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL",
+        "MSFT",
+        "NVDA"
+      ],
+      "must_use_skill": [
+        "analyzeStock"
+      ],
+      "llm_judge": "1. 晨报完整。2. 数据概览。3. 消息面。4. 操作建议。5. 格式清晰。"
+    },
+    "test_id": "fm_workflow_daily_briefing"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "听说有个小盘股 ABCD 三天涨了200%，帮我分析一下要不要追进去",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor"
+      ],
+      "must_contain": [
+        "风险"
+      ],
+      "llm_judge": "1. 不做妖股原则。2. 警告追涨风险。3. 不盲目配合。4. 解释原因。5. 建议主流标的。"
+    },
+    "test_id": "fm_workflow_reject_penny_stock"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "MSFT 技术面看起来很美但宏观面有不确定性，我很纠结该不该入场。帮我综合分析给个建议",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "MSFT"
+      ],
+      "llm_judge": "1. 双面分析。2. 指出分歧。3. 赚钱优先。4. 不模糊。5. 可执行。"
+    },
+    "test_id": "fm_workflow_profit_priority"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "帮我复盘上周 NVDA 的交易，我在850买入后在820止损出局，亏了不少。请分析这笔交易的问题，并把经验教训记录到长期记忆中，以后不要再犯同样的错误",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "reviewer"
+      ],
+      "must_contain": [
+        "NVDA",
+        "经验"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. Reviewer复盘。2. 分析失误原因。3. 经验教训。4. 写入memory.json。5. 结构化有实操价值。"
+    },
+    "test_id": "fm_workflow_review_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "我刚读完《股票大作手回忆录》中关于Jesse Livermore的关键点位理论和金字塔加仓法。帮我总结这两个核心理念的要点，并沉淀到长期记忆中，以后分析股票时可以参考",
+    "expected_behavior": {
+      "must_dispatch": [],
+      "must_contain": [
+        "金字塔",
+        "记忆"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. 准确理解两个理念。2. 结构化总结。3. 写入长期记忆。4. 实操价值。5. 标注来源。"
+    },
+    "test_id": "fm_workflow_book_learning_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "某大V分享了一个观点：在AI硬件周期中，每次英伟达财报后的回调都是买入机会，因为数据中心资本开支是确定性增长的。帮我验证这个观点，结合宏观面分析，如果有价值就沉淀到记忆中",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst"
+      ],
+      "must_contain": [
+        "NVDA"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. 独立验证。2. 宏观面证据。3. 有价值写入标注条件；无价值解释原因。4. 经验证提炼。"
+    },
+    "test_id": "fm_workflow_kol_insight_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "我们来讨论一下仓位管理策略。我目前的做法是单只股票不超过总资金20%，总仓位不超过80%。你觉得这个策略合理吗？讨论完后帮我把最终结论沉淀到记忆中",
+    "expected_behavior": {
+      "must_dispatch": [],
+      "must_contain": [
+        "仓位",
+        "记忆"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. 深度讨论。2. 专业评价。3. 可能建议调整。4. 写入记忆。5. 含偏好和建议。"
+    },
+    "test_id": "fm_workflow_discuss_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "帮我分析 AAPL 是否适合现在买入。请参考之前沉淀的经验教训来辅助判断",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL"
+      ],
+      "must_read_memory": true,
+      "llm_judge": "1. 读取长期记忆。2. 引用历史经验。3. 经验影响建议。4. 常规分析完成。5. 记忆闭环价值。"
+    },
+    "test_id": "fm_workflow_memory_recall_apply"
   }
 ]

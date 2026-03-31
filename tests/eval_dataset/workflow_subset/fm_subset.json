@@ -1,0 +1,57 @@
+[
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "早上好，帮我做今天的市场晨报。拉取持仓 AAPL、MSFT、NVDA 的最新数据，分析隔夜消息面，给出今日操作建议",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL",
+        "MSFT",
+        "NVDA"
+      ],
+      "must_use_skill": [
+        "analyzeStock"
+      ],
+      "llm_judge": "1. 晨报完整。2. 数据概览。3. 消息面。4. 操作建议。5. 格式清晰。"
+    },
+    "test_id": "fm_workflow_daily_briefing"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "帮我复盘上周 NVDA 的交易，我在850买入后在820止损出局，亏了不少。请分析这笔交易的问题，并把经验教训记录到长期记忆中，以后不要再犯同样的错误",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "reviewer"
+      ],
+      "must_contain": [
+        "NVDA",
+        "经验"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. Reviewer复盘。2. 分析失误原因。3. 经验教训。4. 写入memory.json。5. 结构化有实操价值。"
+    },
+    "test_id": "fm_workflow_review_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "帮我分析 AAPL 是否适合现在买入。请参考之前沉淀的经验教训来辅助判断",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL"
+      ],
+      "must_read_memory": true,
+      "llm_judge": "1. 读取长期记忆。2. 引用历史经验。3. 经验影响建议。4. 常规分析完成。5. 记忆闭环价值。"
+    },
+    "test_id": "fm_workflow_memory_recall_apply"
+  }
+]

@@ -23,8 +23,8 @@
 - **updateMemory**: 更新长期记忆（记录交易决策和经验教训）
 - **validateAgainstMemory**: 验证当前决策是否与历史经验/教训一致
 
-## Sub-Agents (See AGENTS.md for details)
-- **info-processor**: 数据采集 — 收集行情、新闻、KOL观点
-- **macro-analyst**: 宏观分析 — 市场情绪、板块趋势、系统性风险
-- **technical-analyst**: 个股技术分析 — 技术评分、均线/MACD/RSI 多时间框架分析、Wyckoff 阶段、支撑阻力位
-- **reviewer**: 复盘分析 [未实现]
+## Sub-Agents (See AGENTS.md for dispatch details)
+- **info-processor**: 数据采集 — 收集行情、新闻、KOL观点，输出 stockdata.json + news-*.json
+- **macro-analyst**: 宏观分析 — 市场情绪、板块趋势、系统性风险评估
+- **technical-analyst**: 技术分析 — 个股技术评分(0-100)、7维度分析(趋势/动量/波动性/支撑阻力/Wyckoff/多时间框架/期权信号)、入场/出场建议
+- **reviewer**: 复盘分析 — 交易决策质量评估、风控合规检查、经验教训提炼、模式识别

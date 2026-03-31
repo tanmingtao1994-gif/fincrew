@@ -22,8 +22,6 @@ interface EvalCase {
     must_contain?: string[];
     must_dispatch?: string[];
     must_reject?: boolean;
-    must_write_memory?: boolean;
-    must_read_memory?: boolean;
     llm_judge?: string;
   };
 }
@@ -255,87 +253,6 @@ async function evaluateCase(evalCase: EvalCase, targetDir: string): Promise<Test
         details.push(`❌ 预期调度子 Agent [${agent}]，但未在 session 中找到 openclaw dispatch 命令`);
         pass = false;
       }
-    }
-  }
-
-
-  // === must_write_memory assertion ===
-  if (evalCase.expected_behavior.must_write_memory) {
-    let memoryWritten = false;
-    const memLines = fs.readFileSync(resultFile, 'utf-8').split('
-').filter(l => l.trim().length > 0);
-    for (const line of memLines) {
-      try {
-        const obj = JSON.parse(line);
-        if (obj.type === 'message' && obj.message?.role === 'assistant') {
-          const contentArr = obj.message.content;
-          if (Array.isArray(contentArr)) {
-            for (const item of contentArr) {
-              if (item.type === 'toolCall' && (item.name === 'write' || item.name === 'edit')) {
-                const filePath = ((item.arguments?.path || item.arguments?.file_path || '') as string);
-                if (filePath.includes('memory.json') || filePath.includes('memory/')) {
-                  memoryWritten = true;
-                  break;
-                }
-              }
-              if (item.type === 'toolCall' && item.name === 'exec') {
-                const cmd = ((item.arguments?.command || '') as string);
-                if (cmd.includes('memory') && (cmd.includes('>') || cmd.includes('write') || cmd.includes('echo') || cmd.includes('python') || cmd.includes('extractLessons'))) {
-                  memoryWritten = true;
-                  break;
-                }
-              }
-            }
-          }
-        }
-      } catch {}
-      if (memoryWritten) break;
-    }
-    if (memoryWritten) {
-      details.push('✅ 长期记忆写入：检测到对 memory 的写操作');
-    } else {
-      details.push('❌ 预期将经验沉淀到长期记忆(memory.json)，但未检测到写操作');
-      pass = false;
-    }
-  }
-
-  // === must_read_memory assertion ===
-  if (evalCase.expected_behavior.must_read_memory) {
-    let memoryRead = false;
-    const memRLines = fs.readFileSync(resultFile, 'utf-8').split('
-').filter(l => l.trim().length > 0);
-    for (const line of memRLines) {
-      try {
-        const obj = JSON.parse(line);
-        if (obj.type === 'message' && obj.message?.role === 'assistant') {
-          const contentArr = obj.message.content;
-          if (Array.isArray(contentArr)) {
-            for (const item of contentArr) {
-              if (item.type === 'toolCall' && item.name === 'read') {
-                const filePath = ((item.arguments?.path || item.arguments?.file_path || '') as string);
-                if (filePath.includes('memory.json') || filePath.includes('memory/')) {
-                  memoryRead = true;
-                  break;
-                }
-              }
-              if (item.type === 'toolCall' && item.name === 'exec') {
-                const cmd = ((item.arguments?.command || '') as string);
-                if (cmd.includes('memory') && (cmd.includes('cat') || cmd.includes('read') || cmd.includes('jq') || cmd.includes('python'))) {
-                  memoryRead = true;
-                  break;
-                }
-              }
-            }
-          }
-        }
-      } catch {}
-      if (memoryRead) break;
-    }
-    if (memoryRead) {
-      details.push('✅ 长期记忆读取：检测到对 memory 的读操作');
-    } else {
-      details.push('❌ 预期读取长期记忆以参考历史经验，但未检测到读操作');
-      pass = false;
     }
   }
 
