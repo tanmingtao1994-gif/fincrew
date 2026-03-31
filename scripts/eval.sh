@@ -11,10 +11,10 @@
 #   compare   Compare/judge results only
 #
 # Examples:
-#   npm run eval                                           # full pipeline, all cases
-#   npm run eval -- single_agent/info_processor.json      # full pipeline, specific file
-#   npm run eval:run -- single_agent                      # run only, specific dir
-#   npm run eval:compare                                  # compare only, latest batch
+#   npm run eval                                                      # full pipeline, all cases
+#   npm run eval --target single_agent/info_processor.json            # full pipeline, specific file (relative to dataset_dir)
+#   npm run eval:run --dir single_agent                            # run only, specific dir (relative to dataset_dir)
+#   npm run eval:compare                                              # compare only, latest batch
 #
 
 set -euo pipefail

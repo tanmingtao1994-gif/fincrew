@@ -65,8 +65,8 @@ function loadEvalConfig(): EvalConfig {
   const cfgPath = path.join(process.cwd(), 'eval.config.json');
   const defaults: EvalConfig = {
     runner: { command: 'openclaw', mode: 'dev' },
-    dataset_dir: 'tests/eval_dataset',
-    results_dir: 'tests/llm_invoke_results',
+    dataset_dir: 'eval/eval_dataset',
+    results_dir: 'eval/llm_invoke_results',
     openclaw_dev_dir: '~/.openclaw-dev',
     openclaw_prod_dir: '~/.openclaw',
   };

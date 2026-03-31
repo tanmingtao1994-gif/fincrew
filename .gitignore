@@ -20,8 +20,8 @@ output/
 logs/
 
 # Eval results (generated)
-tests/eval_results/
-tests/llm_invoke_results/
+eval/eval_results/
+eval/llm_invoke_results/
 packages/eval-ui/public/eval-data.json
 
 # IDE/editor
