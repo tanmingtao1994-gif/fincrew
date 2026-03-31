@@ -23,6 +23,7 @@ logs/
 eval/eval_results/
 eval/llm_invoke_results/
 packages/eval-ui/public/eval-data.json
+**/.vite/
 
 # IDE/editor
 .vscode/
@@ -54,3 +55,4 @@ specs/
 .specify/
 .specstory/
 AGENTS.md
+
