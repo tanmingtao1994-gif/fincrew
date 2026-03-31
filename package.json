@@ -1,35 +1,32 @@
 {
-  "name": "ai-financial-assistant",
+  "name": "fincrew",
   "version": "1.0.0",
-  "description": "AI Personal Financial Assistant powered by OpenClaw",
+  "description": "A self-evolving multi-agent financial assistant powered by OpenClaw",
   "type": "module",
-  "main": "src/index.ts",
   "scripts": {
-    "start": "node --loader ts-node/esm src/index.ts",
-    "test": "node --loader ts-node/esm scripts/run-all-tests.ts",
-    "build": "tsc -p tsconfig.build.json",
-    "collect": "node ./dist/index.js -- --collect",
-    "data": "node ./dist/index.js -- data",
-    "options": "node ./dist/index.js -- options",
-    "news": "node ./dist/index.js -- news",
-    "analyze": "node --loader ts-node/esm src/index.ts analyze",
-    "market": "node --loader ts-node/esm src/index.ts market",
-    "trade": "node --loader ts-node/esm src/index.ts trade",
-    "update-docs": "node --loader ts-node/esm scripts/update-agents-doc.ts",
-    "eval:run": "node --loader ts-node/esm scripts/eval-runner.ts",
-    "eval:compare": "node --loader ts-node/esm scripts/eval-compare.ts",
-    "eval": "sh -c 'TS=$(date +\"%Y-%m-%d-%H-%M-%S\") && if [ -z \"$1\" ]; then npm run eval:run -- --timestamp $TS && npm run eval:compare -- --timestamp $TS; else npm run eval:run -- --timestamp $TS --dir \"$1\" && npm run eval:compare -- --timestamp $TS --dir \"$1\"; fi' --",
-    "view": "npx tsx eval-view.ts",
-    "claw-dev": "npx cpx2 \"src/agents/**/*\" ~/.openclaw --watch --ignore=\"**/templates/**\" & npx cpx2 \"src/agents/**/*\" /Users/taotanming/.openclaw-dev --watch --ignore=\"**/templates/**\""
+    "data": "npx tsx packages/tools/getStockData/cli.ts",
+    "news": "npx tsx packages/tools/getNews/cli.ts",
+    "kol": "npx tsx packages/tools/getKolOptions/cli.ts",
+    "options": "npx tsx packages/tools/getOptions/cli.ts",
+    "eval:run": "bash scripts/eval.sh run",
+    "eval:compare": "bash scripts/eval.sh compare",
+    "eval": "bash scripts/eval.sh",
+    "view": "cd packages/eval-ui && npx vite",
+    "deploy:dev": "bash scripts/deploy.sh --env dev",
+    "deploy:prod": "bash scripts/deploy.sh --env prod",
+    "deploy:watch": "bash scripts/deploy-watch.sh",
+    "update-docs": "node --loader ts-node/esm scripts/update-agents-doc.ts"
   },
   "keywords": [
     "ai",
-    "finance",
-    "agent",
-    "trading"
+    "multi-agent",
+    "financial",
+    "openclaw",
+    "trading",
+    "stock-analysis"
   ],
   "author": "OpenClaw User",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^11.0.0",
@@ -52,5 +49,9 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "vite": "^5.4.21"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/user/fincrew.git"
   }
 }
