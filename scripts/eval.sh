@@ -23,8 +23,14 @@ cd "$(dirname "$0")/.."
 # ---- Parse arguments ----
 SUBCMD=""
 EXTRA_ARGS=""
+SKIP_NEXT=false
 
 for arg in "$@"; do
+  if $SKIP_NEXT; then
+    EXTRA_ARGS="$EXTRA_ARGS $arg"
+    SKIP_NEXT=false
+    continue
+  fi
   case "$arg" in
     run|compare)
       if [ -z "$SUBCMD" ]; then
@@ -33,8 +39,16 @@ for arg in "$@"; do
         EXTRA_ARGS="$EXTRA_ARGS $arg"
       fi
       ;;
-    *)
+    --timestamp|--dir|--target)
       EXTRA_ARGS="$EXTRA_ARGS $arg"
+      SKIP_NEXT=true
+      ;;
+    --*)
+      EXTRA_ARGS="$EXTRA_ARGS $arg"
+      ;;
+    *)
+      # Bare positional arg (not a subcommand) → map to --target
+      EXTRA_ARGS="$EXTRA_ARGS --target $arg"
       ;;
   esac
 done

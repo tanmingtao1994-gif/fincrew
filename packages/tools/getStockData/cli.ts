@@ -10,7 +10,7 @@ import { readDailyData, writeDailyData } from '../shared/cache.js';
 import { batchFundamentals } from './fundamental.js';
 import { analyzeTechnical } from './technical.js';
 import { getOptionsMaxPain } from '../shared/yahoo.js';
-import type { FullTechnicalAnalysis } from '../analysis/technical.js';
+import type { FullTechnicalAnalysis } from './technical.js';
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -79,7 +79,7 @@ export async function runData(date: string, symbols?: string[]) {
     result[symbol] = { fundamentals: fund, technical: tech };
   }
 
-  await writeDailyData(date, 'stockdata', result, true);
+  await writeDailyData(date, 'stockdata', result);
   console.log(`[data] 数据已保存 → data/info/daily/${date}/stockdata.json`);
 }
 

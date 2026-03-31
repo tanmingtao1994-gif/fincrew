@@ -464,6 +464,7 @@ async function phaseCompare(evalConfig: EvalConfig, cases: EvalCase[], timestamp
 
 async function main() {
   const { subcommand, timestamp: forcedTs, dir: targetDir, target: targetFile } = parseArgs();
+  console.log(`📋 Command Args: subcommand=${subcommand}, timestamp=${forcedTs}, dir=${targetDir}, target=${targetFile}`);
   const evalConfig = loadEvalConfig();
   const datasetDir = path.join(process.cwd(), evalConfig.dataset_dir);
   const timestamp = forcedTs || getTimestampString();

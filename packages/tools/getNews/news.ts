@@ -223,7 +223,7 @@ export async function collectNews(date: string, symbols: string[]): Promise<void
       searchTwitterNews(symbol).then(r => { console.log(`[news:twitter] ${symbol}: ${r.length} 条`); return r; }),
       searchReddit(symbol),
       searchGoogleNews(symbol).then(r => { console.log(`[news:google] ${symbol}: ${r.length} 条`); return r; }),
-      getYahooNews(symbol).then(r => { console.log(`[news:yahoo] ${symbol}: ${r.length} 条新闻`); return r; }),
+      getYahooNews(symbol).then(r => { console.log(`[news:yahoo] ${symbol}: ${r.length} 条新闻`); return r; }).catch(() => { console.log(`[news:yahoo] ${symbol}: Yahoo News 不可用，跳过`); return []; }),
       getInsiderTrading(symbol).then(r => { console.log(`[news:insider] ${symbol}: ${r.transactions.length} 笔交易`); return r; }).catch(() => { console.log(`[news:insider] ${symbol}: 无内幕交易数据（ETF/跳过）`); return { transactions: [], summary: { buyCount: null, buyShares: null, buyPercent: null, sellCount: null, sellShares: null, sellPercent: null, netCount: null, netShares: null, netPercent: null } }; }),
     ]);
 

@@ -7,7 +7,7 @@
  */
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
-import { extname, basename, dirname, join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 
 const PROJECT_ROOT = resolve(process.cwd());
 
@@ -15,21 +15,6 @@ const PROJECT_ROOT = resolve(process.cwd());
 export const INFO_DIR = join(PROJECT_ROOT, 'data', 'info');
 export const CACHE_DIR = join(INFO_DIR, 'cache');
 export const DAILY_DIR = join(INFO_DIR, 'daily');
-
-/** 若文件已存在，返回带 _HHMMSS 后缀的新路径，否则返回原路径 */
-function safeFilename(fullPath: string): string {
-  if (!existsSync(fullPath)) return fullPath;
-  const ext = extname(fullPath);
-  const base = basename(fullPath, ext);
-  const dir = dirname(fullPath);
-  const now = new Date();
-  const ts = [
-    now.getHours().toString().padStart(2, '0'),
-    now.getMinutes().toString().padStart(2, '0'),
-    now.getSeconds().toString().padStart(2, '0'),
-  ].join('');
-  return join(dir, `${base}_${ts}${ext}`);
-}
 
 /** 确保目录存在 */
 async function ensureDir(dir: string) {
@@ -67,13 +52,12 @@ export async function readDailyData<T>(date: string, platform: string): Promise<
   }
 }
 
-/** 写入每日采集数据。overwrite=false（默认）时若文件已存在则加时间戳后缀，不覆盖原文件 */
-export async function writeDailyData(date: string, platform: string, data: unknown, overwrite = false): Promise<void> {
+/** 写入每日采集数据，同名文件直接覆盖 */
+export async function writeDailyData(date: string, platform: string, data: unknown): Promise<void> {
   const dir = join(DAILY_DIR, date);
   await ensureDir(dir);
-  const rawPath = join(dir, `${platform}.json`);
-  const finalPath = overwrite ? rawPath : safeFilename(rawPath);
-  await writeFile(finalPath, JSON.stringify(data, null, 2), 'utf-8');
+  const fullPath = join(dir, `${platform}.json`);
+  await writeFile(fullPath, JSON.stringify(data, null, 2), 'utf-8');
 }
 
 /** 检查缓存是否过期 (基于文件修改时间) */
