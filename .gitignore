@@ -19,6 +19,11 @@ data/
 output/
 logs/
 
+# Personal config (use *.sample as templates)
+config/kols.json
+config/watchlist.json
+config/openclaw.json
+
 # Eval results (generated)
 eval/eval_results/
 eval/llm_invoke_results/

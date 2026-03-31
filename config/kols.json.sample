@@ -1,0 +1,24 @@
+{
+  "kols": [
+    {
+      "id": "example-kol",
+      "name": "示例KOL",
+      "platforms": {
+        "weibo": { "uid": "YOUR_WEIBO_UID" }
+      },
+      "expertise": ["宏观", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+    {
+      "id": "example-twitter-kol",
+      "name": "Example Twitter KOL",
+      "platforms": {
+        "twitter": { "username": "YOUR_TWITTER_USERNAME" }
+      },
+      "expertise": ["宏观", "加密货币"],
+      "reliability": 4,
+      "language": "EN"
+    }
+  ]
+}

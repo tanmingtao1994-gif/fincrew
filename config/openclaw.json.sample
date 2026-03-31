@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "note": "Copy this to ~/.openclaw or ~/.openclaw-dev and fill in your LLM provider config"
+  },
+  "logging": {
+    "level": "debug"
+  },
+  "models": {
+    "providers": {
+      "minimax": {
+        "baseUrl": "YOUR_LLM_PROVIDER_BASE_URL",
+        "apiKey": "YOUR_API_KEY_HERE",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "Minimax-M2.5",
+            "name": "Minimax-M2.5",
+            "api": "openai-completions",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 200000,
+            "maxTokens": 8192,
+            "compat": {
+              "supportsDeveloperRole": false
+            }
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "minimax/Minimax-M2.5"
+      },
+      "workspace": "~/.openclaw-dev/workspace",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "subagents": { "allowAgents": ["*"] }
+      },
+      {
+        "id": "financial-manager",
+        "subagents": { "allowAgents": ["*"] }
+      },
+      {
+        "id": "info-processor",
+        "subagents": { "allowAgents": ["*"] }
+      },
+      {
+        "id": "macro-analyst",
+        "subagents": { "allowAgents": ["*"] }
+      },
+      {
+        "id": "reviewer",
+        "subagents": { "allowAgents": ["*"] }
+      },
+      {
+        "id": "technical-analyst",
+        "subagents": { "allowAgents": ["*"] }
+      }
+    ]
+  },
+  "channels": {
+    
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "YOUR_GATEWAY_TOKEN"
+    }
+  }
+}

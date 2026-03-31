@@ -1,0 +1,7 @@
+{
+  "stocks": [
+    { "symbol": "NVDA", "name": "NVIDIA", "sector": "半导体", "tags": ["AI芯片", "GPU"] },
+    { "symbol": "TSLA", "name": "特斯拉", "sector": "汽车", "tags": ["FSD", "Robotaxi"] },
+    { "symbol": "HK.09988", "name": "阿里巴巴", "sector": "互联网", "tags": ["云计算", "电商"] }
+  ]
+}
