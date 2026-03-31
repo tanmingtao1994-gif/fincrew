@@ -1,0 +1,39 @@
+[
+  {
+    "test_id": "macro_analyst_overall_sentiment",
+    "agent_target": "workspace-macro-analyst",
+    "input_prompt": "帮我分析一下当前美股的整体市场情绪，现在是偏多还是偏空？有没有什么系统性风险需要注意的？",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeMarket"],
+      "llm_judge": "1. 助手准确识别出这是一个宏观市场分析请求，并主动读取了 analyzeMarket 的 SKILL.md 和 collect 的 SKILL.md。2. 助手通过系统命令获取了当天的真实日期，并且先检查了 Info Processor 的 data/daily/<date>/stockdata.json 是否已存在（通过 ls 或 cat 验证），体现了其数据依赖于 Info Processor 的设计。3. 助手读取了 stockdata.json 中的技术指标数据来支撑其市场情绪判断。4. 助手的最终结论（bullish/bearish/neutral）必须与其引用的技术指标数据逻辑一致——例如如果多只股票的 MACD 为负值、RSI 低于 50，则不应得出'强烈看多'的结论。5. 助手在分析中必须明确提到具体的数据指标值（如 RSI、MACD、MA 等具体数字），而不是泛泛地说'技术面偏弱'。6. 助手在风险评估中必须基于实际数据识别风险因素，而非凭空编造。"
+    }
+  },
+  {
+    "test_id": "macro_analyst_sector_rotation",
+    "agent_target": "workspace-macro-analyst",
+    "input_prompt": "最近科技股整体走势如何？从AAPL、TSLA、NVDA、MSFT这几只来看，有没有板块分化或轮动的迹象？",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeMarket"],
+      "must_contain": ["AAPL", "TSLA", "NVDA", "MSFT"],
+      "llm_judge": "1. 助手识别出这是一个板块分析请求，主动读取了 analyzeMarket SKILL.md 并获取了当天真实日期。2. 助手检查了 Info Processor 数据是否已存在，然后读取了 stockdata.json 中所有四只股票（AAPL, TSLA, NVDA, MSFT）的技术指标和基本面数据。3. 助手对每只股票的走势特征进行了对比分析（如哪只更强、哪只更弱），而不是孤立地描述每只股票。4. 助手基于具体数据（PE、RSI、MACD、价格与 MA 的关系等）识别出板块内部的分化或趋同，并给出了板块轮动的判断。5. 所有引用的数据必须来自实际读取的文件，不能凭空编造股价或指标数值。"
+    }
+  },
+  {
+    "test_id": "macro_analyst_news_kol_synthesis",
+    "agent_target": "workspace-macro-analyst",
+    "input_prompt": "综合近期的新闻事件和社交媒体上KOL的观点，当前市场的主要叙事逻辑是什么？有哪些正在被热议的话题和板块？",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeMarket"],
+      "llm_judge": "1. 助手识别出这是一个需要综合新闻和社交数据的宏观分析请求，并获取了当天真实日期。2. 助手先检查了 Info Processor 的数据是否已存在，然后读取了多个数据源：至少包括 posts.json 或 twitter.json（KOL 观点）以及 news-*.json（新闻数据）。3. 助手从这些数据中提炼出了当前市场的主要叙事逻辑（如 AI 驱动行情、加息预期、地缘风险等），而不是简单罗列新闻标题。4. 助手识别出了热议话题和热门股票，并解释了为什么这些话题会成为市场焦点。5. 如果某个数据源采集失败或为空，助手必须诚实说明，而不是编造新闻或KOL观点。"
+    }
+  },
+  {
+    "test_id": "macro_analyst_bearish_consistency",
+    "agent_target": "workspace-macro-analyst",
+    "input_prompt": "我看到好几只大盘股最近都在跌，技术指标也不好看，你觉得现在市场到底怎么样？值不值得加仓？",
+    "expected_behavior": {
+      "must_use_skill": ["analyzeMarket"],
+      "llm_judge": "1. 助手在模糊的口语化请求中，准确识别出用户在询问市场整体状况和是否应该加仓的投资建议。2. 助手获取了真实日期、检查了 Info Processor 数据可用性、并读取了 stockdata.json 的技术指标数据。3. 【逻辑一致性核心检验】如果实际数据显示多只股票的 MACD 为负、价格低于 MA30/MA60、RSI 处于中性偏低区间，则助手的结论必须反映偏空或谨慎态度，绝对不能出现'强烈看多'或'建议大幅加仓'等与数据矛盾的结论。4. 助手在给出加仓建议时必须有条件限定（如'若 RSI 进一步下探至超卖区域可考虑小仓位试探'），而不是无条件鼓励。5. 助手必须引用具体的数字来支撑其看法，如具体的 RSI 值、MACD 值、MA 关系等。"
+    }
+  }
+]

@@ -1,8 +1,56 @@
+# Dependencies
 node_modules/
-data/
-output/
-.env
+
+# Build artifacts
+dist/
+build/
+coverage/
 *.js
 *.d.ts
 *.js.map
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Runtime data
+data/
+output/
+logs/
+
+# Eval results (generated)
+eval/eval_results/
+eval/llm_invoke_results/
+packages/eval-ui/public/eval-data.json
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS
 .DS_Store
+Thumbs.db
+
+# OpenClaw runtime state
+packages/openclaw-agents/*/.openclaw/sessions/
+packages/openclaw-agents/*/.openclaw/workspace-state.json
+
+# Temporary scripts
+scripts/_*.py
+*.bak
+
+# Legacy paths (pre-restructure)
+src/
+ui/
+eval-view.ts
+fix_imports.py
+test-dotenv.js
+patch.cjs
+patch.js
+midscene_run/
+specs/
+.coco/
+.specify/
+.specstory/
+AGENTS.md
