@@ -101,7 +101,6 @@ fincrew/
 │   ├── eval_dataset/             # Eval test cases
 │   │   ├── single_agent/         # Per-agent capability tests
 │   │   ├── workflow/             # Multi-agent orchestration tests
-│   │   └── workflow_subset/      # Subset for quick iteration
 │   ├── eval_results/             # Generated eval reports (gitignored)
 │   └── llm_invoke_results/       # Raw LLM invocation logs (gitignored)
 ├── eval.config.json              # Eval runner configuration
