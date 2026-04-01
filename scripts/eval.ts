@@ -19,6 +19,7 @@ const __dirname = dirname(__filename);
 
 interface EvalConfig {
   runner: { command: string; mode: string };
+  judge: { command: string; flag: string };
   dataset_dir: string;
   results_dir: string;
   openclaw_dev_dir: string;
@@ -65,6 +66,7 @@ function loadEvalConfig(): EvalConfig {
   const cfgPath = path.join(process.cwd(), 'config/eval.config.json');
   const defaults: EvalConfig = {
     runner: { command: 'openclaw', mode: 'dev' },
+    judge: { command: 'coco', flag: '-p' },
     dataset_dir: 'eval/eval_dataset',
     results_dir: 'eval/llm_invoke_results',
     openclaw_dev_dir: '~/.openclaw-dev',
@@ -317,7 +319,7 @@ function checkMemoryRead(items: SessionData['assistantContentItems']): boolean {
   return false;
 }
 
-async function callLLMJudge(assistantTexts: string, judgePrompt: string): Promise<{ score: number; reason: string }> {
+async function callLLMJudge(assistantTexts: string, judgePrompt: string, evalConfig: EvalConfig): Promise<{ score: number; reason: string }> {
   const templatePath = path.join(__dirname, 'prompt', 'llm-judge.md');
   let fullPrompt = fs.readFileSync(templatePath, 'utf-8');
   const currentDate = new Date().toISOString().split('T')[0];
@@ -328,7 +330,7 @@ async function callLLMJudge(assistantTexts: string, judgePrompt: string): Promis
 
   try {
     const safePrompt = fullPrompt.replace(/"/g, '\\"').replace(/\$/g, '\\$');
-    const result = execSync(`coco -p "${safePrompt}"`, { encoding: 'utf-8' });
+    const result = execSync(`${evalConfig.judge.command} ${evalConfig.judge.flag} "${safePrompt}"`, { encoding: 'utf-8' });
     const match = result.match(/\{[\s\S]*?\}/);
     if (match) {
       const parsed = JSON.parse(match[0]);
@@ -341,7 +343,7 @@ async function callLLMJudge(assistantTexts: string, judgePrompt: string): Promis
   }
 }
 
-async function evaluateCase(evalCase: EvalCase, invokeDir: string): Promise<TestResult> {
+async function evaluateCase(evalCase: EvalCase, invokeDir: string, evalConfig: EvalConfig): Promise<TestResult> {
   const resultFile = path.join(invokeDir, `${evalCase.test_id}_result.jsonl`);
   const details: string[] = [];
   let pass = true;
@@ -389,7 +391,7 @@ async function evaluateCase(evalCase: EvalCase, invokeDir: string): Promise<Test
   }
 
   if (eb.llm_judge) {
-    const judgeResult = await callLLMJudge(assistantTexts, eb.llm_judge);
+    const judgeResult = await callLLMJudge(assistantTexts, eb.llm_judge, evalConfig);
     if (judgeResult.score >= 4) details.push(`✅ LLM Judge 评分 [${judgeResult.score}/5]: ${judgeResult.reason}`);
     else { details.push(`❌ LLM Judge 评分 [${judgeResult.score}/5]: ${judgeResult.reason}`); pass = false; }
   }
@@ -421,7 +423,7 @@ async function phaseCompare(evalConfig: EvalConfig, cases: EvalCase[], timestamp
   let passedCount = 0;
 
   for (const c of cases) {
-    const res = await evaluateCase(c, invokeDirPath);
+    const res = await evaluateCase(c, invokeDirPath, evalConfig);
     results.push(res);
     if (res.pass) passedCount++;
     console.log(`\n[${res.pass ? 'PASS' : 'FAIL'}] ${res.test_id}`);

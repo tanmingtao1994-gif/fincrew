@@ -2,7 +2,12 @@
   "runner": {
     "command": "openclaw",
     "mode": "dev",
-    "comment": "Set mode to 'dev' for --dev flag, 'prod' for production. Change command to 'coco' if using coco CLI."
+    "comment": "Set mode to 'dev' for --dev flag, 'prod' for production."
+  },
+  "judge": {
+    "command": "coco",
+    "flag": "-p",
+    "comment": "CLI used to evaluate openclaw results. e.g. 'coco -p <prompt>'"
   },
   "dataset_dir": "eval/eval_dataset",
   "results_dir": "eval/llm_invoke_results",

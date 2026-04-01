@@ -23,30 +23,27 @@ else
   echo "[FinCrew] Deploying to DEVELOPMENT (~/.openclaw-dev)"
 fi
 
-# Deploy agents
+# Deploy agents (keep workspace-* prefix, copy directly to TARGET_DIR)
 AGENTS_SRC="$PROJECT_ROOT/packages/openclaw-agents"
-AGENTS_DST="$TARGET_DIR/agents"
-mkdir -p "$AGENTS_DST"
 
 for agent_dir in "$AGENTS_SRC"/workspace-*; do
   agent_name=$(basename "$agent_dir")
-  agent_id="${agent_name#workspace-}"
-  mkdir -p "$AGENTS_DST/$agent_id"
-  rsync -av --delete --exclude=".openclaw/sessions" --exclude=".git" "$agent_dir/" "$AGENTS_DST/$agent_id/"
-  echo "  Agent deployed: $agent_id"
+  mkdir -p "$TARGET_DIR/$agent_name"
+  rsync -av --delete --exclude=".openclaw/sessions" --exclude=".git" "$agent_dir/" "$TARGET_DIR/$agent_name/"
+  echo "  Agent deployed: $agent_name"
 done
 
 # Deploy skills
 if [ -d "$AGENTS_SRC/skills" ]; then
-  mkdir -p "$AGENTS_DST/skills"
-  rsync -av --delete --exclude="_TEMPLATE" "$AGENTS_SRC/skills/" "$AGENTS_DST/skills/"
+  mkdir -p "$TARGET_DIR/skills"
+  rsync -av --delete --exclude="_TEMPLATE" "$AGENTS_SRC/skills/" "$TARGET_DIR/skills/"
   echo "  Skills deployed"
 fi
 
 # Deploy templates
 if [ -d "$AGENTS_SRC/templates" ]; then
-  mkdir -p "$AGENTS_DST/templates"
-  rsync -av --delete "$AGENTS_SRC/templates/" "$AGENTS_DST/templates/"
+  mkdir -p "$TARGET_DIR/templates"
+  rsync -av --delete "$AGENTS_SRC/templates/" "$TARGET_DIR/templates/"
   echo "  Templates deployed"
 fi
 

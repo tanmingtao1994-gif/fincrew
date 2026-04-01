@@ -6,15 +6,14 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 echo "[FinCrew] Watch mode - syncing agent changes in real-time"
 echo "  Source: packages/openclaw-agents"
-echo "  Target: ~/.openclaw/agents & ~/.openclaw-dev/agents"
+echo "  Target: ~/.openclaw-dev/"
 echo "  Press Ctrl+C to stop"
 echo ""
 
 # Initial deploy
 bash "$SCRIPT_DIR/deploy.sh" --env dev
 
-# cpx2 requires a glob STRING (not shell-expanded paths)
-# Must cd to project root so the relative glob works correctly
+# Watch mode: cpx2 preserves relative path after the glob base
 cd "$PROJECT_ROOT"
 
 npx cpx2 "packages/openclaw-agents/**/*" ~/.openclaw-dev --watch --verbose --ignore="**/templates/**,**/.openclaw/sessions/**"
