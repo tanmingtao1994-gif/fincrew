@@ -90,9 +90,12 @@ fincrew/
 ├── data/
 │   ├── info/daily/               # Daily collected data
 │   └── memory/                   # Agent memory storage
-├── tests/eval_dataset/           # Eval test cases
-│   ├── zh/                       # Chinese eval cases
-│   └── en/                       # English eval cases
+├── eval/
+│   ├── eval_dataset/               # Eval test cases
+│   │   ├── zh/                     # Chinese eval cases
+│   │   └── en/                     # English eval cases
+│   ├── eval_results/               # Eval reports (gitignored)
+│   └── llm_invoke_results/         # Raw LLM logs (gitignored)
 └── scripts/                      # Deploy & eval scripts
 ```
 

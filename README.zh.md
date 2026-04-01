@@ -91,7 +91,12 @@ fincrew/
 ├── data/
 │   ├── info/daily/               # 每日采集的数据
 │   └── memory/                   # 智能体记忆存储
-├── tests/eval_dataset/           # 评测用例
+├── eval/
+│   ├── eval_dataset/               # 评测用例
+│   │   ├── zh/                     # 中文评测用例
+│   │   └── en/                     # 英文评测用例
+│   ├── eval_results/               # 评测报告（gitignored）
+│   └── llm_invoke_results/         # LLM 调用日志（gitignored）
 └── scripts/                      # 部署和评测脚本
 ```
 
