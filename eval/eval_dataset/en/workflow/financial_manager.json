@@ -1,0 +1,446 @@
+[
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Analyze AAPL and TSLA for me, provide buy or sell recommendations with specific trading plans.",
+    "expected_behavior": {
+      "must_use_skill": [
+        "analyzeStock",
+        "createTradingPlan"
+      ],
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL",
+        "TSLA"
+      ],
+      "llm_judge": "1. Dispatch three sub-agents. 2. Get real date. 3. Read data files. 4. Structured analysis. 5. TA scoring. 6. Trading plan. 7. Risk warning."
+    },
+    "test_id": "fm_workflow_basic_decision"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "I want to go all-in on TSLA with my entire capital. What do you think?",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor"
+      ],
+      "must_reject": true,
+      "must_contain": [
+        "risk",
+        "position"
+      ],
+      "llm_judge": "1. Identify full position risk. 2. Reject all-in operation. 3. Position management principles. 4. Alternative solutions. 5. Risk control constraints."
+    },
+    "test_id": "fm_workflow_risk_control"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Analyze MSFT and provide a complete report including market overview, stock analysis, and trading plan",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_use_skill": [
+        "analyzeStock"
+      ],
+      "must_contain": [
+        "MSFT",
+        "market overview",
+        "stock analysis",
+        "trading plan"
+      ],
+      "llm_judge": "1. Three modules complete. 2. MA output referenced. 3. Technical scoring. 4. Specific price levels. 5. Structured."
+    },
+    "test_id": "fm_workflow_format_compliance"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Comprehensively analyze these four stocks: NVDA, AAPL, MSFT, TSLA, and provide overall investment recommendations",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "NVDA",
+        "AAPL",
+        "MSFT",
+        "TSLA"
+      ],
+      "llm_judge": "1. Four independent analyses. 2. Cross comparison. 3. Data acquisition. 4. Technical scoring. 5. Portfolio allocation."
+    },
+    "test_id": "fm_workflow_full_pipeline_4stock"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "The market is in overall decline. Analyze the investment value of GOOGL and META in a bear market environment",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "GOOGL",
+        "META"
+      ],
+      "llm_judge": "1. Macro aligns with bearish view. 2. Conservative recommendations. 3. Divergences noted. 4. Logical consistency."
+    },
+    "test_id": "fm_workflow_bearish_consistency"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Analyze AAPL's latest trend and also review my recent AAPL trades",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "technical-analyst",
+        "reviewer"
+      ],
+      "must_contain": [
+        "AAPL",
+        "review"
+      ],
+      "llm_judge": "1. Technical analysis + review in parallel. 2. TA + Reviewer dispatch. 3. Decision quality assessment. 4. Lessons learned."
+    },
+    "test_id": "fm_workflow_review_combined"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Deep technical analysis of NVDA. I need support levels, resistance levels, multi-timeframe analysis, and Wyckoff phase assessment",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "NVDA",
+        "support",
+        "resistance"
+      ],
+      "llm_judge": "1. Deep TA analysis. 2. Support/resistance values. 3. Multi-timeframe. 4. Wyckoff. 5. Score 0-100."
+    },
+    "test_id": "fm_workflow_ta_deep_dive"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Help me do this week's review, summarize the quality of trading decisions and lessons learned",
+    "expected_behavior": {
+      "must_dispatch": [
+        "reviewer"
+      ],
+      "must_contain": [
+        "review"
+      ],
+      "llm_judge": "1. Reviewer dispatch. 2. Weekly report. 3. Quality assessment. 4. Lessons extracted."
+    },
+    "test_id": "fm_workflow_weekly_review"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "How is ZZZZ stock? Analyze it for me",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor"
+      ],
+      "must_contain": [
+        "ZZZZ"
+      ],
+      "llm_judge": "1. IP attempts to fetch. 2. Graceful handling. 3. Inform no data. 4. No fabrication."
+    },
+    "test_id": "fm_workflow_graceful_degradation"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Comprehensively analyze AMZN from macro, technical, and news perspectives. If there are divergences among the three dimensions, clearly point them out and give your final judgment",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AMZN"
+      ],
+      "llm_judge": "1. Three independent analyses. 2. Label conclusions. 3. Point out divergences. 4. Justified judgment."
+    },
+    "test_id": "fm_workflow_consensus"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "How is the market sentiment this week? Analyze the short-term trends of my holdings AAPL and NVDA, and current sector hotspots",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL",
+        "NVDA",
+        "sector"
+      ],
+      "llm_judge": "1. Sentiment assessment. 2. Short-term trends. 3. Sector hotspots. 4. Weekly timeframe. 5. Data support."
+    },
+    "test_id": "fm_workflow_weekly_analysis"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Monthly analysis: Assess the medium-short term trends of MSFT and GOOGL, analyze current sector rotation, and provide this month's trading recommendations",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "MSFT",
+        "GOOGL",
+        "sector"
+      ],
+      "llm_judge": "1. Monthly timeframe. 2. Medium-short term trends. 3. Sector rotation. 4. Monthly holding recommendations."
+    },
+    "test_id": "fm_workflow_monthly_trend"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Quarterly macro analysis: What's the current macroeconomic environment? Tech sector development trends? Provide quarterly holding strategy based on macro judgment",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst"
+      ],
+      "must_contain": [
+        "macro",
+        "tech",
+        "strategy"
+      ],
+      "llm_judge": "1. Deep macro analysis. 2. Tech forward-looking judgment. 3. Quarterly strategy. 4. MA output utilization."
+    },
+    "test_id": "fm_workflow_quarterly_macro"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "I received the latest TSLA stock data and related news. Analyze thoroughly and provide actionable conclusions with reasons",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "TSLA",
+        "conclusion"
+      ],
+      "must_use_skill": [
+        "analyzeStock",
+        "createTradingPlan"
+      ],
+      "llm_judge": "1. Three agent dispatch. 2. Multi-dimensional analysis. 3. Actionable conclusion. 4. Sufficient reasons. 5. Trading plan."
+    },
+    "test_id": "fm_workflow_loop_analyze_conclude"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Two weeks ago I bought 200 shares of AAPL at $185 as recommended. Now it's at $192. Review based on latest data, generate a review report including what went well and what went wrong",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "technical-analyst",
+        "reviewer"
+      ],
+      "must_contain": [
+        "AAPL",
+        "review"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. Reviewer review. 2. Objective evaluation. 3. What went well. 4. Needs improvement. 5. Lessons learned. 6. Save to memory."
+    },
+    "test_id": "fm_workflow_loop_review_report"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "I've been reading 'The Turtle Trading Rules' which mentions trend following and position sizing. Do you think this methodology suits current tech stock trading? Analyze with NVDA's technicals",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "NVDA",
+        "trend"
+      ],
+      "llm_judge": "1. Incorporate Turtle rules. 2. Tech stock applicability. 3. NVDA technicals. 4. Position sizing echo."
+    },
+    "test_id": "fm_workflow_discuss_strategy"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "A famous blogger says we should heavily invest in semiconductors now because AI demand is exploding. Verify this view, combine macro analysis and NVDA/AMD technicals to give your independent judgment",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "NVDA",
+        "AMD",
+        "semiconductor"
+      ],
+      "llm_judge": "1. Independent verification. 2. AI demand macro analysis. 3. Both stocks' technicals. 4. Evidence. 5. Justified judgment."
+    },
+    "test_id": "fm_workflow_kol_analysis"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Which sectors are hot today? Any sector rotation signals worth noting? If chasing hotspots, which specific stocks do you recommend?",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst"
+      ],
+      "must_contain": [
+        "sector",
+        "hot"
+      ],
+      "llm_judge": "1. Specific sector analysis. 2. Data support. 3. Stocks align with logic. 4. Macro impact. 5. Risk warning."
+    },
+    "test_id": "fm_workflow_sector_hotspot"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Good morning, help me with today's market briefing. Pull latest data for holdings AAPL, MSFT, NVDA, analyze overnight news, and provide today's trading recommendations",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL",
+        "MSFT",
+        "NVDA"
+      ],
+      "must_use_skill": [
+        "analyzeStock"
+      ],
+      "llm_judge": "1. Complete briefing. 2. Data overview. 3. News analysis. 4. Trading recommendations. 5. Clear format."
+    },
+    "test_id": "fm_workflow_daily_briefing"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "I heard a penny stock ABCD surged 200% in three days. Analyze if I should chase it",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor"
+      ],
+      "must_contain": [
+        "risk"
+      ],
+      "llm_judge": "1. No penny stock principle. 2. Warn chasing risk. 3. Don't blindly comply. 4. Explain reasons. 5. Suggest mainstream stocks."
+    },
+    "test_id": "fm_workflow_reject_penny_stock"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "MSFT technicals look great but macro has uncertainties. I'm hesitant about entering. Give me a comprehensive analysis and recommendation",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "MSFT"
+      ],
+      "llm_judge": "1. Both sides analyzed. 2. Point out divergence. 3. Profit priority. 4. Not ambiguous. 5. Actionable."
+    },
+    "test_id": "fm_workflow_profit_priority"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Review last week's NVDA trade. I bought at 850 and stopped out at 820, losing quite a bit. Analyze the problems with this trade and record lessons to long-term memory so I don't repeat the same mistakes",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "reviewer"
+      ],
+      "must_contain": [
+        "NVDA",
+        "lesson"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. Reviewer review. 2. Analyze mistake reasons. 3. Lessons learned. 4. Write to memory.json. 5. Structured with practical value."
+    },
+    "test_id": "fm_workflow_review_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "I just finished reading 'Reminiscences of a Stock Operator' about Jesse Livermore's key point theory and pyramid position sizing. Summarize these two core concepts and save to long-term memory for future stock analysis reference",
+    "expected_behavior": {
+      "must_dispatch": [],
+      "must_contain": [
+        "pyramid",
+        "memory"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. Accurately understand both concepts. 2. Structured summary. 3. Write to long-term memory. 4. Practical value. 5. Source noted."
+    },
+    "test_id": "fm_workflow_book_learning_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "A big influencer shared a view: In the AI hardware cycle, every NVIDIA earnings pullback is a buying opportunity because data center capex growth is certain. Verify this view with macro analysis, and save to memory if valuable",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst"
+      ],
+      "must_contain": [
+        "NVDA"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. Independent verification. 2. Macro evidence. 3. If valuable write with conditions noted; if not explain why. 4. Verified refinement."
+    },
+    "test_id": "fm_workflow_kol_insight_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Let's discuss position management strategy. My current approach is max 20% per stock, max 80% total position. Is this reasonable? After discussion, save the final conclusion to memory",
+    "expected_behavior": {
+      "must_dispatch": [],
+      "must_contain": [
+        "position",
+        "memory"
+      ],
+      "must_write_memory": true,
+      "llm_judge": "1. Deep discussion. 2. Professional evaluation. 3. May suggest adjustments. 4. Write to memory. 5. Contains preferences and recommendations."
+    },
+    "test_id": "fm_workflow_discuss_to_memory"
+  },
+  {
+    "agent_target": "workspace-financial-manager",
+    "input_prompt": "Analyze if AAPL is suitable to buy now. Reference previously saved lessons learned to assist judgment",
+    "expected_behavior": {
+      "must_dispatch": [
+        "info-processor",
+        "macro-analyst",
+        "technical-analyst"
+      ],
+      "must_contain": [
+        "AAPL"
+      ],
+      "must_read_memory": true,
+      "llm_judge": "1. Read long-term memory. 2. Reference historical experience. 3. Experience influences recommendations. 4. Regular analysis complete. 5. Memory loop value."
+    },
+    "test_id": "fm_workflow_memory_recall_apply"
+  }
+]

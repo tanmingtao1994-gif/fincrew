@@ -173,13 +173,14 @@ function parseSessionData(jsonlPath: string): SessionData {
   return { toolCalls, usedSkills, assistantTexts, assistantContentItems };
 }
 
-function parseArgs(): { subcommand?: string; timestamp?: string; dir?: string; target?: string } {
+function parseArgs(): { subcommand?: string; timestamp?: string; dir?: string; target?: string; lang?: string } {
   const args = process.argv.slice(2);
-  const result: { subcommand?: string; timestamp?: string; dir?: string; target?: string } = {};
+  const result: { subcommand?: string; timestamp?: string; dir?: string; target?: string; lang?: string } = {};
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--timestamp' && args[i + 1]) { result.timestamp = args[i + 1]; i++; }
     else if (args[i] === '--dir' && args[i + 1]) { result.dir = args[i + 1]; i++; }
     else if (args[i] === '--target' && args[i + 1]) { result.target = args[i + 1]; i++; }
+    else if (args[i] === '--lang' && args[i + 1]) { result.lang = args[i + 1]; i++; }
     else if (!args[i].startsWith('--') && !result.subcommand) { result.subcommand = args[i]; }
   }
   return result;
@@ -465,13 +466,15 @@ async function phaseCompare(evalConfig: EvalConfig, cases: EvalCase[], timestamp
 // ==================== Main Entry ====================
 
 async function main() {
-  const { subcommand, timestamp: forcedTs, dir: targetDir, target: targetFile } = parseArgs();
-  console.log(`📋 Command Args: subcommand=${subcommand}, timestamp=${forcedTs}, dir=${targetDir}, target=${targetFile}`);
+  const { subcommand, timestamp: forcedTs, dir: targetDir, target: targetFile, lang } = parseArgs();
+  const language = lang || 'zh';
+  console.log(`📋 Command Args: subcommand=${subcommand}, timestamp=${forcedTs}, dir=${targetDir}, target=${targetFile}, lang=${language}`);
   const evalConfig = loadEvalConfig();
-  const datasetDir = path.join(process.cwd(), evalConfig.dataset_dir);
+  const datasetDir = path.join(process.cwd(), evalConfig.dataset_dir, language);
   const timestamp = forcedTs || getTimestampString();
 
   console.log(`📋 Eval config: command=${evalConfig.runner.command}, mode=${evalConfig.runner.mode}`);
+  console.log(`🌐 Language: ${language}`);
   console.log(`⏱  Timestamp: ${timestamp}`);
 
   const cases = loadAllEvalCases(datasetDir, targetFile || targetDir || undefined);

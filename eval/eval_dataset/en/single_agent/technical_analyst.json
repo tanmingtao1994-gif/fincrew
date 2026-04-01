@@ -1,0 +1,10 @@
+[
+  {
+    "agent_target": "workspace-technical-analyst",
+    "input_prompt": "Perform technical analysis on NVDA including RSI, MACD, support and resistance levels",
+    "expected_behavior": {
+      "must_contain": ["NVDA", "RSI"]
+    },
+    "test_id": "ta_basic_analysis"
+  }
+]

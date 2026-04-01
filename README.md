@@ -1,322 +1,457 @@
 # FinCrew
 
+[English](./README.en.md) | 简体中文
+
 A self-evolving multi-agent financial assistant powered by [OpenClaw](https://github.com/nicepkg/openclaw).
 
 ## Overview
 
-FinCrew is a team of 5 specialized AI agents that collaborate to provide comprehensive financial analysis, trading decisions, and portfolio management. Built on the OpenClaw multi-agent framework, it features a self-evolution memory loop that learns from past trades and continuously improves its decision-making.
+FinCrew 是一个基于 OpenClaw 的多智能体金融助手，由 5 个专业 AI 智能体协作完成投资分析、交易决策和组合管理。它的核心特性是**自我进化记忆循环**——从每次交易中学习，持续优化决策质量。
 
-### Agent Architecture
+**适用场景**：
+- 个人投资者的日常市场分析和交易决策辅助
+- 追踪关注的 KOL 观点并整合到投资决策中
+- 基于个人投资理念和风险偏好的定制化分析
+- 交易复盘和经验沉淀
+
+## 智能体架构
 
 ```
 ┌─────────────────────────────────────────────────┐
-│              Financial Manager (FM)               │
-│         Senior Private Wealth Manager             │
-│    Orchestrates all agents & final decisions       │
+│         Financial Manager (财务经理)              │
+│         高级私人财富管理顾问                        │
+│    协调所有智能体并做出最终决策                      │
 └───────────┬──────┬──────┬──────┬────────────────┘
             │      │      │      │
      ┌──────▼──┐ ┌─▼────┐ ┌▼─────┐ ┌▼────────┐
      │  Info    │ │Macro │ │Tech  │ │Reviewer  │
      │Processor│ │Analyst│ │Analyst│ │          │
+     │ 信息处理  │ │宏观分析│ │技术分析│ │ 交易复盘  │
      │         │ │       │ │      │ │          │
-     │ Data &  │ │Market │ │Chart │ │ Trade    │
-     │ News    │ │Trends │ │Signals│ │ Review   │
+     │ 数据采集  │ │市场趋势│ │图表信号│ │ 经验沉淀  │
+     │ 新闻整合  │ │板块轮动│ │RSI/MACD│ │ 绩效评估  │
      └─────────┘ └───────┘ └──────┘ └──────────┘
 ```
 
-| Agent | Role | Responsibility |
-|-------|------|----------------|
-| **Financial Manager** | Orchestrator | Dispatches tasks, synthesizes analysis, makes final buy/hold/sell decisions |
-| **Info Processor** | Intelligence Officer | Collects stock data, news, KOL opinions, and insider trading info |
-| **Macro Analyst** | Global Strategist | Evaluates market trends, sector rotation, geopolitical risks |
-| **Technical Analyst** | Chart Expert | RSI, MACD, Bollinger Bands, Wyckoff analysis, support/resistance |
-| **Reviewer** | Risk Auditor | Post-trade review, lesson extraction, performance coaching |
+| 智能体 | 角色 | 职责 |
+|-------|------|------|
+| **Financial Manager** | 协调者 | 分派任务、综合分析、做出买入/持有/卖出决策 |
+| **Info Processor** | 情报官 | 采集股票数据、新闻、KOL 观点、内部交易信息 |
+| **Macro Analyst** | 宏观策略师 | 评估市场趋势、板块轮动、地缘政治风险 |
+| **Technical Analyst** | 图表专家 | RSI、MACD、布林带、威科夫分析、支撑阻力位 |
+| **Reviewer** | 风控审计 | 交易后复盘、经验提取、绩效辅导 |
 
-### Self-Evolution Memory Loop
+### 自我进化记忆循环
 
-FinCrew's distinguishing feature is its **memory persistence loop** — a closed-loop learning system:
+FinCrew 的核心特性是**记忆持久化循环**——一个闭环学习系统：
 
 ```
-Trade Review → Lesson Extraction → Long-term Memory → Future Decision Reference
-Book/Article → Key Insight Extraction → Long-term Memory → Applied in Analysis
-KOL Opinion → Validate & Summarize → Long-term Memory → Cross-referenced
+交易复盘 → 经验提取 → 长期记忆 → 未来决策参考
+书籍/文章 → 关键洞察提取 → 长期记忆 → 应用于分析
+KOL 观点 → 验证并总结 → 长期记忆 → 交叉引用
 ```
 
-Every review conclusion, book summary, KOL insight, and discussion outcome is persisted as long-term memory, making the system smarter over time.
+每次复盘结论、书籍总结、KOL 洞察和讨论结果都会持久化为长期记忆，让系统随时间变得更智能。
 
-## Project Structure
+**如何让智能体记住你的投资理念**：
+1. 编辑 `~/.openclaw-dev/workspace-financial-manager/MEMORY.md`
+2. 添加你的投资原则、风险偏好、决策框架
+3. 智能体会在每次决策时自动参考这些记忆
+
+## 项目结构
 
 ```
 fincrew/
 ├── packages/
-│   ├── openclaw-agents/          # Agent definitions & skills
+│   ├── openclaw-agents/          # 智能体定义和技能
 │   │   ├── workspace-financial-manager/
 │   │   ├── workspace-info-processor/
 │   │   ├── workspace-macro-analyst/
 │   │   ├── workspace-technical-analyst/
 │   │   ├── workspace-reviewer/
-│   │   ├── skills/               # Shared agent skills (incl. memory/)
-│   │   └── templates/            # Agent prompt templates
-│   ├── eval-ui/                  # Eval results visualization (React + Vite)
-│   │   ├── eval-view.ts          # Eval data aggregation server
-│   │   └── src/                  # React components & pages
-│   └── tools/                    # Data collection & analysis tools (each independently callable)
-│       ├── getStockData/         # Fundamental & technical data
-│       │   ├── cli.ts            # Independent CLI entry
-│       │   ├── fundamental.ts
-│       │   └── technical.ts
-│       ├── getNews/              # Multi-source news aggregation
-│       │   ├── cli.ts            # Independent CLI entry
-│       │   └── news.ts
-│       ├── getKolOpinions/       # Twitter, Weibo, YouTube KOL tracking
-│       │   ├── cli.ts            # Independent CLI entry
-│       │   ├── twitter.ts
-│       │   ├── weibo.ts
-│       │   └── youtube.ts
-│       ├── getOptions/           # Options chain analysis
-│       │   ├── cli.ts            # Independent CLI entry
-│       │   └── options.ts
-│       ├── shared/               # Shared utilities (Yahoo Finance, caching, date)
-│       └── index.ts              # Backward-compatible dispatcher
-├── data/
-│   ├── info/                     # All tool outputs
-│   │   ├── daily/                # Per-date collected data (stockdata, news, posts, options)
-│   │   └── cache/                # API response caches (fundamentals, OHLCV, options-chain)
-│   └── memory/                   # Agent memory storage
-├── scripts/
-│   ├── deploy.sh                 # Unified deploy (--env dev|prod)
-│   ├── deploy-watch.sh           # Watch mode for development
-│   ├── eval-utils.ts             # Shared eval utilities
-│   ├── eval-runner.ts            # Eval case executor
-│   ├── eval-compare.ts           # Eval result assertion engine
-│   ├── eval.sh                   # Eval pipeline entry point
-│   ├── update-agents-doc.ts      # Auto-generate AGENTS.md from agent dirs
-│   └── prompt/
-│       └── llm-judge.md          # LLM judge prompt template
+│   │   ├── skills/               # 共享技能（包含 memory/）
+│   │   └── templates/            # 智能体提示词模板
+│   ├── eval-ui/                  # 评测结果可视化（React + Vite）
+│   └── tools/                    # 数据采集工具（每个可独立调用）
+│       ├── getStockData/         # 基本面 + 技术面数据
+│       ├── getNews/              # 多源新闻聚合
+│       ├── getKolOpinions/       # Twitter、微博、YouTube KOL 追踪
+│       └── getOptions/           # 期权链分析
 ├── config/
-│   ├── openclaw.json             # OpenClaw configuration template
-│   ├── kols.json                 # KOL watchlist
-│   └── watchlist.json            # Stock watchlist
-├── tests/
-│   ├── eval_dataset/             # Eval test cases
-│   │   ├── single_agent/         # Per-agent capability tests
-│   │   ├── workflow/             # Multi-agent orchestration tests
-│   ├── eval_results/             # Generated eval reports (gitignored)
-│   └── llm_invoke_results/       # Raw LLM invocation logs (gitignored)
-├── eval.config.json              # Eval runner configuration
-├── .env.example                  # Environment variables template
-└── package.json
+│   ├── openclaw.json.sample      # OpenClaw 配置模板
+│   ├── kols.json.sample          # KOL 关注列表模板
+│   └── watchlist.json.sample     # 股票关注列表模板
+├── data/
+│   ├── info/daily/               # 每日采集的数据
+│   └── memory/                   # 智能体记忆存储
+├── tests/eval_dataset/           # 评测用例
+└── scripts/                      # 部署和评测脚本
 ```
 
 ## Getting Started
 
-### Prerequisites
+### 1. 安装 OpenClaw
 
-- [Node.js](https://nodejs.org/) >= 18
-- [OpenClaw CLI](https://github.com/nicepkg/openclaw) installed globally
-- An LLM provider API key (see `config/openclaw.json`)
-
-### Installation
+FinCrew 基于 OpenClaw 框架运行，首先需要安装 OpenClaw CLI：
 
 ```bash
-git clone https://github.com/user/fincrew.git
+npm install -g @nicepkg/openclaw
+```
+
+验证安装：
+```bash
+openclaw --version
+```
+
+### 2. 克隆项目并安装依赖
+
+```bash
+git clone https://github.com/tanmingtao1994-gif/fincrew.git
 cd fincrew
 npm install
 ```
 
-### Configuration
+### 3. 配置 LLM 提供商
 
-1. **LLM Provider**: Copy and edit the OpenClaw config:
-   ```bash
-   cp config/openclaw.json ~/.openclaw-dev/openclaw.json
-   # Edit ~/.openclaw-dev/openclaw.json — fill in your API key and base URL
-   ```
-
-2. **Environment Variables**: Copy and edit `.env`:
-   ```bash
-   cp .env.example .env
-   # Fill in TWITTER_API_KEY, YAHOO_FINANCE_API_KEY, etc.
-   ```
-
-3. **Deploy Agents**:
-   ```bash
-   # One-time deploy to development environment
-   npm run deploy:dev
-   
-   # Or watch mode (auto-redeploy on file changes)
-   npm run deploy:watch
-   ```
-
-## Usage
-
-### Running the Financial Manager
+复制配置模板并填入你的 API 密钥：
 
 ```bash
-# Development mode (uses ~/.openclaw-dev)
-openclaw --dev agent --agent financial-manager --message "Analyze AAPL for a potential buy"
+# 开发环境配置
+mkdir -p ~/.openclaw-dev
+cp config/openclaw.json.sample ~/.openclaw-dev/openclaw.json
 
-# Production mode (uses ~/.openclaw)
-openclaw agent --agent financial-manager --message "Generate today's market briefing for AAPL, MSFT, NVDA"
+# 编辑配置文件，填入你的 LLM API 信息
+# 支持 OpenAI、Anthropic、Minimax 等兼容 OpenAI API 的提供商
 ```
 
-### Example Prompts
-
-| Scenario | Prompt |
-|----------|--------|
-| Daily Briefing | `"做今天的市场晨报，拉取 AAPL、MSFT、NVDA 的数据，分析消息面，给出操作建议"` |
-| Trade Review | `"复盘上周 NVDA 的交易，分析问题并记录经验教训到长期记忆"` |
-| Buy Analysis | `"分析 TSLA 是否适合现在买入，参考之前沉淀的经验教训"` |
-| Sector Analysis | `"最近半导体板块有什么热点？帮我分析一下"` |
-
-### Data Collection Tools
-
-Each tool can be called independently or via `npm run`:
-
-```bash
-# Collect KOL opinions from Twitter/Weibo/YouTube
-npm run collect -- --date 2026-03-31
-# or directly: npx tsx packages/tools/getKolOpinions/cli.ts --date 2026-03-31
-
-# Fetch stock data (fundamentals + technicals)
-npm run data -- --symbols AAPL,MSFT,NVDA
-# or directly: npx tsx packages/tools/getStockData/cli.ts --symbols AAPL,MSFT,NVDA
-
-# Aggregate news from multiple sources
-npm run news -- --symbols AAPL
-# or directly: npx tsx packages/tools/getNews/cli.ts --symbols AAPL
-
-# Options chain analysis
-npm run options -- --symbol NVDA --expiry 2026-04-18 --direction call
-# or directly: npx tsx packages/tools/getOptions/cli.ts --symbol NVDA --expiry 2026-04-18 --direction call
-```
-
-All tool outputs are stored under `data/info/daily/<date>/`.
-
-## Evaluation
-
-FinCrew includes a comprehensive eval framework for testing agent behavior.
-
-### Eval Configuration
-
-Edit `eval.config.json` to switch between CLI backends:
-
+配置示例（`~/.openclaw-dev/openclaw.json`）：
 ```json
 {
-  "runner": {
-    "command": "openclaw",   // or "coco" for coco CLI
-    "mode": "dev"            // "dev" adds --dev flag, "prod" for production
-  }
-}
-```
-
-### Running Evals
-
-```bash
-# Run all eval cases
-npm run eval
-
-# Run a specific eval directory
-npm run eval -- workflow
-
-# Run eval steps separately
-npm run eval:run -- --dir workflow --timestamp 2026-03-31-14-00-00
-npm run eval:compare -- --timestamp 2026-03-31-14-00-00
-
-# View eval results in browser
-npm run view
-```
-
-### Eval Dataset Structure
-
-```
-tests/eval_dataset/
-├── single_agent/               # Test individual agent capabilities
-│   ├── info_processor.json
-│   ├── macro_analyst.json
-│   ├── technical_analyst.json
-│   └── reviewer.json
-└── workflow/                   # Test multi-agent orchestration
-    └── financial_manager.json  # 26 cases covering 7 scenario dimensions
-```
-
-### Assertion Types
-
-| Assertion | Description |
-|-----------|-------------|
-| `must_call` | Agent must invoke specific tools |
-| `must_dispatch` | FM must delegate to specific sub-agents |
-| `must_contain` | Response must include specific keywords |
-| `must_reject` | Agent must refuse invalid requests |
-| `must_write_memory` | Agent must persist experience to long-term memory |
-| `must_read_memory` | Agent must reference historical experience |
-| `llm_judge` | LLM-based quality assessment with custom criteria |
-
-## Development
-
-### Agent Development Workflow
-
-1. **Edit agent definitions** in `packages/openclaw-agents/workspace-{agent-name}/`
-   - `SOUL.md` — Core personality, decision rules, workflow
-   - `TOOLS.md` — Available tools and when to use them
-   - `IDENTITY.md` — Role and objective
-   - `MEMORY.md` — Long-term memory (Financial Manager only)
-
-2. **Deploy changes**:
-   ```bash
-   npm run deploy:dev    # one-time
-   npm run deploy:watch  # continuous
-   ```
-
-3. **Test interactively**:
-   ```bash
-   openclaw --dev agent --agent financial-manager --message "your test prompt"
-   ```
-
-4. **Run evals** to validate changes:
-   ```bash
-   npm run eval -- workflow
-   ```
-
-5. **Review results** in the eval UI:
-   ```bash
-   npm run view
-   ```
-
-### Adding a New Eval Case
-
-Add to the appropriate JSON file in `tests/eval_dataset/`:
-
-```json
-{
-  "test_id": "fm_workflow_my_new_case",
-  "agent_target": "workspace-financial-manager",
-  "input_prompt": "Your test prompt here",
-  "expected_behavior": {
-    "must_dispatch": ["workspace-info-processor", "workspace-macro-analyst"],
-    "must_contain": ["keyword1", "keyword2"],
-    "must_write_memory": true,
-    "llm_judge": {
-      "criteria": "Evaluate whether the response provides actionable advice",
-      "pass_threshold": 7
+  "models": {
+    "providers": {
+      "minimax": {
+        "baseUrl": "https://api.minimax.chat/v1",
+        "apiKey": "YOUR_API_KEY_HERE",
+        "models": [
+          {
+            "id": "Minimax-M2.5",
+            "name": "Minimax-M2.5"
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "minimax/Minimax-M2.5"
+      }
     }
   }
 }
 ```
 
-## Deployment
+### 4. 部署智能体到 OpenClaw
 
 ```bash
-# Development (recommended for testing)
+# 部署到开发环境（推荐）
 npm run deploy:dev
 
-# Production (with confirmation prompt)
-npm run deploy:prod
+# 或使用监听模式（代码改动自动重新部署）
+npm run deploy:watch
 ```
 
-Both commands use a unified `scripts/deploy.sh` under the hood:
-1. Sync agent definitions to `~/.openclaw-dev` (or `~/.openclaw`)
-2. Deploy shared skills and templates
-3. Copy `openclaw.json` config (first-time only, won't overwrite existing)
+部署完成后，5 个智能体会被安装到 `~/.openclaw-dev/workspace-*` 目录。
+
+## 个性化配置
+
+### 配置关注的股票
+
+编辑 `config/watchlist.json`（首次使用需从模板复制）：
+
+```bash
+cp config/watchlist.json.sample config/watchlist.json
+```
+
+添加你关注的股票：
+```json
+{
+  "stocks": [
+    { "symbol": "NVDA", "name": "NVIDIA", "sector": "半导体", "tags": ["AI芯片", "GPU"] },
+    { "symbol": "TSLA", "name": "特斯拉", "sector": "汽车", "tags": ["FSD", "Robotaxi"] },
+    { "symbol": "HK.09988", "name": "阿里巴巴", "sector": "互联网", "tags": ["云计算", "电商"] }
+  ]
+}
+```
+
+### 配置关注的 KOL
+
+编辑 `config/kols.json`（首次使用需从模板复制）：
+
+```bash
+cp config/kols.json.sample config/kols.json
+```
+
+添加你信任的投资 KOL：
+```json
+{
+  "kols": [
+    {
+      "id": "混沌与概率1997",
+      "name": "混沌与概率1997",
+      "platforms": {
+        "weibo": { "uid": "1648195723" }
+      },
+      "expertise": ["宏观", "美股"],
+      "reliability": 4,
+      "language": "zh"
+    },
+    {
+      "id": "your-twitter-kol",
+      "name": "Your Favorite Analyst",
+      "platforms": {
+        "twitter": { "username": "analyst_handle" }
+      },
+      "expertise": ["技术分析", "加密货币"],
+      "reliability": 5,
+      "language": "en"
+    }
+  ]
+}
+```
+
+**字段说明**：
+- `reliability`: 1-5，可信度评分，影响观点权重
+- `expertise`: 擅长领域标签，用于智能体筛选相关观点
+- `platforms`: 支持 `weibo`（微博 UID）、`twitter`（用户名）
+
+### 配置投资理念和风险偏好
+
+编辑 Financial Manager 的长期记忆文件：
+
+```bash
+# 文件位置
+~/.openclaw-dev/workspace-financial-manager/MEMORY.md
+```
+
+在 `MEMORY.md` 中添加你的投资原则：
+
+```markdown
+## 投资理念
+
+### 风险偏好
+- 风险承受能力：中等偏高
+- 单笔最大仓位：不超过总资产的 15%
+- 止损线：单笔亏损超过 8% 必须止损
+
+### 投资风格
+- 偏好成长股，关注科技、新能源、半导体板块
+- 持仓周期：中长期（3-12 个月）
+- 不做短线日内交易
+
+### 决策原则
+- 技术面 + 基本面结合，技术面权重 40%
+- 重视 RSI 超卖信号和 MACD 金叉
+- 必须参考 KOL 观点，但不盲从
+- 每次交易必须有明确的买入/卖出逻辑
+
+### 禁忌
+- 不追高：RSI > 70 不买入
+- 不抄底：下跌趋势未确认反转前不抄底
+- 不重仓单一标的
+```
+
+智能体会在每次决策时参考这些原则。
+
+### 获取必要的 API 密钥
+
+FinCrew 需要以下 API 密钥来采集数据。复制环境变量模板：
+
+```bash
+cp .env.example .env
+```
+
+#### 1. Twitter API（采集 Twitter KOL 观点）
+
+**获取步骤**：
+1. 访问 [Twitter Developer Portal](https://developer.twitter.com/en/portal/dashboard)
+2. 创建一个新的 App（需要 Twitter 账号）
+3. 在 "Keys and tokens" 页面获取：
+   - API Key
+   - API Secret Key
+4. 填入 `.env`：
+   ```
+   TWITTER_API_KEY=your_api_key
+   TWITTER_API_SECRET=your_api_secret
+   ```
+
+**费用**：免费套餐每月 500,000 次请求
+
+#### 2. 微博 API（采集微博 KOL 观点）
+
+**获取步骤**：
+1. 访问 [微博开放平台](https://open.weibo.com/)
+2. 注册开发者账号并创建应用
+3. 获取 App Key 和 App Secret
+4. 填入 `.env`：
+   ```
+   WEIBO_APP_KEY=your_app_key
+   WEIBO_APP_SECRET=your_app_secret
+   ```
+
+**注意**：微博 API 审核较严格，个人开发者可能需要企业认证
+
+#### 3. Reddit API（可选，采集 Reddit 讨论）
+
+**获取步骤**：
+1. 访问 [Reddit Apps](https://www.reddit.com/prefs/apps)
+2. 点击 "create another app"，选择 "script" 类型
+3. 获取 Client ID 和 Client Secret
+4. 填入 `.env`：
+   ```
+   REDDIT_CLIENT_ID=your_client_id
+   REDDIT_CLIENT_SECRET=your_client_secret
+   REDDIT_USER_AGENT=FinCrew/1.0
+   ```
+
+**费用**：免费
+
+#### 4. Yahoo Finance API（股票数据）
+
+**获取步骤**：
+1. 访问 [RapidAPI - Yahoo Finance](https://rapidapi.com/apidojo/api/yahoo-finance1)
+2. 注册并订阅（有免费套餐）
+3. 获取 API Key
+4. 填入 `.env`：
+   ```
+   YAHOO_FINANCE_API_KEY=your_api_key
+   ```
+
+**费用**：免费套餐每月 500 次请求
+
+**替代方案**：如果不想申请 API，可以使用 `yfinance` Python 库（无需密钥，但速率限制更严格）
+
+## 使用 FinCrew
+
+### 基本用法
+
+通过 OpenClaw CLI 调用 Financial Manager：
+
+```bash
+# 开发环境（推荐）
+openclaw --dev agent --agent financial-manager --message "分析 NVDA 是否适合买入"
+
+# 生产环境
+openclaw agent --agent financial-manager --message "分析 NVDA 是否适合买入"
+```
+
+### 常用场景
+
+**1. 每日市场简报**
+```bash
+openclaw --dev agent --agent financial-manager --message "做今天的市场晨报，分析 AAPL、MSFT、NVDA，给出操作建议"
+```
+
+**2. 买入分析**
+```bash
+openclaw --dev agent --agent financial-manager --message "分析 TSLA 现在是否适合买入，参考我的投资理念和历史经验"
+```
+
+**3. 交易复盘**
+```bash
+openclaw --dev agent --agent financial-manager --message "复盘上周 NVDA 的交易，分析得失并记录到长期记忆"
+```
+
+**4. 板块分析**
+```bash
+openclaw --dev agent --agent financial-manager --message "最近半导体板块有什么热点？帮我分析一下机会"
+```
+
+**5. KOL 观点整合**
+```bash
+openclaw --dev agent --agent financial-manager --message "整合最近关于 AI 板块的 KOL 观点，给出市场情绪判断"
+```
+
+### 数据采集工具
+
+智能体会自动调用数据采集工具，你也可以手动预先采集数据：
+
+```bash
+# 采集 KOL 观点（Twitter/微博）
+npm run collect -- --date 2026-03-31
+
+# 获取股票数据（基本面 + 技术面）
+npm run data -- --symbols AAPL,MSFT,NVDA
+
+# 聚合新闻
+npm run news -- --symbols AAPL
+
+# 期权链分析
+npm run options -- --symbol NVDA --expiry 2026-04-18 --direction call
+```
+
+所有数据存储在 `data/info/daily/<date>/`
+
+## 评测系统
+
+FinCrew 包含完整的评测框架用于测试智能体行为。
+
+### 运行评测
+
+```bash
+# 运行所有评测用例
+npm run eval
+
+# 运行特定目录的评测
+npm run eval -- workflow
+
+# 查看评测结果（浏览器可视化）
+npm run view
+```
+
+### 评测断言类型
+
+| 断言 | 说明 |
+|------|------|
+| `must_call` | 智能体必须调用特定工具 |
+| `must_dispatch` | FM 必须委派给特定子智能体 |
+| `must_contain` | 回复必须包含特定关键词 |
+| `must_write_memory` | 智能体必须将经验持久化到长期记忆 |
+| `llm_judge` | 基于 LLM 的质量评估 |
+
+## 开发指南
+
+### 修改智能体行为
+
+1. 编辑智能体定义文件（位于 `packages/openclaw-agents/workspace-{agent-name}/`）：
+   - `SOUL.md` — 核心个性、决策规则、工作流程
+   - `TOOLS.md` — 可用工具及使用时机
+   - `IDENTITY.md` — 角色和目标
+   - `MEMORY.md` — 长期记忆（仅 Financial Manager）
+
+2. 重新部署：
+   ```bash
+   npm run deploy:dev
+   ```
+
+3. 测试修改：
+   ```bash
+   openclaw --dev agent --agent financial-manager --message "测试提示词"
+   ```
+
+## 常见问题
+
+**Q: 如何让智能体记住我的投资偏好？**  
+A: 编辑 `~/.openclaw-dev/workspace-financial-manager/MEMORY.md`，添加你的投资理念、风险偏好等。
+
+**Q: 数据采集失败怎么办？**  
+A: 检查 `.env` 文件中的 API 密钥是否正确配置。
+
+**Q: 如何切换 LLM 提供商？**  
+A: 编辑 `~/.openclaw-dev/openclaw.json`，修改 `providers` 和 `agents.defaults.model.primary` 配置。
+
+**Q: 智能体没有调用预期的工具？**  
+A: 检查智能体的 `TOOLS.md` 文件，确保工具使用说明清晰。运行评测验证行为。
 
 ## License
 

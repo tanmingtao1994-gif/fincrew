@@ -1,0 +1,11 @@
+[
+  {
+    "agent_target": "workspace-info-processor",
+    "input_prompt": "Collect latest data for AAPL including fundamentals, technicals, news, and KOL opinions",
+    "expected_behavior": {
+      "must_use_skill": ["collect"],
+      "must_contain": ["AAPL"]
+    },
+    "test_id": "ip_basic_collect"
+  }
+]

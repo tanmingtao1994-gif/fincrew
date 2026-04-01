@@ -1,0 +1,10 @@
+[
+  {
+    "agent_target": "workspace-reviewer",
+    "input_prompt": "Review last week's TSLA trade and extract lessons learned",
+    "expected_behavior": {
+      "must_contain": ["TSLA", "lesson"]
+    },
+    "test_id": "reviewer_basic_review"
+  }
+]

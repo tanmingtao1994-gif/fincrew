@@ -1,0 +1,10 @@
+[
+  {
+    "agent_target": "workspace-macro-analyst",
+    "input_prompt": "Analyze current macroeconomic environment and tech sector trends",
+    "expected_behavior": {
+      "must_contain": ["macro", "tech"]
+    },
+    "test_id": "ma_basic_analysis"
+  }
+]
