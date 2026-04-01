@@ -49,7 +49,6 @@ scripts/_*.py
 # Legacy paths (pre-restructure)
 src/
 ui/
-eval-view.ts
 fix_imports.py
 test-dotenv.js
 patch.cjs
