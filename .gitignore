@@ -47,13 +47,6 @@ scripts/_*.py
 *.bak
 
 # Legacy paths (pre-restructure)
-src/
-ui/
-fix_imports.py
-test-dotenv.js
-patch.cjs
-patch.js
-midscene_run/
 specs/
 .coco/
 .specify/
