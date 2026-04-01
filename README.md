@@ -40,6 +40,13 @@ FinCrew is a multi-agent financial assistant built on OpenClaw, featuring 5 spec
 | **Technical Analyst** | Chart Expert | RSI, MACD, Bollinger Bands, Wyckoff analysis, support/resistance |
 | **Reviewer** | Risk Auditor | Post-trade review, lesson extraction, performance coaching |
 
+### Evaluation Results
+
+Latest evaluation (2026-04-01):
+- **Test Pass Rate**: 68% (30/44 cases passed)
+- **LLM Judge Average Score**: 4.5/5
+- Covers 44 test scenarios including single-agent capabilities and multi-agent workflows
+
 ### Self-Evolution Memory Loop
 
 FinCrew's core feature is a **memory persistence loop** — a closed-loop learning system:
