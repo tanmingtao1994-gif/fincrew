@@ -1,109 +1,102 @@
 # FinCrew
 
-[English](./README.en.md) | 简体中文
+English | [简体中文](./README.zh.md)
 
 A self-evolving multi-agent financial assistant powered by [OpenClaw](https://github.com/nicepkg/openclaw).
 
 ## Overview
 
-FinCrew 是一个基于 OpenClaw 的多智能体金融助手，由 5 个专业 AI 智能体协作完成投资分析、交易决策和组合管理。它的核心特性是**自我进化记忆循环**——从每次交易中学习，持续优化决策质量。
+FinCrew is a multi-agent financial assistant built on OpenClaw, featuring 5 specialized AI agents that collaborate on investment analysis, trading decisions, and portfolio management. Its core feature is a **self-evolution memory loop** that learns from every trade to continuously improve decision quality.
 
-**适用场景**：
-- 个人投资者的日常市场分析和交易决策辅助
-- 追踪关注的 KOL 观点并整合到投资决策中
-- 基于个人投资理念和风险偏好的定制化分析
-- 交易复盘和经验沉淀
+**Use Cases**:
+- Daily market analysis and trading decision support for individual investors
+- Track and integrate KOL opinions into investment decisions
+- Customized analysis based on personal investment philosophy and risk preferences
+- Trade reviews and experience accumulation
 
-## 智能体架构
+## Agent Architecture
 
 ```
 ┌─────────────────────────────────────────────────┐
-│         Financial Manager (财务经理)              │
-│         高级私人财富管理顾问                        │
-│    协调所有智能体并做出最终决策                      │
+│              Financial Manager                    │
+│         Senior Private Wealth Advisor             │
+│    Coordinates all agents & makes final decisions │
 └───────────┬──────┬──────┬──────┬────────────────┘
             │      │      │      │
      ┌──────▼──┐ ┌─▼────┐ ┌▼─────┐ ┌▼────────┐
      │  Info    │ │Macro │ │Tech  │ │Reviewer  │
      │Processor│ │Analyst│ │Analyst│ │          │
-     │ 信息处理  │ │宏观分析│ │技术分析│ │ 交易复盘  │
      │         │ │       │ │      │ │          │
-     │ 数据采集  │ │市场趋势│ │图表信号│ │ 经验沉淀  │
-     │ 新闻整合  │ │板块轮动│ │RSI/MACD│ │ 绩效评估  │
+     │ Data     │ │Market │ │Chart │ │ Trade    │
+     │Collection│ │Trends │ │Signals│ │ Review   │
      └─────────┘ └───────┘ └──────┘ └──────────┘
 ```
 
-| 智能体 | 角色 | 职责 |
-|-------|------|------|
-| **Financial Manager** | 协调者 | 分派任务、综合分析、做出买入/持有/卖出决策 |
-| **Info Processor** | 情报官 | 采集股票数据、新闻、KOL 观点、内部交易信息 |
-| **Macro Analyst** | 宏观策略师 | 评估市场趋势、板块轮动、地缘政治风险 |
-| **Technical Analyst** | 图表专家 | RSI、MACD、布林带、威科夫分析、支撑阻力位 |
-| **Reviewer** | 风控审计 | 交易后复盘、经验提取、绩效辅导 |
+| Agent | Role | Responsibility |
+|-------|------|----------------|
+| **Financial Manager** | Coordinator | Dispatch tasks, synthesize analysis, make buy/hold/sell decisions |
+| **Info Processor** | Intelligence Officer | Collect stock data, news, KOL opinions, insider trading info |
+| **Macro Analyst** | Macro Strategist | Evaluate market trends, sector rotation, geopolitical risks |
+| **Technical Analyst** | Chart Expert | RSI, MACD, Bollinger Bands, Wyckoff analysis, support/resistance |
+| **Reviewer** | Risk Auditor | Post-trade review, lesson extraction, performance coaching |
 
-### 自我进化记忆循环
+### Self-Evolution Memory Loop
 
-FinCrew 的核心特性是**记忆持久化循环**——一个闭环学习系统：
+FinCrew's core feature is a **memory persistence loop** — a closed-loop learning system:
 
 ```
-交易复盘 → 经验提取 → 长期记忆 → 未来决策参考
-书籍/文章 → 关键洞察提取 → 长期记忆 → 应用于分析
-KOL 观点 → 验证并总结 → 长期记忆 → 交叉引用
+Trade Review → Lesson Extraction → Long-term Memory → Future Decision Reference
+Books/Articles → Key Insight Extraction → Long-term Memory → Applied in Analysis
+KOL Opinions → Validate & Summarize → Long-term Memory → Cross-referenced
 ```
 
-每次复盘结论、书籍总结、KOL 洞察和讨论结果都会持久化为长期记忆，让系统随时间变得更智能。
+Every review conclusion, book summary, KOL insight, and discussion outcome is persisted as long-term memory, making the system smarter over time.
 
-**如何让智能体记住你的投资理念**：
-1. 编辑 `~/.openclaw-dev/workspace-financial-manager/MEMORY.md`
-2. 添加你的投资原则、风险偏好、决策框架
-3. 智能体会在每次决策时自动参考这些记忆
+**How to make agents remember your investment philosophy**:
+1. Edit `~/.openclaw-dev/workspace-financial-manager/MEMORY.md`
+2. Add your investment principles, risk preferences, decision framework
+3. Agents will automatically reference these memories in every decision
 
-## 项目结构
+## Project Structure
 
 ```
 fincrew/
 ├── packages/
-│   ├── openclaw-agents/          # 智能体定义和技能
+│   ├── openclaw-agents/          # Agent definitions & skills
 │   │   ├── workspace-financial-manager/
 │   │   ├── workspace-info-processor/
 │   │   ├── workspace-macro-analyst/
 │   │   ├── workspace-technical-analyst/
 │   │   ├── workspace-reviewer/
-│   │   ├── skills/               # 共享技能（包含 memory/）
-│   │   └── templates/            # 智能体提示词模板
-│   ├── eval-ui/                  # 评测结果可视化（React + Vite）
-│   └── tools/                    # 数据采集工具（每个可独立调用）
-│       ├── getStockData/         # 基本面 + 技术面数据
-│       ├── getNews/              # 多源新闻聚合
-│       ├── getKolOpinions/       # Twitter、微博、YouTube KOL 追踪
-│       └── getOptions/           # 期权链分析
+│   │   ├── skills/               # Shared skills (incl. memory/)
+│   │   └── templates/            # Agent prompt templates
+│   ├── eval-ui/                  # Eval results visualization (React + Vite)
+│   └── tools/                    # Data collection tools (each independently callable)
+│       ├── getStockData/         # Fundamentals + technicals
+│       ├── getNews/              # Multi-source news aggregation
+│       ├── getKolOpinions/       # Twitter, Weibo, YouTube KOL tracking
+│       └── getOptions/           # Options chain analysis
 ├── config/
-│   ├── openclaw.json.sample      # OpenClaw 配置模板
-│   ├── kols.json.sample          # KOL 关注列表模板
-│   └── watchlist.json.sample     # 股票关注列表模板
+│   ├── openclaw.json.sample      # OpenClaw config template
+│   ├── kols.json.sample          # KOL watchlist template
+│   └── watchlist.json.sample     # Stock watchlist template
 ├── data/
-│   ├── info/daily/               # 每日采集的数据
-│   └── memory/                   # 智能体记忆存储
-├── tests/eval_dataset/           # 评测用例
-└── scripts/                      # 部署和评测脚本
+│   ├── info/daily/               # Daily collected data
+│   └── memory/                   # Agent memory storage
+├── tests/eval_dataset/           # Eval test cases
+│   ├── zh/                       # Chinese eval cases
+│   └── en/                       # English eval cases
+└── scripts/                      # Deploy & eval scripts
 ```
 
 ## Getting Started
 
-### 1. 安装 OpenClaw
+### Prerequisites
 
-FinCrew 基于 OpenClaw 框架运行，首先需要安装 OpenClaw CLI：
+- Node.js >= 18
+- [OpenClaw](https://github.com/nicepkg/openclaw) installed
 
-```bash
-npm install -g @nicepkg/openclaw
-```
-
-验证安装：
-```bash
-openclaw --version
-```
-
-### 2. 克隆项目并安装依赖
+### 1. Clone and Install Dependencies
 
 ```bash
 git clone https://github.com/tanmingtao1994-gif/fincrew.git
@@ -111,20 +104,22 @@ cd fincrew
 npm install
 ```
 
-### 3. 配置 LLM 提供商
+### 2. Configure LLM Provider
 
-复制配置模板并填入你的 API 密钥：
+Copy the config template and fill in your API key:
 
 ```bash
-# 开发环境配置
-mkdir -p ~/.openclaw-dev
-cp config/openclaw.json.sample ~/.openclaw-dev/openclaw.json
+# Create OpenClaw config directory
+mkdir -p ~/.openclaw
 
-# 编辑配置文件，填入你的 LLM API 信息
-# 支持 OpenAI、Anthropic、Minimax 等兼容 OpenAI API 的提供商
+# Copy config template
+cp config/openclaw.json.sample ~/.openclaw/openclaw.json
+
+# Edit the config file with your LLM API info
+# Supports OpenAI, Anthropic, Minimax, and other OpenAI-compatible providers
 ```
 
-配置示例（`~/.openclaw-dev/openclaw.json`）：
+Config example (`~/.openclaw/openclaw.json`):
 ```json
 {
   "models": {
@@ -151,68 +146,54 @@ cp config/openclaw.json.sample ~/.openclaw-dev/openclaw.json
 }
 ```
 
-### 4. 部署智能体到 OpenClaw
+### 3. Deploy Agents to OpenClaw
 
 ```bash
-# 部署到开发环境（推荐）
-npm run deploy:dev
-
-# 或使用监听模式（代码改动自动重新部署）
-npm run deploy:watch
+npm run deploy
 ```
 
-部署完成后，5 个智能体会被安装到 `~/.openclaw-dev/workspace-*` 目录。
+After deployment, 5 agents will be installed to `~/.openclaw/workspace-*` directories.
 
-## 个性化配置
+## Personalization
 
-### 配置关注的股票
+### Configure Your Watchlist
 
-编辑 `config/watchlist.json`（首次使用需从模板复制）：
+Edit `config/watchlist.json` (copy from template first):
 
 ```bash
 cp config/watchlist.json.sample config/watchlist.json
 ```
 
-添加你关注的股票：
+Add stocks you want to track:
 ```json
 {
   "stocks": [
-    { "symbol": "NVDA", "name": "NVIDIA", "sector": "半导体", "tags": ["AI芯片", "GPU"] },
-    { "symbol": "TSLA", "name": "特斯拉", "sector": "汽车", "tags": ["FSD", "Robotaxi"] },
-    { "symbol": "HK.09988", "name": "阿里巴巴", "sector": "互联网", "tags": ["云计算", "电商"] }
+    { "symbol": "NVDA", "name": "NVIDIA", "sector": "Semiconductor", "tags": ["AI chip", "GPU"] },
+    { "symbol": "TSLA", "name": "Tesla", "sector": "Auto", "tags": ["FSD", "Robotaxi"] },
+    { "symbol": "HK.09988", "name": "Alibaba", "sector": "Internet", "tags": ["Cloud", "E-commerce"] }
   ]
 }
 ```
 
-### 配置关注的 KOL
+### Configure KOLs to Follow
 
-编辑 `config/kols.json`（首次使用需从模板复制）：
+Edit `config/kols.json` (copy from template first):
 
 ```bash
 cp config/kols.json.sample config/kols.json
 ```
 
-添加你信任的投资 KOL：
+Add investment KOLs you trust:
 ```json
 {
   "kols": [
     {
-      "id": "混沌与概率1997",
-      "name": "混沌与概率1997",
-      "platforms": {
-        "weibo": { "uid": "1648195723" }
-      },
-      "expertise": ["宏观", "美股"],
-      "reliability": 4,
-      "language": "zh"
-    },
-    {
-      "id": "your-twitter-kol",
-      "name": "Your Favorite Analyst",
+      "id": "analyst-name",
+      "name": "Market Analyst",
       "platforms": {
         "twitter": { "username": "analyst_handle" }
       },
-      "expertise": ["技术分析", "加密货币"],
+      "expertise": ["Technical Analysis", "Crypto"],
       "reliability": 5,
       "language": "en"
     }
@@ -220,238 +201,237 @@ cp config/kols.json.sample config/kols.json
 }
 ```
 
-**字段说明**：
-- `reliability`: 1-5，可信度评分，影响观点权重
-- `expertise`: 擅长领域标签，用于智能体筛选相关观点
-- `platforms`: 支持 `weibo`（微博 UID）、`twitter`（用户名）
+**Field descriptions**:
+- `reliability`: 1-5, credibility score affecting opinion weight
+- `expertise`: Domain tags for agent filtering
+- `platforms`: Supports `weibo` (Weibo UID), `twitter` (username)
 
-### 配置投资理念和风险偏好
+### Configure Investment Philosophy
 
-编辑 Financial Manager 的长期记忆文件：
+Configure your investment philosophy through conversation with Financial Manager:
 
-```bash
-# 文件位置
-~/.openclaw-dev/workspace-financial-manager/MEMORY.md
+```
+I want to configure my investment philosophy. My risk tolerance is moderate to high, max 15% position per stock, 8% stop loss. I prefer growth stocks in tech, clean energy, semiconductors, holding period 3-12 months. Please save these principles to long-term memory.
 ```
 
-在 `MEMORY.md` 中添加你的投资原则：
+The agent will save these principles to long-term memory and automatically reference them in every decision.
 
-```markdown
-## 投资理念
+You can also add more principles through conversation:
+- Decision framework: "My decision principle is 40% technical weight, 60% fundamental, value RSI oversold signals"
+- Taboos: "Remember: Don't buy when RSI > 70, don't catch falling knives until downtrend reversal confirmed"
+- Trade review: "Review last week's NVDA trade and save lessons to long-term memory"
 
-### 风险偏好
-- 风险承受能力：中等偏高
-- 单笔最大仓位：不超过总资产的 15%
-- 止损线：单笔亏损超过 8% 必须止损
+### Obtaining Required API Keys
 
-### 投资风格
-- 偏好成长股，关注科技、新能源、半导体板块
-- 持仓周期：中长期（3-12 个月）
-- 不做短线日内交易
-
-### 决策原则
-- 技术面 + 基本面结合，技术面权重 40%
-- 重视 RSI 超卖信号和 MACD 金叉
-- 必须参考 KOL 观点，但不盲从
-- 每次交易必须有明确的买入/卖出逻辑
-
-### 禁忌
-- 不追高：RSI > 70 不买入
-- 不抄底：下跌趋势未确认反转前不抄底
-- 不重仓单一标的
-```
-
-智能体会在每次决策时参考这些原则。
-
-### 获取必要的 API 密钥
-
-FinCrew 需要以下 API 密钥来采集数据。复制环境变量模板：
+FinCrew needs the following API keys for data collection. Copy the environment template:
 
 ```bash
 cp .env.example .env
 ```
 
-#### 1. Twitter API（采集 Twitter KOL 观点）
+#### 1. Twitter API (for Twitter KOL opinions)
 
-**获取步骤**：
-1. 访问 [Twitter Developer Portal](https://developer.twitter.com/en/portal/dashboard)
-2. 创建一个新的 App（需要 Twitter 账号）
-3. 在 "Keys and tokens" 页面获取：
-   - API Key
-   - API Secret Key
-4. 填入 `.env`：
+Use your personal Twitter account's Cookie or Bearer Token:
+
+1. Login to Twitter web version
+2. Open browser DevTools (F12)
+3. In Network tab, find any API request
+4. Copy `authorization: Bearer ...` or Cookie from request headers
+5. Fill in `.env`:
    ```
-   TWITTER_API_KEY=your_api_key
-   TWITTER_API_SECRET=your_api_secret
-   ```
-
-**费用**：免费套餐每月 500,000 次请求
-
-#### 2. 微博 API（采集微博 KOL 观点）
-
-**获取步骤**：
-1. 访问 [微博开放平台](https://open.weibo.com/)
-2. 注册开发者账号并创建应用
-3. 获取 App Key 和 App Secret
-4. 填入 `.env`：
-   ```
-   WEIBO_APP_KEY=your_app_key
-   WEIBO_APP_SECRET=your_app_secret
+   TWITTER_BEARER_TOKEN=your_bearer_token
+   # or
+   TWITTER_COOKIE=your_cookie_string
    ```
 
-**注意**：微博 API 审核较严格，个人开发者可能需要企业认证
+**Cost**: Personal account, free
 
-#### 3. Reddit API（可选，采集 Reddit 讨论）
+#### 2. Weibo API (for Weibo KOL opinions)
 
-**获取步骤**：
-1. 访问 [Reddit Apps](https://www.reddit.com/prefs/apps)
-2. 点击 "create another app"，选择 "script" 类型
-3. 获取 Client ID 和 Client Secret
-4. 填入 `.env`：
+Use your personal Weibo account's Cookie:
+
+1. Login to Weibo web version (weibo.com)
+2. Open browser DevTools (F12)
+3. In Application/Storage > Cookies, find Weibo cookies
+4. Copy the complete Cookie string
+5. Fill in `.env`:
+   ```
+   WEIBO_COOKIE=your_cookie_string
+   ```
+
+**Cost**: Personal account, free
+
+#### 3. Reddit API (optional, for Reddit discussions)
+
+**Steps**:
+1. Visit [Reddit Apps](https://www.reddit.com/prefs/apps)
+2. Click "create another app", select "script" type
+3. Get Client ID and Client Secret
+4. Fill in `.env`:
    ```
    REDDIT_CLIENT_ID=your_client_id
    REDDIT_CLIENT_SECRET=your_client_secret
    REDDIT_USER_AGENT=FinCrew/1.0
    ```
 
-**费用**：免费
+**Cost**: Free
 
-#### 4. Yahoo Finance API（股票数据）
+#### 4. Yahoo Finance API (for stock data)
 
-**获取步骤**：
-1. 访问 [RapidAPI - Yahoo Finance](https://rapidapi.com/apidojo/api/yahoo-finance1)
-2. 注册并订阅（有免费套餐）
-3. 获取 API Key
-4. 填入 `.env`：
+**Steps**:
+1. Visit [RapidAPI - Yahoo Finance](https://rapidapi.com/apidojo/api/yahoo-finance1)
+2. Register and subscribe (free tier available)
+3. Get API Key
+4. Fill in `.env`:
    ```
    YAHOO_FINANCE_API_KEY=your_api_key
    ```
 
-**费用**：免费套餐每月 500 次请求
+**Cost**: Free tier includes 500 requests/month
 
-**替代方案**：如果不想申请 API，可以使用 `yfinance` Python 库（无需密钥，但速率限制更严格）
+**Alternative**: Use `yfinance` Python library (no key needed, but stricter rate limits)
 
-## 使用 FinCrew
+## Using FinCrew
 
-### 基本用法
+### Basic Usage
 
-通过 OpenClaw CLI 调用 Financial Manager：
+After deployment, interact with Financial Manager through OpenClaw:
 
 ```bash
-# 开发环境（推荐）
-openclaw --dev agent --agent financial-manager --message "分析 NVDA 是否适合买入"
+# Analyze stocks
+"Analyze if NVDA is a good buy"
 
-# 生产环境
-openclaw agent --agent financial-manager --message "分析 NVDA 是否适合买入"
+# Daily briefing
+"Generate today's market brief for AAPL, MSFT, NVDA with trading recommendations"
+
+# Trade review
+"Review last week's NVDA trade, analyze lessons and save to long-term memory"
 ```
 
-### 常用场景
+### Common Scenarios
 
-**1. 每日市场简报**
-```bash
-openclaw --dev agent --agent financial-manager --message "做今天的市场晨报，分析 AAPL、MSFT、NVDA，给出操作建议"
+**1. Daily Market Brief**
+```
+Generate today's market brief for AAPL, MSFT, NVDA with trading recommendations
 ```
 
-**2. 买入分析**
-```bash
-openclaw --dev agent --agent financial-manager --message "分析 TSLA 现在是否适合买入，参考我的投资理念和历史经验"
+**2. Buy Analysis**
+```
+Analyze if TSLA is a good buy now, reference my investment philosophy and historical experience
 ```
 
-**3. 交易复盘**
-```bash
-openclaw --dev agent --agent financial-manager --message "复盘上周 NVDA 的交易，分析得失并记录到长期记忆"
+**3. Trade Review**
+```
+Review last week's NVDA trade, analyze lessons and save to long-term memory
 ```
 
-**4. 板块分析**
-```bash
-openclaw --dev agent --agent financial-manager --message "最近半导体板块有什么热点？帮我分析一下机会"
+**4. Sector Analysis**
+```
+What are the hot topics in semiconductor sector? Analyze opportunities
 ```
 
-**5. KOL 观点整合**
-```bash
-openclaw --dev agent --agent financial-manager --message "整合最近关于 AI 板块的 KOL 观点，给出市场情绪判断"
+**5. KOL Opinion Integration**
+```
+Integrate recent KOL opinions on AI sector and assess market sentiment
 ```
 
-### 数据采集工具
+### Data Collection Tools
 
-智能体会自动调用数据采集工具，你也可以手动预先采集数据：
+Agents automatically call data collection tools, or you can manually pre-collect data:
 
 ```bash
-# 采集 KOL 观点（Twitter/微博）
+# Collect KOL opinions (Twitter/Weibo)
 npm run collect -- --date 2026-03-31
 
-# 获取股票数据（基本面 + 技术面）
+# Get stock data (fundamentals + technicals)
 npm run data -- --symbols AAPL,MSFT,NVDA
 
-# 聚合新闻
+# Aggregate news
 npm run news -- --symbols AAPL
 
-# 期权链分析
+# Options chain analysis
 npm run options -- --symbol NVDA --expiry 2026-04-18 --direction call
 ```
 
-所有数据存储在 `data/info/daily/<date>/`
+All data stored in `data/info/daily/<date>/`
 
-## 评测系统
+## Evaluation System
 
-FinCrew 包含完整的评测框架用于测试智能体行为。
+FinCrew includes a comprehensive eval framework for testing agent behavior.
 
-### 运行评测
+### Running Evals
 
 ```bash
-# 运行所有评测用例
+# Run all Chinese eval cases (default)
 npm run eval
+# or explicitly: npm run eval:zh
 
-# 运行特定目录的评测
-npm run eval -- workflow
+# Run English eval cases
+npm run eval:en
 
-# 查看评测结果（浏览器可视化）
+# View eval results in browser
 npm run view
 ```
 
-### 评测断言类型
+### Assertion Types
 
-| 断言 | 说明 |
-|------|------|
-| `must_call` | 智能体必须调用特定工具 |
-| `must_dispatch` | FM 必须委派给特定子智能体 |
-| `must_contain` | 回复必须包含特定关键词 |
-| `must_write_memory` | 智能体必须将经验持久化到长期记忆 |
-| `llm_judge` | 基于 LLM 的质量评估 |
+| Assertion | Description |
+|-----------|-------------|
+| `must_call` | Agent must invoke specific tools |
+| `must_dispatch` | FM must delegate to specific sub-agents |
+| `must_contain` | Response must include specific keywords |
+| `must_write_memory` | Agent must persist experience to long-term memory |
+| `llm_judge` | LLM-based quality assessment |
 
-## 开发指南
+## Development Guide
 
-### 修改智能体行为
+### Development Environment Setup
 
-1. 编辑智能体定义文件（位于 `packages/openclaw-agents/workspace-{agent-name}/`）：
-   - `SOUL.md` — 核心个性、决策规则、工作流程
-   - `TOOLS.md` — 可用工具及使用时机
-   - `IDENTITY.md` — 角色和目标
-   - `MEMORY.md` — 长期记忆（仅 Financial Manager）
+If you need to modify agent code and test quickly, use development environment:
 
-2. 重新部署：
+```bash
+# Configure development environment
+mkdir -p ~/.openclaw-dev
+cp config/openclaw.json.sample ~/.openclaw-dev/openclaw.json
+
+# Deploy to development environment
+npm run deploy:dev
+
+# Or use watch mode (auto-redeploy on code changes)
+npm run deploy:watch
+```
+
+### Modifying Agent Behavior
+
+1. Edit agent definition files (in `packages/openclaw-agents/workspace-{agent-name}/`):
+   - `SOUL.md` — Core personality, decision rules, workflow
+   - `TOOLS.md` — Available tools and when to use them
+   - `IDENTITY.md` — Role and objective
+   - `MEMORY.md` — Long-term memory (Financial Manager only)
+
+2. Redeploy:
    ```bash
    npm run deploy:dev
    ```
 
-3. 测试修改：
+3. Run evals to verify:
    ```bash
-   openclaw --dev agent --agent financial-manager --message "测试提示词"
+   npm run eval
    ```
 
-## 常见问题
+## FAQ
 
-**Q: 如何让智能体记住我的投资偏好？**  
-A: 编辑 `~/.openclaw-dev/workspace-financial-manager/MEMORY.md`，添加你的投资理念、风险偏好等。
+**Q: How to make agents remember my investment preferences?**  
+A: Through conversation, e.g., "Remember my investment philosophy: max 15% position per stock, 8% stop loss"
 
-**Q: 数据采集失败怎么办？**  
-A: 检查 `.env` 文件中的 API 密钥是否正确配置。
+**Q: Data collection fails?**  
+A: Check if API keys or Cookies in `.env` file are correctly configured.
 
-**Q: 如何切换 LLM 提供商？**  
-A: 编辑 `~/.openclaw-dev/openclaw.json`，修改 `providers` 和 `agents.defaults.model.primary` 配置。
+**Q: How to switch LLM providers?**  
+A: Edit `~/.openclaw/openclaw.json`, modify `providers` and `agents.defaults.model.primary` config.
 
-**Q: 智能体没有调用预期的工具？**  
-A: 检查智能体的 `TOOLS.md` 文件，确保工具使用说明清晰。运行评测验证行为。
+**Q: Agent doesn't call expected tools?**  
+A: Check agent's `TOOLS.md` file to ensure tool usage instructions are clear. Run evals to verify behavior.
 
 ## License
 
@@ -460,3 +440,8 @@ MIT
 ## Contributing
 
 Contributions are welcome! Please read the contributing guidelines before submitting a PR.
+
+
+
+
+
