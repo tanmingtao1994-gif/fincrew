@@ -53,3 +53,6 @@ specs/
 .specstory/
 AGENTS.md
 
+# Claude Code
+.claude/
+
