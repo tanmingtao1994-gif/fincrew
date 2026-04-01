@@ -11,7 +11,7 @@
     "eval:run": "bash scripts/eval.sh run",
     "eval:compare": "bash scripts/eval.sh compare",
     "eval": "bash scripts/eval.sh",
-    "view": "cd packages/eval-ui && npx vite",
+    "view": "npx tsx packages/eval-ui/eval-view.ts",
     "deploy:dev": "bash scripts/deploy.sh --env dev",
     "deploy:prod": "bash scripts/deploy.sh --env prod",
     "deploy:watch": "bash scripts/deploy-watch.sh",
